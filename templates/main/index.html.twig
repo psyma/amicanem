@@ -3,5 +3,7 @@
 {% block title %}Amicanem{% endblock %}
 
 {% block body %} 
-
+    <div {{ stimulus_controller('hello',  { }) }}>
+        Hello World!
+    </div>
 {% endblock %}
