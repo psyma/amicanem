@@ -9,7 +9,10 @@ security:
             entity:
                 class: App\Entity\User
                 property: email
+        hwi_oauth.user.provider:
+            id: hwi_oauth.user.provider
         # used to reload user from session & other features (e.g. switch_user)
+        
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
