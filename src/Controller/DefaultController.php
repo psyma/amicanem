@@ -7,9 +7,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class DefaultController extends AbstractController
-{
-    #[Route('/default', name: 'app_default')]
-    public function index(): Response
+{ 
+    public function notFound(): Response
     {
         return $this->redirectToRoute('app_main');
         
