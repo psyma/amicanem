@@ -1,11 +1,34 @@
-<h1>Hi! Please confirm your email!</h1>
-
-<p>
-    Please confirm your email address by clicking the following link: <br><br>
-    <a href="{{ signedUrl|raw }}">Confirm my Email</a>.
-    This link will expire in {{ expiresAtMessageKey|trans(expiresAtMessageData, 'VerifyEmailBundle') }}.
-</p>
-
-<p>
-    Cheers!
-</p>
+<div style="width: 100%; font-family: 'DM Sans', sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';">
+    <div style="max-width: 600px; margin: auto">
+        <div style="background-color: #E2E8F0; padding: 2.5rem;">
+            <div style="background-color: #FFFFFF; padding: 1.25rem;">  
+                <a href="https://amicanem.com" style="display: flex; align-items: center; text-decoration: none; font-size: 1.5rem; line-height: 2rem; font-weight: 400; color: #1F2937;">
+                    <img style="width: 2rem; height: 2rem; margin-right: 0.5rem;" src="https://amicanem.com/logo.png">
+                    Amicanem    
+                </a>
+                <p style="margin-top: 1.25rem;">Dear {{ firstName }},</p>
+                <p style="margin-top: 1.25rem; margin-bottom: 1.25rem;">
+                    Thank you for registering with us. To complete your registration, please confirm your email address by clicking the link below:
+                </p> 
+                <a href="{{ signedUrl|raw }}" style="color: #2563EB;">Confirm my email</a>
+                <p style="margin-top: 1.25rem;"><b>Note</b>: The link will expire in {{ expiresAtMessageKey|trans(expiresAtMessageData, 'VerifyEmailBundle') }}.</p>
+                <p style="margin-top: 1.25rem;">If you did not register with Amicanem, please disregard this email.</p>
+                <div style="margin-top: 1.25rem; line-height: 5px">
+                    <p>Best regards,</p>
+                    <p>The Amicanem Team</p>
+                </div>
+            </div>
+            <div style="margin-top: 1.25rem;">
+                <a href="https://amicanem.com" style="display: flex; align-items: center; text-decoration: none; font-size: 1.5rem; line-height: 2rem; font-weight: 400; color: #1F2937;">
+                    <img style="width: 2rem; height: 2rem; margin-right: 0.5rem;" src="https://amicanem.com/logo.png">
+                    Amicanem    
+                </a>
+                <p style="color: #4B5563; font-size: 0.75rem; line-height: 1rem; margin-top: 0.5rem; margin-bottom: 1rem;">
+                    You have received this email because you registered at Amicanem, to ensure the implementation of our Terms of Service and (or) for other legitimate matters. 
+                </p>
+                <a href="https://amicanem.com/privacy-policy" style="font-size: 0.75rem; line-height: 1rem; color: #4B5563;">Privacy Policy</a>
+                <p style="color: #4B5563; font-size: 0.75rem; line-height: 1rem; margin-top: 0.5rem;">© 2024 - {{ currentYear }} The Amicanem Team</p>
+            </div>
+        </div>
+    </div>
+</div>
