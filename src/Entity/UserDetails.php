@@ -23,33 +23,33 @@ class UserDetails
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $nickname = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $avatar = null;
+
     #[ORM\Column(nullable: true)]
     private ?bool $badge = null;
 
     #[ORM\Column(length: 15, nullable: true)]
-    private ?string $badgecolor = null;
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $about = null;
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $publickey = null;
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $privatekey = null;
+    private ?string $badgecolor = null; 
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $passphrase = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $uid = null;
-
+    private ?string $uid = null;  
+    
     #[ORM\OneToOne(inversedBy: 'userDetails', cascade: ['persist', 'remove'])]
     private ?User $userid = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $avatar = null;
+    #[ORM\OneToOne(inversedBy: 'userDetails', cascade: ['persist', 'remove'])]
+    private ?UserAbout $aboutid = null;
 
+    #[ORM\OneToOne(inversedBy: 'userDetails', cascade: ['persist', 'remove'])]
+    private ?UserPrivateKey $privatekeyid = null;
+
+    #[ORM\OneToOne(inversedBy: 'userDetails', cascade: ['persist', 'remove'])]
+    private ?UserPassphrase $passphraseid = null;
+
+    #[ORM\OneToOne(inversedBy: 'userDetails', cascade: ['persist', 'remove'])]
+    private ?UserPublicKey $publickeyid = null;
+ 
     public function getId(): ?int
     {
         return $this->id;
@@ -113,55 +113,7 @@ class UserDetails
         $this->badgecolor = $badgecolor;
 
         return $this;
-    }
-
-    public function getAbout(): ?string
-    {
-        return $this->about;
-    }
-
-    public function setAbout(?string $about): static
-    {
-        $this->about = $about;
-
-        return $this;
-    }
-
-    public function getPublickey(): ?string
-    {
-        return $this->publickey;
-    }
-
-    public function setPublickey(?string $publickey): static
-    {
-        $this->publickey = $publickey;
-
-        return $this;
-    }
-
-    public function getPrivatekey(): ?string
-    {
-        return $this->privatekey;
-    }
-
-    public function setPrivatekey(?string $privatekey): static
-    {
-        $this->privatekey = $privatekey;
-
-        return $this;
-    }
-
-    public function getPassphrase(): ?string
-    {
-        return $this->passphrase;
-    }
-
-    public function setPassphrase(?string $passphrase): static
-    {
-        $this->passphrase = $passphrase;
-
-        return $this;
-    }
+    } 
 
     public function getUid(): ?string
     {
@@ -198,4 +150,52 @@ class UserDetails
 
         return $this;
     }
+
+    public function getAboutId(): ?UserAbout
+    {
+        return $this->aboutid;
+    }
+
+    public function setAboutId(?UserAbout $aboutid): static
+    {
+        $this->aboutid = $aboutid;
+
+        return $this;
+    }
+
+    public function getPrivatekeyId(): ?UserPrivateKey
+    {
+        return $this->privatekeyid;
+    }
+
+    public function setPrivatekeyId(?UserPrivateKey $privatekeyid): static
+    {
+        $this->privatekeyid = $privatekeyid;
+
+        return $this;
+    }
+
+    public function getPassphraseId(): ?UserPassphrase
+    {
+        return $this->passphraseid;
+    }
+
+    public function setPassphraseId(?UserPassphrase $passphraseid): static
+    {
+        $this->passphraseid = $passphraseid;
+
+        return $this;
+    }
+
+    public function getPublickeyid(): ?UserPublicKey
+    {
+        return $this->publickeyid;
+    }
+
+    public function setPublickeyid(?UserPublicKey $publickeyid): static
+    {
+        $this->publickeyid = $publickeyid;
+
+        return $this;
+    } 
 }
