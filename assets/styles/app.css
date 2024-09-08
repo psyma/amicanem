@@ -12,3 +12,46 @@
 body {
     background-color: #f9f9f9 !important; 
 } 
+
+[contenteditable=true]:empty:before {
+    content: attr(placeholder);
+    pointer-events: none;
+    color: gray;
+    display: block; /* For Firefox */
+    -webkit-user-modify: read-write-plaintext-only;
+}
+
+.progress-ring__circle {
+    transition: stroke-dashoffset 0.35s;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+} 
+
+#play-pause.play::after {
+    font-size: 1.5rem;
+}
+
+#play-pause.pause::after {
+    font-size: 1.5rem;
+}
+
+input[type="range"] {
+    width: 100%;
+    accent-color: white;
+}
+ 
+.loader { 
+    aspect-ratio: 5;
+    --_g: no-repeat radial-gradient(circle closest-side,gray 90%,#0000);
+    background: 
+      var(--_g) 0%   50%,
+      var(--_g) 50%  50%,
+      var(--_g) 100% 50%;
+    background-size: calc(100%/3) 100%;
+    animation: l7 1.25s infinite linear;
+}
+@keyframes l7 {
+    33%{background-size:calc(100%/3) 0%  ,calc(100%/3) 100%,calc(100%/3) 100%}
+    50%{background-size:calc(100%/3) 100%,calc(100%/3) 0%  ,calc(100%/3) 100%}
+    66%{background-size:calc(100%/3) 100%,calc(100%/3) 100%,calc(100%/3) 0%  }
+}

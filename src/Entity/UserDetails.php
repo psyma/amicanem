@@ -47,6 +47,9 @@ class UserDetails
     #[ORM\OneToOne(inversedBy: 'userDetails', cascade: ['persist', 'remove'])]
     private ?User $userid = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $avatar = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -180,6 +183,18 @@ class UserDetails
     public function setUserid(?User $userid): static
     {
         $this->userid = $userid;
+
+        return $this;
+    }
+
+    public function getAvatar(): ?string
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar(?string $avatar): static
+    {
+        $this->avatar = $avatar;
 
         return $this;
     }

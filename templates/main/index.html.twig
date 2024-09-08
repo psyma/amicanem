@@ -2,8 +2,24 @@
 
 {% block title %}Amicanem{% endblock %}
 
-{% block body %} 
-    <div {{ stimulus_controller('hello',  { }) }}>
-        Hello
-    </div>
+{% block body %}   
+    <aside id="separator-sidebar" class="fixed top-0 left-0 z-40 w-full sm:w-96 h-[100dvh] transition-transform -translate-x-full md:translate-x-0" aria-label="Sidebar">
+        {% include 'main/sidebar.html.twig' %}
+    </aside>
+
+    <section class="md:ml-96 relative flex flex-col h-[100dvh] bg-white dark:bg-gray-800"> 
+        {% include 'main/header.html.twig' %}
+        {% include 'main/main.html.twig' %}
+        {% include 'main/footer.html.twig' %} 
+    </section>   
+
+    <script>
+    // On page load or when changing themes, best to add inline in `head` to avoid FOUC
+    //if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    if (false) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark')
+    }
+</script>
 {% endblock %}
