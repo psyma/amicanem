@@ -2,10 +2,43 @@
 
 {% block title %}Password Reset Email Sent{% endblock %}
 
-{% block body %}
-    <p>
-        If an account matching your email exists, then an email was just sent that contains a link that you can use to reset your password.
-        This link will expire in {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.
-    </p>
-    <p>If you don't receive an email please check your spam folder or <a href="{{ path('app_forgot_password_request') }}">try again</a>.</p>
+{% block body %} 
+
+<section class="bg-gray-50 dark:bg-gray-900">
+    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto h-[100dvh] lg:py-0"> 
+        <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+            <img class="w-8 h-8 mr-2" src="/logo.png" alt="logo">
+            Amicanem    
+        </a>
+        <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+            <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+            <h2>Email message</h2>
+            <div class="flex p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
+                <svg class="flex-shrink-0 inline w-4 h-4 me-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                </svg>
+                <span class="sr-only">Info</span>
+                <div>
+                    <span class="font-medium">Ensure that these requirements are met:</span>
+                    <ul class="mt-1.5 list-disc list-ouside">
+                        <li>
+                            If an account matching your email exists, then an email was just sent that contains a link that you can use to reset your password.
+                            This link will expire in {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.
+                        </li>
+                        <li class="mt-5">
+                            If you don't receive an email please check your spam folder or 
+                            <a class="text-blue-600" href="{{ path('app_forgot_password_request') }}">
+                                try again
+                            </a>
+                        </li>
+                    </ul>
+                </div> 
+            </div>
+            <p class="text-sm font-light text-gray-500 dark:text-gray-400">
+                Already confirm the email? <a href="/login" class="font-medium text-blue-600 hover:underline ml-1">Sign In</a>
+            </p>
+        </div>
+    </div>
+</section>
+
 {% endblock %}

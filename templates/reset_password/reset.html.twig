@@ -1,12 +1,97 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Reset your password{% endblock %}
+{% block title %}Reset Password - Amicanem{% endblock %}
 
-{% block body %}
-    <h1>Reset your password</h1>
+{% block body %} 
 
-    {{ form_start(resetForm) }}
-        {{ form_row(resetForm.plainPassword) }}
-        <button class="btn btn-primary">Reset password</button>
-    {{ form_end(resetForm) }}
+<section {{ stimulus_controller('resetpassword', {  }) }} class="bg-gray-50 dark:bg-gray-900">
+    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto h-[100dvh] lg:py-0">
+        <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+            <img class="w-8 h-8 mr-2" src="/logo.png" alt="logo">
+            Amicanem    
+        </a>
+        <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+            <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+                <h2 class="leading-tight tracking-tight text-gray-900 dark:text-white">
+                    Reset your password
+                </h2>
+                {{ form_start(resetForm) }}   
+                    {% if (resetForm.plainPassword.first.vars.errors | length) or (resetForm.plainPassword.second.vars.errors | length)%} 
+                        <div class="flex p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                            <svg class="flex-shrink-0 inline w-4 h-4 me-3 mt-[2px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                            </svg>
+                            <span class="sr-only">Danger</span>
+                            <div>
+                                <span class="font-medium">Ensure that these requirements are met:</span>
+                                <ul class="mt-1.5 list-disc list-outside">
+                                    {% for error in resetForm.plainPassword.first.vars.errors %}
+                                        <li>{{ error.message}}</li>
+                                    {% endfor %}  
+                                    {% for error in resetForm.plainPassword.second.vars.errors %}
+                                        <li>{{ error.message}}</li>
+                                    {% endfor %}  
+                                </ul>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div> 
+                        {{ form_label(resetForm.plainPassword.first, 'New password', {'label_attr': {'class': 'block mb-2 text-sm font-medium text-gray-900 dark:text-white'}}) }}
+                        <div class="relative">
+                            {{ form_widget(resetForm.plainPassword.first, {'attr': {'class': 'bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'}}) }}
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm"> 
+                                <button {{ stimulus_action('resetpassword', 'showPassword', 'click', {'eyeSvg': 'eyeSvgFirst', 'eyeSvgDefault': 'eyeSvgDefaultFirst', 'isShow': false, 'inputPasswordId': 'change_password_form_plainPassword_first' }) }} type="button">
+                                    <svg id="eyeSvgDefaultFirst" class="h-6 text-gray-700 cursor-pointer hidden" fill="none" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 576 512">
+                                        <path fill="currentColor"
+                                            d="M572.52 241.4C518.29 135.59 410.93 64 288 64S57.68 135.64 3.48 241.41a32.35 32.35 0 0 0 0 29.19C57.71 376.41 165.07 448 288 448s230.32-71.64 284.52-177.41a32.35 32.35 0 0 0 0-29.19zM288 400a144 144 0 1 1 144-144 143.93 143.93 0 0 1-144 144zm0-240a95.31 95.31 0 0 0-25.31 3.79 47.85 47.85 0 0 1-66.9 66.9A95.78 95.78 0 1 0 288 160z">
+                                        </path>
+                                    </svg>
+                                </button>
+
+                                <button {{ stimulus_action('resetpassword', 'showPassword', 'click', {'eyeSvg': 'eyeSvgFirst', 'eyeSvgDefault': 'eyeSvgDefaultFirst', 'isShow': true, 'inputPasswordId': 'change_password_form_plainPassword_first' }) }} type="button">
+                                    <svg id="eyeSvgFirst" class="h-6 text-gray-700 cursor-pointer" fill="none" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 640 512">
+                                        <path fill="currentColor"
+                                            d="M320 400c-75.85 0-137.25-58.71-142.9-133.11L72.2 185.82c-13.79 17.3-26.48 35.59-36.72 55.59a32.35 32.35 0 0 0 0 29.19C89.71 376.41 197.07 448 320 448c26.91 0 52.87-4 77.89-10.46L346 397.39a144.13 144.13 0 0 1-26 2.61zm313.82 58.1l-110.55-85.44a331.25 331.25 0 0 0 81.25-102.07 32.35 32.35 0 0 0 0-29.19C550.29 135.59 442.93 64 320 64a308.15 308.15 0 0 0-147.32 37.7L45.46 3.37A16 16 0 0 0 23 6.18L3.37 31.45A16 16 0 0 0 6.18 53.9l588.36 454.73a16 16 0 0 0 22.46-2.81l19.64-25.27a16 16 0 0 0-2.82-22.45zm-183.72-142l-39.3-30.38A94.75 94.75 0 0 0 416 256a94.76 94.76 0 0 0-121.31-92.21A47.65 47.65 0 0 1 304 192a46.64 46.64 0 0 1-1.54 10l-73.61-56.89A142.31 142.31 0 0 1 320 112a143.92 143.92 0 0 1 144 144c0 21.63-5.29 41.79-13.9 60.11z">
+                                        </path>
+                                    </svg> 
+                                </button>
+                            </div>
+                        </div>
+                    </div>  
+                    <div class="mt-5"> 
+                        {{ form_label(resetForm.plainPassword.second, 'Confirm password', {'label_attr': {'class': 'block mb-2 text-sm font-medium text-gray-900 dark:text-white'}}) }}
+                        <div class="relative">
+                            {{ form_widget(resetForm.plainPassword.second, {'attr': {'class': 'bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'}}) }}
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm"> 
+                                <button {{ stimulus_action('resetpassword', 'showPassword', 'click', {'eyeSvg': 'eyeSvgSecond', 'eyeSvgDefault': 'eyeSvgDefaultSecond', 'isShow': false, 'inputPasswordId': 'change_password_form_plainPassword_second' }) }} type="button">
+                                    <svg id="eyeSvgDefaultSecond" class="h-6 text-gray-700 cursor-pointer hidden" fill="none" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 576 512">
+                                        <path fill="currentColor"
+                                            d="M572.52 241.4C518.29 135.59 410.93 64 288 64S57.68 135.64 3.48 241.41a32.35 32.35 0 0 0 0 29.19C57.71 376.41 165.07 448 288 448s230.32-71.64 284.52-177.41a32.35 32.35 0 0 0 0-29.19zM288 400a144 144 0 1 1 144-144 143.93 143.93 0 0 1-144 144zm0-240a95.31 95.31 0 0 0-25.31 3.79 47.85 47.85 0 0 1-66.9 66.9A95.78 95.78 0 1 0 288 160z">
+                                        </path>
+                                    </svg>
+                                </button>
+
+                                <button {{ stimulus_action('resetpassword', 'showPassword', 'click', {'eyeSvg': 'eyeSvgSecond', 'eyeSvgDefault': 'eyeSvgDefaultSecond', 'isShow': true, 'inputPasswordId': 'change_password_form_plainPassword_second' }) }} type="button">
+                                    <svg id="eyeSvgSecond" class="h-6 text-gray-700 cursor-pointer" fill="none" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 640 512">
+                                        <path fill="currentColor"
+                                            d="M320 400c-75.85 0-137.25-58.71-142.9-133.11L72.2 185.82c-13.79 17.3-26.48 35.59-36.72 55.59a32.35 32.35 0 0 0 0 29.19C89.71 376.41 197.07 448 320 448c26.91 0 52.87-4 77.89-10.46L346 397.39a144.13 144.13 0 0 1-26 2.61zm313.82 58.1l-110.55-85.44a331.25 331.25 0 0 0 81.25-102.07 32.35 32.35 0 0 0 0-29.19C550.29 135.59 442.93 64 320 64a308.15 308.15 0 0 0-147.32 37.7L45.46 3.37A16 16 0 0 0 23 6.18L3.37 31.45A16 16 0 0 0 6.18 53.9l588.36 454.73a16 16 0 0 0 22.46-2.81l19.64-25.27a16 16 0 0 0-2.82-22.45zm-183.72-142l-39.3-30.38A94.75 94.75 0 0 0 416 256a94.76 94.76 0 0 0-121.31-92.21A47.65 47.65 0 0 1 304 192a46.64 46.64 0 0 1-1.54 10l-73.61-56.89A142.31 142.31 0 0 1 320 112a143.92 143.92 0 0 1 144 144c0 21.63-5.29 41.79-13.9 60.11z">
+                                        </path>
+                                    </svg> 
+                                </button>
+                            </div>
+                        </div>
+                    </div>  
+                    {{ form_row(resetForm._token) }}  
+                    <button type="submit" class="mt-5 w-full justify-center bg-blue-600 px-4 py-2 border flex gap-2 border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 hover:border-slate-400 dark:hover:border-slate-500 hover:text-slate-900 dark:hover:text-slate-300 hover:shadow transition duration-150">
+                        <span class="text-white">Reset password</span>
+                    </button> 
+                    <p class="text-sm font-light text-gray-500 dark:text-gray-400 mt-5">
+                        Do you remember your password? <a href="/login" class="font-medium text-blue-600 hover:underline">Sign In</a>
+                    </p>
+                {{ form_end(resetForm) }}
+            </div>
+        </div>
+    </div>
+</section>  
+
 {% endblock %}
