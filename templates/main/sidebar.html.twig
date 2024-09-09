@@ -3,7 +3,7 @@
     <div class="w-full min-h-[5rem] max-h-fit px-5 py-6 flex justify-between items-center">
         <div class="flex items-center gap-1">
             <p class="text-black opacity-60 dark:text-white text-xl leading-4 tracking-[.01rem] outline-none" tabindex="0">Messages</p>
-            <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
+            <button id="theme-toggle" type="button" aria-hidden="false" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
                 <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
                 <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
             </button> 
@@ -22,11 +22,40 @@
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                 </svg>
             </div>
-            <input type="search" id="default-search" class="flex w-full p-3 ps-10 text-sm text-gray-900 border border-gray-400 rounded-lg bg-gray-200 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500" placeholder="Search messages or users" required />
+            <input type="search" id="default-search" class="flex w-full p-3 ps-10 text-sm text-gray-900 border border-gray-400 rounded-sm bg-gray-200 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500" placeholder="Search messages or users" required />
         </div> 
     </div>
     <div role="list" aria-label="conversations" class="w-full h-full scroll-smooth scrollbar-hidden" style="overflow: visible auto;">
-        <div>
+        {% for user in users %}
+            {% if user != currentUser %}
+                <div class="select-none" role="listitem">
+                    <button aria-label="conversation withDylan Billy" tabindex="0" class="w-full h-[5.75rem] px-5 py-6 mb-3 flex rounded focus:bg-indigo-100 dark:active:bg-gray-600 dark:focus:bg-gray-600 dark:hover:bg-gray-600 hover:bg-indigo-100 active:bg-indigo-100 focus:outline-none transition duration-500 ease-out">
+                        <div class="mr-4">
+                            <div class="w-7 h-7 rounded-full bg-cover bg-center" style="background-image: url(&quot;https://images.unsplash.com/photo-1522556189639-b150ed9c4330?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=387&amp;q=80&quot;);"></div>
+                        </div>
+                        <div class="w-full flex flex-col">
+                            <div class="w-full">
+                                <div class="flex items-start justify-between">
+                                    <div class="grow mb-4 text-start">
+                                        <p class="outline-none text-sm text-black opacity-60 dark:text-white dark:opacity-70 font-semibold leading-4 tracking-[.01rem]">{{ user.userDetails.firstname }} {{ user.userDetails.lastname }}</p>
+                                    </div>
+                                    <p class="outline-none text-xs text-black opacity-60 dark:text-white dark:opacity-70 font-light leading-4 tracking-[.01rem]">1:30 pm</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-between">
+                                <div>
+                                    <p class="outline-none text-sm text-black opacity-60 dark:text-white dark:opacity-70 font-normal leading-4 tracking-[.01rem] flex justify-start items-center">
+                                        <span class="">You're welcome</span>
+                                    </p>
+                                </div>
+                                <!---->
+                            </div>
+                        </div>
+                    </button> 
+                </div>
+            {% endif %}
+        {% endfor %}
+        <div class="hidden">
             <div>
                 <button aria-label="toggle archived conversations" class="group w-full h-[5.75rem] px-5 py-6 mb-3 flex rounded focus:outline-none transition duration-300 ease-out focus:bg-indigo-100 dark:active:bg-gray-600 dark:focus:bg-gray-600 dark:hover:bg-gray-600 hover:bg-indigo-100 active:bg-indigo-100" tabindex="0">
                     <div class="mr-4">
