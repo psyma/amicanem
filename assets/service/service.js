@@ -15,6 +15,7 @@ export default class Service {
             return { ok: false }
         } 
     }
+ 
 
     createMessage = async (uid, sender, receiver, type, content, timestamp, saveMessages) => {
         const data = new FormData()

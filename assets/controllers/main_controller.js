@@ -33,8 +33,7 @@ export default class extends Controller {
 
         const response = await fetch("/message", { method: "POST"  })
         //console.log(response.ok)  
-        
-        await this.setEncryptionDetails() 
+         
     }
 
     setEncryptionDetails = async () => {   
