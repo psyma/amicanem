@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use JsonSerializable; 
+
 use App\Repository\UserPassphraseRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserPassphraseRepository::class)]
-class UserPassphrase
+class UserPassphrase implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -17,8 +19,15 @@ class UserPassphrase
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $passphrase = null;
 
-    #[ORM\OneToOne(mappedBy: 'passphraseId', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'passphrase', cascade: ['persist', 'remove'])]
     private ?UserDetails $userDetails = null;
+
+    public function jsonSerialize(): mixed
+    {
+        return array(
+            'passphrase' => $this->passphrase, 
+        );
+    }
 
     public function getId(): ?int
     {

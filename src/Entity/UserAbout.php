@@ -17,7 +17,7 @@ class UserAbout
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $about = null;
 
-    #[ORM\OneToOne(mappedBy: 'aboutId', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'about', cascade: ['persist', 'remove'])]
     private ?UserDetails $userDetails = null;
 
     public function getId(): ?int

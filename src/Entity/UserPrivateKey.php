@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use JsonSerializable;
+
 use App\Repository\UserPrivateKeyRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserPrivateKeyRepository::class)]
-class UserPrivateKey
+class UserPrivateKey implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -17,8 +19,15 @@ class UserPrivateKey
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $privatekey = null;
 
-    #[ORM\OneToOne(mappedBy: 'privatekeyId', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'privatekey', cascade: ['persist', 'remove'])]
     private ?UserDetails $userDetails = null;
+
+    public function jsonSerialize(): mixed
+    {
+        return array(
+            'privatekey' => $this->privatekey, 
+        );
+    }
 
     public function getId(): ?int
     {

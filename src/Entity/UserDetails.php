@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use JsonSerializable;
+
 use App\Repository\UserDetailsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserDetailsRepository::class)]
-class UserDetails
+class UserDetails implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -36,20 +38,37 @@ class UserDetails
     private ?string $uid = null;  
     
     #[ORM\OneToOne(inversedBy: 'userDetails', cascade: ['persist', 'remove'])]
-    private ?User $userid = null;
+    private ?User $user = null;
 
     #[ORM\OneToOne(inversedBy: 'userDetails', cascade: ['persist', 'remove'])]
-    private ?UserAbout $aboutid = null;
+    private ?UserAbout $about = null;
 
     #[ORM\OneToOne(inversedBy: 'userDetails', cascade: ['persist', 'remove'])]
-    private ?UserPrivateKey $privatekeyid = null;
+    private ?UserPrivateKey $privatekey = null;
 
     #[ORM\OneToOne(inversedBy: 'userDetails', cascade: ['persist', 'remove'])]
-    private ?UserPassphrase $passphraseid = null;
+    private ?UserPassphrase $passphrase = null;
 
     #[ORM\OneToOne(inversedBy: 'userDetails', cascade: ['persist', 'remove'])]
-    private ?UserPublicKey $publickeyid = null;
- 
+    private ?UserPublicKey $publickey = null;
+    
+    public function jsonSerialize(): mixed
+    {
+        return array(
+            'firstname' => $this->firstname,
+            'lastname' => $this->lastname,
+            'nickname' => $this->nickname,
+            'avatar' => $this->avatar,
+            'badge' => $this->badge,
+            'badgecolor' => $this->badgecolor,
+            'uid' => $this->uid,
+            'about' => $this->about,
+            'publickey' => $this->publickey,
+            'privatekey' => $this->privatekey,
+            'passphrase' => $this->passphrase
+        );
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -129,12 +148,12 @@ class UserDetails
 
     public function getUserid(): ?User
     {
-        return $this->userid;
+        return $this->user;
     }
 
-    public function setUserid(?User $userid): static
+    public function setUserid(?User $user): static
     {
-        $this->userid = $userid;
+        $this->user = $user;
 
         return $this;
     }
@@ -153,48 +172,48 @@ class UserDetails
 
     public function getAboutId(): ?UserAbout
     {
-        return $this->aboutid;
+        return $this->about;
     }
 
-    public function setAboutId(?UserAbout $aboutid): static
+    public function setAboutId(?UserAbout $about): static
     {
-        $this->aboutid = $aboutid;
+        $this->about = $about;
 
         return $this;
     }
 
     public function getPrivatekeyId(): ?UserPrivateKey
     {
-        return $this->privatekeyid;
+        return $this->privatekey;
     }
 
-    public function setPrivatekeyId(?UserPrivateKey $privatekeyid): static
+    public function setPrivatekeyId(?UserPrivateKey $privatekey): static
     {
-        $this->privatekeyid = $privatekeyid;
+        $this->privatekey = $privatekey;
 
         return $this;
     }
 
     public function getPassphraseId(): ?UserPassphrase
     {
-        return $this->passphraseid;
+        return $this->passphrase;
     }
 
-    public function setPassphraseId(?UserPassphrase $passphraseid): static
+    public function setPassphraseId(?UserPassphrase $passphrase): static
     {
-        $this->passphraseid = $passphraseid;
+        $this->passphrase = $passphrase;
 
         return $this;
     }
 
     public function getPublickeyid(): ?UserPublicKey
     {
-        return $this->publickeyid;
+        return $this->publickey;
     }
 
-    public function setPublickeyid(?UserPublicKey $publickeyid): static
+    public function setPublickeyid(?UserPublicKey $publickey): static
     {
-        $this->publickeyid = $publickeyid;
+        $this->publickey = $publickey;
 
         return $this;
     } 

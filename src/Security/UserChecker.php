@@ -22,7 +22,7 @@ class UserChecker implements UserCheckerInterface
             return;
         }
 
-        if (!$user->isVerified()) {
+        if (!$user->isVerified()) { 
             throw new CustomUserMessageAccountStatusException('Your email is not verified');
         }
     }

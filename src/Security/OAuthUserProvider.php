@@ -30,7 +30,7 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
         $email = $response->getEmail();
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $email]);  
 
-        if (!$user) {
+        if (!$user) { 
             $userDetails = new UserDetails();
             $userDetails->setFirstname($response->getFirstName());
             $userDetails->setLastname($response->getLastName());
@@ -40,7 +40,7 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
             $user->setVerified(true);
             $user->setRoles(['ROLE_USER']);
             $user->setPassword($this->userPasswordHasher->hashPassword($user, $this->getRandomString())); 
-            $user->setUserDetails($userDetails); 
+            $user->setUserDetails($userDetails);  
         } 
         else { 
             

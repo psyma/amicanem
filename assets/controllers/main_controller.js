@@ -1,12 +1,16 @@
 import { Controller } from '@hotwired/stimulus';
  
 import Utils from '../js/utils';
+import CryptoJS from 'crypto-js';
 
-import Pusher from 'pusher-js'
+import Pusher from 'pusher-js' 
 
 export default class extends Controller {
-
+    static values = {
+        currentUser: Object
+    }
     static pusher = null
+
     connect = async () => {
         
         Pusher.logToConsole = true;
@@ -16,10 +20,12 @@ export default class extends Controller {
 
         var channel = this.pusher.subscribe('message');
         channel.bind('new-greeting', function(data) {
-            alert(data);
+            
         });
 
         const response = await fetch("/message", { method: "POST"  })
-        console.log(response.ok)
-    }
+        console.log(response.ok)  
+        
+         
+    } 
 }
