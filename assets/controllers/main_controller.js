@@ -1,5 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
  
+import Utils from '../js/utils';
+
 import Pusher from 'pusher-js'
 
 export default class extends Controller {
