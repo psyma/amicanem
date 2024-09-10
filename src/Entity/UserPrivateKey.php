@@ -55,12 +55,12 @@ class UserPrivateKey implements JsonSerializable
     {
         // unset the owning side of the relation if necessary
         if ($userDetails === null && $this->userDetails !== null) {
-            $this->userDetails->setPrivatekeyId(null);
+            $this->userDetails->setPrivatekey(null);
         }
 
         // set the owning side of the relation if necessary
-        if ($userDetails !== null && $userDetails->getPrivatekeyId() !== $this) {
-            $userDetails->setPrivatekeyId($this);
+        if ($userDetails !== null && $userDetails->getPrivatekey() !== $this) {
+            $userDetails->setPrivatekey($this);
         }
 
         $this->userDetails = $userDetails;

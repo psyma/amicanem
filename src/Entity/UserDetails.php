@@ -60,12 +60,8 @@ class UserDetails implements JsonSerializable
             'nickname' => $this->nickname,
             'avatar' => $this->avatar,
             'badge' => $this->badge,
-            'badgecolor' => $this->badgecolor,
-            'uid' => $this->uid,
-            'about' => $this->about,
-            'publickey' => $this->publickey,
-            'privatekey' => $this->privatekey,
-            'passphrase' => $this->passphrase
+            'badgecolor' => $this->badgecolor, 
+            'about' => $this->about,  
         );
     }
 
@@ -146,12 +142,12 @@ class UserDetails implements JsonSerializable
         return $this;
     }
 
-    public function getUserid(): ?User
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUserid(?User $user): static
+    public function setUser(?User $user): static
     {
         $this->user = $user;
 
@@ -170,48 +166,48 @@ class UserDetails implements JsonSerializable
         return $this;
     }
 
-    public function getAboutId(): ?UserAbout
+    public function getAbout(): ?UserAbout
     {
         return $this->about;
     }
 
-    public function setAboutId(?UserAbout $about): static
+    public function setAbout(?UserAbout $about): static
     {
         $this->about = $about;
 
         return $this;
     }
 
-    public function getPrivatekeyId(): ?UserPrivateKey
+    public function getPrivatekey(): ?UserPrivateKey
     {
         return $this->privatekey;
     }
 
-    public function setPrivatekeyId(?UserPrivateKey $privatekey): static
+    public function setPrivatekey(?UserPrivateKey $privatekey): static
     {
         $this->privatekey = $privatekey;
 
         return $this;
     }
 
-    public function getPassphraseId(): ?UserPassphrase
+    public function getPassphrase(): ?UserPassphrase
     {
         return $this->passphrase;
     }
 
-    public function setPassphraseId(?UserPassphrase $passphrase): static
+    public function setPassphrase(?UserPassphrase $passphrase): static
     {
         $this->passphrase = $passphrase;
 
         return $this;
     }
 
-    public function getPublickeyid(): ?UserPublicKey
+    public function getPublickey(): ?UserPublicKey
     {
         return $this->publickey;
     }
 
-    public function setPublickeyid(?UserPublicKey $publickey): static
+    public function setPublickey(?UserPublicKey $publickey): static
     {
         $this->publickey = $publickey;
 

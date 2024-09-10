@@ -55,12 +55,12 @@ class UserPassphrase implements JsonSerializable
     {
         // unset the owning side of the relation if necessary
         if ($userDetails === null && $this->userDetails !== null) {
-            $this->userDetails->setPassphraseId(null);
+            $this->userDetails->setPassphrase(null);
         }
 
         // set the owning side of the relation if necessary
-        if ($userDetails !== null && $userDetails->getPassphraseId() !== $this) {
-            $userDetails->setPassphraseId($this);
+        if ($userDetails !== null && $userDetails->getPassphrase() !== $this) {
+            $userDetails->setPassphrase($this);
         }
 
         $this->userDetails = $userDetails;

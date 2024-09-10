@@ -48,6 +48,14 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) { 
+            $email = $request->getPayload()->getString('email');
+            $user = $this->userRepository->findOneByEmail($email);
+            $userDetails = $user->getUserDetails();
+            $userDetails->setUid(Uuid::v7()->toString());
+
+            $this->entityManager->persist($userDetails);
+            $this->entityManager->flush(); 
+
             return new RedirectResponse($targetPath);
         }
  

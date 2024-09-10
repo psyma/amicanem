@@ -8,6 +8,8 @@ use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
 use App\Security\EmailVerifier;
 use Doctrine\ORM\EntityManagerInterface;
+
+use Symfony\Component\Uid\Uuid;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,6 +47,7 @@ class RegistrationController extends AbstractController
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
 
             $user->setRoles(['ROLE_USER']);
+            $userDetails->setUid(Uuid::v7()->toString());
             $userDetails->setFirstname($registrationForm->get('firstname')->getData());
             $userDetails->setLastname($registrationForm->get('lastname')->getData());
             $user->setUserDetails($userDetails);

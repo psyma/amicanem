@@ -46,12 +46,12 @@ class UserAbout
     {
         // unset the owning side of the relation if necessary
         if ($userDetails === null && $this->userDetails !== null) {
-            $this->userDetails->setAboutId(null);
+            $this->userDetails->setAbout(null);
         }
 
         // set the owning side of the relation if necessary
-        if ($userDetails !== null && $userDetails->getAboutId() !== $this) {
-            $userDetails->setAboutId($this);
+        if ($userDetails !== null && $userDetails->getAbout() !== $this) {
+            $userDetails->setAbout($this);
         }
 
         $this->userDetails = $userDetails;

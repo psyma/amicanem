@@ -55,12 +55,12 @@ class UserPublicKey implements JsonSerializable
     {
         // unset the owning side of the relation if necessary
         if ($userDetails === null && $this->userDetails !== null) {
-            $this->userDetails->setPublickeyid(null);
+            $this->userDetails->setPublickey(null);
         }
 
         // set the owning side of the relation if necessary
-        if ($userDetails !== null && $userDetails->getPublickeyid() !== $this) {
-            $userDetails->setPublickeyid($this);
+        if ($userDetails !== null && $userDetails->getPublickey() !== $this) {
+            $userDetails->setPublickey($this);
         }
 
         $this->userDetails = $userDetails;

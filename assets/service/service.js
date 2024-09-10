@@ -1,6 +1,21 @@
 import axios from 'axios'
 
 export default class Service { 
+    setEncryptionDetails = async (uid, publickey, privatekey, passphrase) => {
+        const data = new FormData()
+        data.append("uid", uid)
+        data.append("publickey", publickey)
+        data.append("privatekey", privatekey)
+        data.append("passphrase", passphrase)
+
+        try {
+            const response = await fetch("/set_encryption_details", { method: "POST", body: data })
+            return await response
+        } catch(e) {
+            return { ok: false }
+        } 
+    }
+
     createMessage = async (uid, sender, receiver, type, content, timestamp, saveMessages) => {
         const data = new FormData()
         data.append("uid", uid)

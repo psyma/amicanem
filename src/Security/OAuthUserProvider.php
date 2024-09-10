@@ -32,6 +32,7 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
 
         if (!$user) { 
             $userDetails = new UserDetails();
+            $userDetails->setUid(Uuid::v7()->toString());
             $userDetails->setFirstname($response->getFirstName());
             $userDetails->setLastname($response->getLastName());
 
@@ -43,7 +44,8 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
             $user->setUserDetails($userDetails);  
         } 
         else { 
-            
+            $userDetails = $user->getUserDetails();
+            $userDetails->setUid(Uuid::v7()->toString());
         }
         
         $this->entityManager->persist($user);

@@ -145,12 +145,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JsonSer
     {
         // unset the owning side of the relation if necessary
         if ($userDetails === null && $this->userDetails !== null) {
-            $this->userDetails->setUserid(null);
+            $this->userDetails->setUser(null);
         }
 
         // set the owning side of the relation if necessary
-        if ($userDetails !== null && $userDetails->getUserid() !== $this) {
-            $userDetails->setUserid($this);
+        if ($userDetails !== null && $userDetails->getUser() !== $this) {
+            $userDetails->setUser($this);
         }
 
         $this->userDetails = $userDetails;
