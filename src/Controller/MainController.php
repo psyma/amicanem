@@ -46,6 +46,16 @@ class MainController extends AbstractController
         ]);
     }
 
+    #[Route('/get_users/{uid}', name: 'app_get_users', methods: ["GET"])]
+    public function get_users(string $uid): JsonResponse
+    {
+        $this->denyAccessUnlessGranted("ROLE_USER");  
+        $this->denyAccessUnlessCurrentUser($uid);
+        
+        $users = $this->userRepository->findAll();
+        return new JsonResponse($users);
+    }
+
     #[Route('/set_encryption_details', name: 'app_encryption_details', methods: ["POST"])]
     public function set_encryption_details(Request $request): JsonResponse {
         $this->denyAccessUnlessGranted("ROLE_USER");  

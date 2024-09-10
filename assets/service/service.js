@@ -15,7 +15,25 @@ export default class Service {
             return { ok: false }
         } 
     }
- 
+
+    createTextMessage = async (uid, event, sender, receiver, type, content, timestamp, isSaveMessage=true) => {
+        const data = new FormData()
+        data.append("uid", uid)
+        data.append("event", event)
+        data.append("sender", sender)
+        data.append("receiver", receiver)
+        data.append("type", type)
+        data.append("content", content)
+        data.append("timestamp", timestamp)
+        data.append("isSaveMessage", isSaveMessage)
+
+        try {
+            const response = await fetch("/create_text_message", { method: "POST", body: data })
+            return await response
+        } catch(e) {
+            return { ok: false }
+        } 
+    }
 
     createMessage = async (uid, sender, receiver, type, content, timestamp, saveMessages) => {
         const data = new FormData()
