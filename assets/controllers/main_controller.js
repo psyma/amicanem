@@ -40,8 +40,12 @@ export default class extends Controller {
     static currentUserPrivatekey = null
     static userToChatId = null
     static userToChatPublickey = null 
+    static page = null
+    static pageSize = null
 
     connect = async () => {  
+        this.page = 1
+        this.pageSize = 20
         this.service = new Service()
 
         Pusher.logToConsole = false;
@@ -50,11 +54,11 @@ export default class extends Controller {
         const response = await this.service.getUsers(this.uidValue)
         const users = await response.json()
 
-         
+        
         this.setDarkModeToggle() 
         this.setSendMessageButtonClick()
         this.setSendMessageChatboxInputKeyDown()
-        await this.setEncryptionDetails() 
+        await this.setEncryptionDetails()  
 
         users.forEach(async(user) => {
             await this.setSidebarUserClickEvent(user)
@@ -100,7 +104,7 @@ export default class extends Controller {
 
     setSidebarUserClickEvent = async (user) => {
         const userElement = document.getElementById(`user${user.id}`) // sidebar user list element  
-        userElement.onclick = () => {
+        userElement.onclick = async () => {
             const name = userElement.getAttribute('name')
             const publickey = user.userDetails.publickey.publickey
             this.userTochatPublickey = Utils.base64ToArrayBuffer(publickey)
@@ -109,9 +113,47 @@ export default class extends Controller {
             this.setUserToChatName(name)
             this.setSidebarUserToggleForMobile() 
             this.setMainChatbox()
+
+            await this.setMessages()
         } 
 
         await this.sleep(1)
+    }
+
+    setMessages = async () => { 
+        function clearChatboxElement() {
+            const chatbox = document.getElementById('chatbox')
+            const element = document.createElement('div')
+            element.className = 'flex flex-grow'
+            chatbox.textContent = ''
+            chatbox.append(element)
+        }
+
+        const response = await this.service.getMessages(this.uidValue, this.currentUserValue.id, this.userToChatId, this.page, this.pageSize) 
+        if (response.ok) { 
+            const messages = await response.json() 
+            const chatbox = document.getElementById('chatbox')
+            clearChatboxElement()
+            for(let i = 0; i < messages.length; i++) {
+                const data = messages[i] 
+                const message = new Message(data)    
+                const { sender, receiver } = JSON.parse(atob(message.content)) 
+
+                try {
+                    const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender)) 
+                    const messageElement = Utils.createOutgoingMessageTextElement(messageData.content)
+                    chatbox.appendChild(messageElement)
+
+                    const imgCheck = messageElement.querySelector('.img-check')
+                    imgCheck.src = '/green_checks.svg' 
+                } catch(e) {
+                    const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver)) 
+                    const messageElement = Utils.createIncomingMessageTextElement(messageData.content)
+                    chatbox.appendChild(messageElement) 
+                }
+            } 
+            this.chatboxScrollToBottom(true)
+        }
     }
 
     setUserToChatName = (name) => {
@@ -174,7 +216,7 @@ export default class extends Controller {
 
         mainChatbox.classList.remove('hidden')
         mainChatboxIntro.classList.add('hidden') 
-    }
+    } 
 
     sendTextMessage = async (message) => {
         const data = JSON.stringify({
