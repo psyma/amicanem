@@ -30,7 +30,7 @@
             <div id="user{{ user.id }}" class="select-none {{ user == currentUser ? 'hidden' : '' }}" role="listitem">
                 <button aria-label="conversation {{ user.userDetails.firstname }} {{ user.userDetails.lastname }}" tabindex="0" class="w-full h-[5.75rem] px-5 py-6 mb-3 flex rounded focus:bg-indigo-100 dark:active:bg-gray-600 dark:focus:bg-gray-600 dark:hover:bg-gray-600 hover:bg-indigo-100 active:bg-indigo-100 focus:outline-none transition duration-500 ease-out">
                     <div class="relative mr-4">
-                        <div class="w-11 h-11 rounded-full bg-contain bg-center shadow border border-gray-200 dark:border-gray-600" style="background-image: url('{{ user.userDetails.avatar }}');"></div>
+                        <div class="w-11 h-11 rounded-full bg-contain bg-center shadow border border-gray-200 dark:border-gray-700" style="background-image: url('{{ user.userDetails.avatar }}');"></div>
                         <span id="sidebarOnlineSpan{{ user.id }}" class="bottom-0 left-8 absolute w-3.5 h-3.5 bg-red-400 border-2 border-white dark:border-gray-800 rounded-full"></span>
                     </div>
                     <div class="w-full flex flex-col">
