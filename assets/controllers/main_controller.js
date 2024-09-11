@@ -93,10 +93,12 @@ export default class extends Controller {
             const message = new Message(data)    
             const { sender, receiver } = JSON.parse(atob(message.content))
             const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver))
-        
-            const messageElement = Utils.createIncomingMessageTextElement(messageData.content)
-            this.chatboxScrollToBottom()
-            chatbox.appendChild(messageElement)
+            
+            if (messageData.sender == this.userToChatId) {
+                const messageElement = Utils.createIncomingMessageTextElement(messageData.content)
+                this.chatboxScrollToBottom()
+                chatbox.appendChild(messageElement)
+            }
 
             this.setUserLastMesasgeElement(messageData.sender, messageData.content) 
         })
