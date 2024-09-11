@@ -59,6 +59,7 @@ export default class extends Controller {
         this.setSendMessageButtonClick()
         this.setSendMessageChatboxInputKeyDown()
         await this.setEncryptionDetails()  
+        await this.setUserLastMessage()
 
         users.forEach(async(user) => {
             await this.setSidebarUserClickEvent(user)
@@ -91,12 +92,13 @@ export default class extends Controller {
         channel.bind(`messages/${user.id}/${this.currentUserValue.id}`, async (data) => {
             const message = new Message(data)    
             const { sender, receiver } = JSON.parse(atob(message.content))
-            const { id, content, isSeen } = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver))
-
-            const messageElement = Utils.createIncomingMessageTextElement(content)
+            const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver))
+        
+            const messageElement = Utils.createIncomingMessageTextElement(messageData.content)
             this.chatboxScrollToBottom()
             chatbox.appendChild(messageElement)
 
+            this.setUserLastMesasgeElement(messageData.sender, messageData.content) 
         })
 
         await this.sleep(1)
@@ -114,13 +116,37 @@ export default class extends Controller {
             this.setSidebarUserToggleForMobile() 
             this.setMainChatbox()
 
-            await this.setMessages()
+            await this.setConversations()
         } 
 
         await this.sleep(1)
     }
 
-    setMessages = async () => { 
+    setUserLastMesasgeElement = (id, content) => {
+        const userLastMessage = document.getElementById(`user${id}-last-message`)
+        userLastMessage.textContent = content
+    }
+
+    setUserLastMessage = async () => {
+        const response = await this.service.getLastMessages(this.uidValue, this.currentUserValue.id)
+        if (response.ok) {
+            const messages = await response.json()
+            messages.forEach(async(data) => { 
+                const message = new Message(data)    
+                const { sender, receiver } = JSON.parse(atob(message.content)) 
+
+                try { 
+                    const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender)) 
+                    this.setUserLastMesasgeElement(messageData.receiver, messageData.content) 
+                } catch(e) { 
+                    const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver)) 
+                    this.setUserLastMesasgeElement(messageData.sender, messageData.content) 
+                }
+            })
+        }
+    }
+
+    setConversations = async () => { 
         function clearChatboxElement() {
             const chatbox = document.getElementById('chatbox')
             const element = document.createElement('div')
@@ -240,11 +266,12 @@ export default class extends Controller {
         
         this.chatboxScrollToBottom(true)
         chatboxInput.textContent = ''
-        chatbox.appendChild(messageElement)
-
+        chatbox.appendChild(messageElement) 
+        
         const response = await this.service.createTextMessage(this.uidValue, `messages/${this.currentUserValue.id}/${this.userToChatId}`, this.currentUserValue.id, this.userToChatId, MessageType.TEXT, content, Date.now(), true)
         const imgCheck = messageElement.querySelector('.img-check')
-        if (response.ok) {
+        if (response.ok) { 
+            this.setUserLastMesasgeElement(this.userToChatId, message) 
             imgCheck.src = '/green_checks.svg'
         }
         else {
