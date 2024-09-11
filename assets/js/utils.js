@@ -121,6 +121,53 @@ export default class Utils {
         }
         return bytes.buffer;
     }  
+
+    static setChatboxMessageAvatarHidden = () => {
+        // if the user has successive messages then only show 1 avatar
+        const chatbox = document.getElementById('chatbox')
+        const elements = Array.from(chatbox.children)
+        for (let i = 0; i < elements.length - 1; i++) {
+            const current = elements[i]
+            const next = elements[i + 1]
+
+            const avatar1 = current.querySelector('.avatar')
+            const avatar2 = next.querySelector('.avatar')
+            if (avatar1 != null &&  avatar2 != null) {
+                avatar1.classList.add('invisible') 
+            }
+        } 
+    }
+
+    static setChatboxMessageBorderAndMargin = () => {
+        // if the user has successive messages then the last element border and margin must be updated
+        const chatbox = document.getElementById('chatbox')
+        const elements = Array.from(chatbox.children)
+        for (let i = 0; i < elements.length - 1; i++) {
+            const current = elements[i]
+            const next = elements[i + 1]
+
+            const avatar1 = current.querySelector('.avatar')
+            const avatar2 = next.querySelector('.avatar')
+            if (avatar1 != null && avatar2 != null) { 
+                current.classList.remove('mb-10')
+                current.querySelector('.chat-message-container').classList.remove('rounded-bl-none')
+                
+                if (i != elements.length - 2) {
+                    next.classList.add('mb-10')
+                }
+            }
+            else if (avatar1 == null && avatar2 == null) {
+                try { 
+                    current.classList.remove('mb-10')
+                    current.querySelector('.chat-message-container').classList.remove('rounded-br-none')
+                    
+                    if (i != elements.length - 2) {
+                        next.classList.add('mb-10')
+                    }
+                } catch(e) { }
+            } 
+        } 
+    }
     
     static createLoaderElement = () => {
         const colorTheme = localStorage.getItem('color-theme') 
@@ -139,7 +186,7 @@ export default class Utils {
         selectNoneDiv.classList.add('select-none')
  
         const flexDiv = document.createElement('div')
-        flexDiv.classList.add('xs:mb-6', 'md:mb-5', 'flex', 'justify-end')
+        flexDiv.classList.add( 'flex', 'justify-end')
  
         const mr4Div = document.createElement('div')
         mr4Div.classList.add('mr-4');
@@ -147,15 +194,15 @@ export default class Utils {
         const flexItemsDiv = document.createElement('div')
         flexItemsDiv.classList.add('flex', 'items-end')
  
-        const groupDiv = document.createElement('div')
-        groupDiv.classList.add('group', 'max-w-[31.25rem]', 'p-5', 'rounded-b', 'transition', 'duration-500', 'rounded-tl', 'ml-4', 'order-2', 'bg-indigo-50', 'dark:bg-gray-600')
+        const chatMessageContainer = document.createElement('div')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'ml-4', 'order-2', 'bg-indigo-50', 'dark:bg-gray-600')
  
         const chatMessage = document.createElement('p')
         chatMessage.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
         chatMessage.setAttribute('tabindex', '0')
         chatMessage.textContent = message
  
-        groupDiv.appendChild(chatMessage);
+        chatMessageContainer.appendChild(chatMessage);
  
         const timeDiv = document.createElement('div')
         timeDiv.classList.add('ml-4', 'order-1')
@@ -170,7 +217,7 @@ export default class Utils {
         img.src = '/gray_checks.svg'
         img.classList.add('w-[.875rem]', 'h-[.875rem]', 'img-check')
  
-        flexItemsDiv.appendChild(groupDiv)
+        flexItemsDiv.appendChild(chatMessageContainer)
         flexItemsDiv.appendChild(timeDiv)
         flexItemsDiv.appendChild(img)
  
@@ -191,17 +238,16 @@ export default class Utils {
         innerDiv1.classList.add('select-none')
  
         const flexDiv = document.createElement('div')
-        flexDiv.classList.add('xs:mb-6', 'md:mb-5', 'flex')
+        flexDiv.classList.add( 'flex')
  
         const avatarDivContainer = document.createElement('div')
-        avatarDivContainer.classList.add('mr-4')
+        avatarDivContainer.classList.add('mr-4', 'flex', 'items-end')
  
         const avatarDiv = document.createElement('div')
-        avatarDiv.setAttribute('aria-label', 'Dylan Billy')
         avatarDiv.classList.add('outline-none')
  
         const avatarImageDiv = document.createElement('div')
-        avatarImageDiv.classList.add('w-[2.25rem]', 'h-[2.25rem]', 'bg-cover', 'bg-center', 'rounded-full')
+        avatarImageDiv.classList.add('avatar', 'w-[2.25rem]', 'h-[2.25rem]', 'bg-cover', 'bg-center', 'rounded-full')
         avatarImageDiv.style.backgroundImage = `url("${avatar}")`
  
         avatarDiv.appendChild(avatarImageDiv)
@@ -212,7 +258,7 @@ export default class Utils {
         chatContainer.classList.add('flex', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
-        chatMessageContainer.classList.add('group', 'max-w-[31.25rem]', 'p-5', 'rounded-b', 'transition', 'duration-500', 'rounded-tr', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
  
         const chatMessage = document.createElement('p')
         chatMessage.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')

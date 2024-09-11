@@ -214,10 +214,11 @@ export default class extends Controller {
         chatbox.addEventListener('scroll', async () => {
             if (chatbox.scrollTop == 0 && !this.isReceivedFirstMessage) {
                 this.page += 1 
+                const flexGrowChild = chatbox.removeChild(chatbox.children[0]) 
                 const firstChild = chatbox.children[0]
                 const loader = Utils.createLoaderElement()
                 chatbox.prepend(loader)
-
+ 
                 const response = await this.service.getMessages(this.uidValue, this.currentUserValue.id, this.userToChatId, this.page, this.pageSize, 1)
                 if (response.ok) {
                     const messages = await response.json()
@@ -242,8 +243,12 @@ export default class extends Controller {
                             }
                         } 
 
+                        Utils.setChatboxMessageAvatarHidden()
+                        Utils.setChatboxMessageBorderAndMargin()
+
                         setTimeout(() => {
                             firstChild.scrollIntoView({ behavior: "smooth", block: "end" })
+                            chatbox.prepend(flexGrowChild)
                         }, 500)
                     }
                     else {
@@ -294,7 +299,9 @@ export default class extends Controller {
             this.chatboxScrollToBottom(true)
         }
 
-        chatbox.removeChild(loader)
+        chatbox.removeChild(loader) 
+        Utils.setChatboxMessageAvatarHidden()
+        Utils.setChatboxMessageBorderAndMargin()
     }
 
     setUserToChatName = (name) => {
