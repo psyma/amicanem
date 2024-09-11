@@ -48,6 +48,7 @@ export default class extends Controller {
         this.pageSize = 20
         this.service = new Service()
 
+        this.isReceivedFirstMessage = false
         this.usersOnlineMap = new Map()
         this.usersMap = new Map()
 
@@ -64,6 +65,7 @@ export default class extends Controller {
         this.setSendMessageChatboxInputKeyDown()
         await this.setEncryptionDetails()  
         await this.setUserLastMessage()
+        await this.setChatboxInfiniteScrolling()
 
         users.forEach(async(user) => {
             await this.setSidebarUserClickEvent(user)
@@ -205,6 +207,53 @@ export default class extends Controller {
                 }
             })
         }
+    }
+
+    setChatboxInfiniteScrolling = async () => {
+        const chatbox = document.getElementById('chatbox')
+        chatbox.addEventListener('scroll', async () => {
+            if (chatbox.scrollTop == 0 && !this.isReceivedFirstMessage) {
+                this.page += 1 
+                const firstChild = chatbox.children[0]
+                const loader = Utils.createLoaderElement()
+                chatbox.prepend(loader)
+
+                const response = await this.service.getMessages(this.uidValue, this.currentUserValue.id, this.userToChatId, this.page, this.pageSize, 1)
+                if (response.ok) {
+                    const messages = await response.json()
+                    chatbox.removeChild(loader)
+                    if (messages.length) { 
+                        for(let i = 0; i < messages.length; i++) {
+                            const data = messages[i] 
+                            const message = new Message(data)    
+                            const { sender, receiver } = JSON.parse(atob(message.content)) 
+            
+                            try {
+                                const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender)) 
+                                const messageElement = Utils.createOutgoingMessageTextElement(messageData.content)
+                                chatbox.prepend(messageElement)
+            
+                                const imgCheck = messageElement.querySelector('.img-check')
+                                imgCheck.src = '/green_checks.svg' 
+                            } catch(e) { 
+                                const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver)) 
+                                const messageElement = Utils.createIncomingMessageTextElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar)
+                                chatbox.prepend(messageElement) 
+                            }
+                        } 
+
+                        setTimeout(() => {
+                            firstChild.scrollIntoView({ behavior: "smooth", block: "end" })
+                        }, 500)
+                    }
+                    else {
+                        this.isReceivedFirstMessage = true
+                    }
+                }
+            }
+        })
+
+        await this.sleep(1)
     }
 
     setConversations = async () => { 
