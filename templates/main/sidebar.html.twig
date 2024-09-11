@@ -27,10 +27,11 @@
     </div>
     <div role="list" aria-label="conversations" class="w-full h-full scroll-smooth scrollbar-hidden" style="overflow: visible auto;">
         {% for user in users %} 
-            <div id="user{{ user.id }}" class="select-none {{ user == currentUser ? 'hidden' : '' }}" role="listitem" name="{{ user.userDetails.firstname }} {{ user.userDetails.lastname }}">
+            <div id="user{{ user.id }}" class="select-none {{ user == currentUser ? 'hidden' : '' }}" role="listitem">
                 <button aria-label="conversation {{ user.userDetails.firstname }} {{ user.userDetails.lastname }}" tabindex="0" class="w-full h-[5.75rem] px-5 py-6 mb-3 flex rounded focus:bg-indigo-100 dark:active:bg-gray-600 dark:focus:bg-gray-600 dark:hover:bg-gray-600 hover:bg-indigo-100 active:bg-indigo-100 focus:outline-none transition duration-500 ease-out">
-                    <div class="mr-4">
-                        <div class="w-7 h-7 rounded-full bg-cover bg-center" style="background-image: url(&quot;https://images.unsplash.com/photo-1522556189639-b150ed9c4330?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=387&amp;q=80&quot;);"></div>
+                    <div class="relative mr-4">
+                        <div class="w-11 h-11 rounded-full bg-contain bg-center shadow border border-gray-200 dark:border-gray-600" style="background-image: url('{{ user.userDetails.avatar }}');"></div>
+                        <span id="sidebarOnlineSpan{{ user.id }}" class="bottom-0 left-8 absolute w-3.5 h-3.5 bg-red-400 border-2 border-white dark:border-gray-800 rounded-full"></span>
                     </div>
                     <div class="w-full flex flex-col">
                         <div class="w-full">

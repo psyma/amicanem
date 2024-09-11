@@ -39,6 +39,15 @@ class RegistrationController extends AbstractController
         $registrationForm = $this->createForm(RegistrationFormType::class, $user);
         $registrationForm->handleRequest($request);
 
+        $avatars = array(
+            "/avatars/Antelope.png", "/avatars/Dove.png", "/avatars/Fox.png", "/avatars/Parrot.png", "/avatars/Sheep.png",
+            "/avatars/BassetHound.png", "/avatars/Duck.png", "/avatars/MallardDuck.png", "/avatars/Pigeon.png", "/avatars/Wolf.png",
+            "/avatars/Bulldog.png", "/avatars/Eagle.png", "/avatars/MountainGoat.png", "/avatars/Pig.png",
+            "/avatars/chicken.png", "/avatars/Fox1.png", "/avatars/Ox.png", "/avatars/Reindeer.png",
+            "/avatars/Dog.png", "/avatars/Fox3.png", "/avatars/Panda.png", "/avatars/Rooster.png"
+        );
+        shuffle($avatars); 
+
         if ($registrationForm->isSubmitted() && $registrationForm->isValid()) {
             /** @var string $plainPassword */
             $plainPassword = $registrationForm->get('plainPassword')->getData();
@@ -47,6 +56,7 @@ class RegistrationController extends AbstractController
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
 
             $user->setRoles(['ROLE_USER']);
+            $userDetails->setAvatar($avatars[0]);
             $userDetails->setUid(Uuid::v7()->toString());
             $userDetails->setFirstname($registrationForm->get('firstname')->getData());
             $userDetails->setLastname($registrationForm->get('lastname')->getData());

@@ -105,14 +105,16 @@ export default class extends Controller {
     }
 
     setSidebarUserClickEvent = async (user) => {
-        const userElement = document.getElementById(`user${user.id}`) // sidebar user list element  
+        const userElement = document.getElementById(`user${user.id}`) // sidebar user list element   
         userElement.onclick = async () => {
-            const name = userElement.getAttribute('name')
+            const name = `${user.userDetails.firstname} ${user.userDetails.lastname}`
+            const avatar = user.userDetails.avatar
             const publickey = user.userDetails.publickey.publickey
             this.userTochatPublickey = Utils.base64ToArrayBuffer(publickey)
             this.userToChatId = user.id
 
             this.setUserToChatName(name)
+            this.setUserToChatAvatar(avatar)
             this.setSidebarUserToggleForMobile() 
             this.setMainChatbox()
 
@@ -185,6 +187,11 @@ export default class extends Controller {
     setUserToChatName = (name) => {
         const userToChatName = document.getElementById('userToChatName')
         userToChatName.textContent = name
+    }
+
+    setUserToChatAvatar = (avatar) => {
+        const userToChatAvatar = document.getElementById('userToChatAvatar')
+        userToChatAvatar.style.backgroundImage = `url('${avatar}')`
     }
 
     setDarkModeToggle = () => { 

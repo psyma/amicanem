@@ -31,7 +31,17 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $email]);  
 
         if (!$user) { 
+            $avatars = array(
+                "/avatars/Antelope.png", "/avatars/Dove.png", "/avatars/Fox.png", "/avatars/Parrot.png", "/avatars/Sheep.png",
+                "/avatars/BassetHound.png", "/avatars/Duck.png", "/avatars/MallardDuck.png", "/avatars/Pigeon.png", "/avatars/Wolf.png",
+                "/avatars/Bulldog.png", "/avatars/Eagle.png", "/avatars/MountainGoat.png", "/avatars/Pig.png",
+                "/avatars/chicken.png", "/avatars/Fox1.png", "/avatars/Ox.png", "/avatars/Reindeer.png",
+                "/avatars/Dog.png", "/avatars/Fox3.png", "/avatars/Panda.png", "/avatars/Rooster.png"
+            );
+            shuffle($avatars); 
+
             $userDetails = new UserDetails();
+            $userDetails->setAvatar($avatars[0]);
             $userDetails->setUid(Uuid::v7()->toString());
             $userDetails->setFirstname($response->getFirstName());
             $userDetails->setLastname($response->getLastName());
