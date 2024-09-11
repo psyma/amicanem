@@ -2,8 +2,7 @@ import { Controller } from '@hotwired/stimulus';
  
 import Utils from '../js/utils';
 import Service from "../service/service"   
-
-import { Drawer } from 'flowbite';
+ 
 import CryptoJS from 'crypto-js';
 import Pusher from 'pusher-js' 
 import Bowser from 'bowser';
@@ -54,6 +53,7 @@ export default class extends Controller {
          
         this.setDarkModeToggle() 
         this.setSendMessageButtonClick()
+        this.setSendMessageChatboxInputKeyDown()
         await this.setEncryptionDetails() 
 
         users.forEach(async(user) => {
@@ -85,22 +85,24 @@ export default class extends Controller {
         const channel = this.pusher.subscribe('messages')
 
         channel.bind(`messages/${user.id}/${this.currentUserValue.id}`, async (data) => {
-            const message = new Message(data)   
+            const message = new Message(data)    
             const { sender, receiver } = JSON.parse(atob(message.content))
             const { id, content, isSeen } = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver))
 
             const messageElement = Utils.createIncomingMessageTextElement(content)
+            this.chatboxScrollToBottom()
             chatbox.appendChild(messageElement)
+
         })
 
         await this.sleep(1)
     }
 
     setSidebarUserClickEvent = async (user) => {
-        const userElement = document.getElementById(`user${user.id}`) // sidebar user list element 
+        const userElement = document.getElementById(`user${user.id}`) // sidebar user list element  
         userElement.onclick = () => {
             const name = userElement.getAttribute('name')
-            const publickey = userElement.getAttribute('publickey')
+            const publickey = user.userDetails.publickey.publickey
             this.userTochatPublickey = Utils.base64ToArrayBuffer(publickey)
             this.userToChatId = user.id
 
@@ -160,9 +162,8 @@ export default class extends Controller {
         });  
     }
 
-    setSidebarUserToggleForMobile = () => {
-        const browser = Bowser.getParser(window.navigator.userAgent); 
-        if (browser.parsedResult.platform.type == 'mobile') {
+    setSidebarUserToggleForMobile = () => { 
+        if (this.getUserAgentPlatformType() == 'mobile') {
             document.getElementById('separatorSidebarButton').click()
         } 
     }
@@ -175,36 +176,94 @@ export default class extends Controller {
         mainChatboxIntro.classList.add('hidden') 
     }
 
-    setSendMessageButtonClick = () => {
+    sendTextMessage = async (message) => {
+        const data = JSON.stringify({
+            sender: this.currentUserValue.id,
+            receiver: this.userToChatId,
+            type: MessageType.TEXT,
+            content: message,
+            timestamp: Date.now()
+        })
+
+        const encryptedSenderTextMessage = await Utils.encryptMessage(this.currentUserPublickey, data)
+        const encryptedReceiverTextMessage = await Utils.encryptMessage(this.userTochatPublickey, data) 
+        const content = btoa(JSON.stringify({
+            sender: encryptedSenderTextMessage,
+            receiver: encryptedReceiverTextMessage
+        }))
+
         const chatbox = document.getElementById('chatbox')
+        const chatboxInput = document.getElementById('chatboxInput')
+        const messageElement = Utils.createOutgoingMessageTextElement(message)
+        
+        this.chatboxScrollToBottom(true)
+        chatboxInput.textContent = ''
+        chatbox.appendChild(messageElement)
+
+        const response = await this.service.createTextMessage(this.uidValue, `messages/${this.currentUserValue.id}/${this.userToChatId}`, this.currentUserValue.id, this.userToChatId, MessageType.TEXT, content, Date.now(), true)
+        const imgCheck = messageElement.querySelector('.img-check')
+        if (response.ok) {
+            imgCheck.src = '/green_checks.svg'
+        }
+        else {
+            imgCheck.src = '/red_checks.svg'
+        }
+    }
+
+    setSendMessageButtonClick = () => { 
         const chatboxInput = document.getElementById('chatboxInput')
         const sendMessageButton = document.getElementById('sendMessageButton')
 
         sendMessageButton.onclick = async () => {
-            const message = chatboxInput.textContent.trim()
+            const message = chatboxInput.textContent.trim() 
             if (!this.isEmptyOrSpaces(message)) {
-                const data = JSON.stringify({
-                    sender: this.currentUserValue.id,
-                    receiver: this.userToChatId,
-                    type: MessageType.TEXT,
-                    content: message,
-                    timestamp: Date.now()
-                })
-                
-                const encryptedSenderTextMessage = await Utils.encryptMessage(this.currentUserPublickey, data)
-                const encryptedReceiverTextMessage = await Utils.encryptMessage(this.userTochatPublickey, data) 
-                const content = btoa(JSON.stringify({
-                    sender: encryptedSenderTextMessage,
-                    receiver: encryptedReceiverTextMessage
-                }))
-                const response = await this.service.createTextMessage(this.uidValue, `messages/${this.currentUserValue.id}/${this.userToChatId}`, this.currentUserValue.id, this.userToChatId, MessageType.TEXT, content, Date.now(), true)
-                if (response.ok) {
-                    const messageElement = Utils.createOutgoingMessageTextElement(message)
-                    chatbox.appendChild(messageElement)
-                }
+                await this.sendTextMessage(message)
             }
 
-            chatboxInput.textContent = ''
+        }
+    }
+
+    setSendMessageChatboxInputKeyDown = () => { 
+        const chatboxInput = document.getElementById('chatboxInput')
+        chatboxInput.onkeydown = async (e) => {
+            const message = e.target.textContent.trim()
+            if (this.getUserAgentPlatformType() == 'desktop') {
+                if (e.key === 'Enter' && !e.shiftKey) {  
+                    e.preventDefault()
+                    
+                    if (!this.isEmptyOrSpaces(message)) {
+                        await this.sendTextMessage(message)
+                    } 
+                }
+            }
+        }
+    }
+
+    getUserAgentPlatformType = () => {
+        const browser = Bowser.getParser(window.navigator.userAgent); 
+        return browser.parsedResult.platform.type  
+    }
+
+    chatboxScrollToBottom = (force=false) => {
+        const chatbox = document.getElementById('chatbox')
+        function isScrollbarAtBottom(element){
+            const offset = Math.abs(element.scrollHeight - element.clientHeight) * .40  
+            return Math.abs(element.scrollHeight - element.clientHeight - element.scrollTop) <= offset
+        }
+
+        if (force) {
+            setTimeout(() => {
+                chatbox.style.scrollBehavior = "smooth"
+                chatbox.scrollTop = chatbox.scrollHeight
+            }, 500)
+        }
+        else {
+            if (isScrollbarAtBottom(chatbox)) {
+                setTimeout(() => {
+                    chatbox.style.scrollBehavior = "smooth"
+                    chatbox.scrollTop = chatbox.scrollHeight
+                }, 500)
+            }
         }
     }
 

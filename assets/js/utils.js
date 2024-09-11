@@ -141,7 +141,7 @@ export default class Utils {
         groupDiv.classList.add('group', 'max-w-[31.25rem]', 'p-5', 'rounded-b', 'transition', 'duration-500', 'rounded-tl', 'ml-4', 'order-2', 'bg-indigo-50', 'dark:bg-gray-600')
  
         const chatMessage = document.createElement('p')
-        chatMessage.classList.add('text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
+        chatMessage.classList.add('whitespace-pre-wrap', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
         chatMessage.setAttribute('tabindex', '0')
         chatMessage.textContent = message
  
@@ -157,8 +157,8 @@ export default class Utils {
         timeDiv.appendChild(timeP)
  
         const img = document.createElement('img')
-        img.src = '/assets/green_checks-6ffb68e3.svg'
-        img.classList.add('w-[.875rem]', 'h-[.875rem]')
+        img.src = '/gray_checks.svg'
+        img.classList.add('w-[.875rem]', 'h-[.875rem]', 'img-check')
  
         flexItemsDiv.appendChild(groupDiv)
         flexItemsDiv.appendChild(timeDiv)
@@ -205,7 +205,7 @@ export default class Utils {
         chatMessageContainer.classList.add('group', 'max-w-[31.25rem]', 'p-5', 'rounded-b', 'transition', 'duration-500', 'rounded-tr', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
  
         const chatMessage = document.createElement('p')
-        chatMessage.classList.add('text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
+        chatMessage.classList.add('whitespace-pre-wrap', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
         chatMessage.setAttribute('tabindex', '0')
         chatMessage.textContent = message
  

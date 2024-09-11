@@ -56,6 +56,46 @@ class MessageController extends AbstractController
         return new JsonResponse($message); 
     }
 
+    #[Route('/get_messages/{uid}/{currentUserId}/{userToChatId}/{page}/{pageSize}/{toReverse}', name: 'app_get_messages', methods: ["GET"])]
+    public function get_messages(string $uid, int $currentUserId, int $userToChatId, int $page, int $pageSize, int $toReverse): JsonResponse {  
+        $this->denyAccessUnlessGranted("ROLE_USER");   
+        $this->denyAccessUnlessCurrentUser($uid);
+        
+        $messages = $this->messageRepository->findBySenderAndReceiver($currentUserId, $userToChatId, $page, $pageSize);
+        usort($messages, function($a, $b) {
+            $dateTimeA = new \DateTime('@' . $a->getTimestamp());
+            $dateTimeB = new \DateTime('@' . $b->getTimestamp());
+            return $dateTimeA <=> $dateTimeB;
+        }); 
+         
+        if ($toReverse) {
+            $messages = array_reverse($messages);
+        }
+      
+        return new JsonResponse($messages);
+    }
+
+    #[Route('/get_last_messages/{uid}/{currentUserId}', name: 'app_get_last_messages', methods: ["GET"])]
+    public function get_last_messages(string $uid, int $currentUserId): JsonResponse {
+        $this->denyAccessUnlessGranted("ROLE_USER");  
+        $this->denyAccessUnlessCurrentUser($uid);
+
+        $last_messages = array();
+        $users = $this->userRepository->findAll();
+        $currentUser = $this->userRepository->find($currentUserId);
+        
+        foreach($users as $user) {
+            if ($user != $currentUser) {
+                $message = $this->messageRepository->findLastMessageBetweenUsers($currentUser->getId(), $user->getId());
+                if ($message != null) { 
+                    array_push($last_messages, $message);
+                }
+            } 
+        }  
+
+        return new JsonResponse($last_messages);
+    } 
+
     private function denyAccessUnlessCurrentUser($uid) {
         $user = $this->userRepository->findOneByEmail($this->getUser()->getUserIdentifier());
         if ($user->getUserDetails()->getUid() != $uid) {
