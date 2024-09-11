@@ -109,9 +109,12 @@ export default class extends Controller {
                 const messageElement = Utils.createIncomingMessageTextElement(messageData.content, user.userDetails.avatar)
                 this.chatboxScrollToBottom()
                 chatbox.appendChild(messageElement)
+
+                Utils.setChatboxMessageAvatarHidden()
+                Utils.setChatboxMessageBorderAndMargin()
             }
 
-            this.setUserLastMesasgeElement(messageData.sender, messageData.content) 
+            this.setUserLastMesasgeElement(messageData.sender, messageData.content)  
         })
 
         await this.sleep(1)
@@ -181,6 +184,7 @@ export default class extends Controller {
             this.setSidebarUserToggleForMobile() 
             this.setMainChatbox()
 
+            this.setDefaultValues()
             await this.setConversations()
         } 
 
@@ -270,7 +274,13 @@ export default class extends Controller {
         await this.sleep(1)
     }
 
-    setConversations = async () => { 
+    setDefaultValues = () => {
+        this.page = 1 
+        this.isReceivedFirstMessage = false
+        this.isLockInfiniteScrolling = true
+    }
+
+    setConversations = async () => {  
         function clearChatboxElement() { 
             const chatbox = document.getElementById('chatbox') 
             const element = document.createElement('div')
@@ -278,9 +288,7 @@ export default class extends Controller {
             chatbox.innerHTML = ''
             chatbox.append(element) 
         }
-
-        this.page = 1 
-        this.isLockInfiniteScrolling = true
+ 
         clearChatboxElement()
         const chatbox = document.getElementById('chatbox')
         const loader = Utils.createLoaderElement()
@@ -422,6 +430,9 @@ export default class extends Controller {
         this.chatboxScrollToBottom(true)
         chatboxInput.textContent = ''
         chatbox.appendChild(messageElement) 
+
+        Utils.setChatboxMessageAvatarHidden()
+        Utils.setChatboxMessageBorderAndMargin()
         
         const response = await this.service.createTextMessage(this.uidValue, `messages/${this.currentUserValue.id}/${this.userToChatId}`, this.currentUserValue.id, this.userToChatId, MessageType.TEXT, content, Date.now(), true)
         const imgCheck = messageElement.querySelector('.img-check')
