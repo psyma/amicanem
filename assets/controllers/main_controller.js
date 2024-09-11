@@ -19,6 +19,14 @@ class MessageType {
     static get GIF() { return GIF }
 }
 
+class Message {
+    constructor(data) {
+        this.id = data.id
+        this.content = data.content
+        this.isSeen = data.isSeen
+    }
+}
+
 export default class extends Controller {
     static values = {
         currentUser: Object,
@@ -40,50 +48,18 @@ export default class extends Controller {
         Pusher.logToConsole = false;
         this.pusher = new Pusher('7c4d952c51d2be9a8302', { cluster: 'ap1' });
 
-        this.setDarkModeToggle()
-        await this.setEncryptionDetails() 
-        //const response = await fetch("/message", { method: "POST"  })
-        //console.log(response.ok)  
-
         const response = await this.service.getUsers(this.uidValue)
         const users = await response.json()
 
-        users.forEach((user) => {
-            const userElement = document.getElementById(`user${user.id}`) // sidebar user list element
-            if (userElement != null) {
-                userElement.onclick = () => {
-                    const name = userElement.getAttribute('name')
-                    const publickey = userElement.getAttribute('publickey')
-                    this.userTochatPublickey = Utils.base64ToArrayBuffer(publickey)
-                    this.userToChatId = user.id
+         
+        this.setDarkModeToggle() 
+        this.setSendMessageButtonClick()
+        await this.setEncryptionDetails() 
 
-                    this.setUserToChatName(name)
-                    this.setSidebarToggleForMobile() 
-                    this.setMainChatbox()
-                }
-            }
-
-            const channel = this.pusher.subscribe('message')
-            channel.bind(`user${user.id}`, (data) => {
-                console.log(data)
-            })
-        })
-
-        const sendMessageButton = document.getElementById('sendMessageButton')
-        sendMessageButton.onclick = async () => {
-            const data = JSON.stringify({
-                sender: this.currentUserValue.id,
-                receiver: this.userToChatId,
-                type: MessageType.TEXT,
-                content: "Hello World!",
-                timestamp: Date.now()
-            })
-
-            const encryptedSenderTextMessage = await Utils.encryptMessage(this.currentUserPublickey, data)
-            const encryptedReceiverTextMessage = await Utils.encryptMessage(this.userTochatPublickey, data)
-            const content = [encryptedSenderTextMessage, encryptedReceiverTextMessage].join("<|>") 
-            await this.service.createTextMessage(this.uidValue, `user${this.userToChatId}`, this.currentUserValue.id, this.userToChatId, MessageType.TEXT, content, Date.now(), true)
-        }
+        users.forEach(async(user) => {
+            await this.setSidebarUserClickEvent(user)
+            await this.setUserPusherChannelSubscription(user)
+        }) 
     } 
 
     setEncryptionDetails = async () => {   
@@ -104,8 +80,36 @@ export default class extends Controller {
         }
     }
 
-    setPusherChannelSubscription = () => {
+    setUserPusherChannelSubscription = async (user) => { 
+        const chatbox = document.getElementById('chatbox')
+        const channel = this.pusher.subscribe('messages')
 
+        channel.bind(`messages/${user.id}/${this.currentUserValue.id}`, async (data) => {
+            const message = new Message(data)   
+            const { sender, receiver } = JSON.parse(atob(message.content))
+            const { id, content, isSeen } = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver))
+
+            const messageElement = Utils.createIncomingMessageTextElement(content)
+            chatbox.appendChild(messageElement)
+        })
+
+        await this.sleep(1)
+    }
+
+    setSidebarUserClickEvent = async (user) => {
+        const userElement = document.getElementById(`user${user.id}`) // sidebar user list element 
+        userElement.onclick = () => {
+            const name = userElement.getAttribute('name')
+            const publickey = userElement.getAttribute('publickey')
+            this.userTochatPublickey = Utils.base64ToArrayBuffer(publickey)
+            this.userToChatId = user.id
+
+            this.setUserToChatName(name)
+            this.setSidebarUserToggleForMobile() 
+            this.setMainChatbox()
+        } 
+
+        await this.sleep(1)
     }
 
     setUserToChatName = (name) => {
@@ -156,11 +160,11 @@ export default class extends Controller {
         });  
     }
 
-    setSidebarToggleForMobile = () => {
+    setSidebarUserToggleForMobile = () => {
         const browser = Bowser.getParser(window.navigator.userAgent); 
         if (browser.parsedResult.platform.type == 'mobile') {
             document.getElementById('separatorSidebarButton').click()
-        }
+        } 
     }
 
     setMainChatbox = () => {
@@ -168,6 +172,47 @@ export default class extends Controller {
         const mainChatboxIntro = document.getElementById('mainChatboxIntro')
 
         mainChatbox.classList.remove('hidden')
-        mainChatboxIntro.classList.add('hidden')
+        mainChatboxIntro.classList.add('hidden') 
+    }
+
+    setSendMessageButtonClick = () => {
+        const chatbox = document.getElementById('chatbox')
+        const chatboxInput = document.getElementById('chatboxInput')
+        const sendMessageButton = document.getElementById('sendMessageButton')
+
+        sendMessageButton.onclick = async () => {
+            const message = chatboxInput.textContent.trim()
+            if (!this.isEmptyOrSpaces(message)) {
+                const data = JSON.stringify({
+                    sender: this.currentUserValue.id,
+                    receiver: this.userToChatId,
+                    type: MessageType.TEXT,
+                    content: message,
+                    timestamp: Date.now()
+                })
+                
+                const encryptedSenderTextMessage = await Utils.encryptMessage(this.currentUserPublickey, data)
+                const encryptedReceiverTextMessage = await Utils.encryptMessage(this.userTochatPublickey, data) 
+                const content = btoa(JSON.stringify({
+                    sender: encryptedSenderTextMessage,
+                    receiver: encryptedReceiverTextMessage
+                }))
+                const response = await this.service.createTextMessage(this.uidValue, `messages/${this.currentUserValue.id}/${this.userToChatId}`, this.currentUserValue.id, this.userToChatId, MessageType.TEXT, content, Date.now(), true)
+                if (response.ok) {
+                    const messageElement = Utils.createOutgoingMessageTextElement(message)
+                    chatbox.appendChild(messageElement)
+                }
+            }
+
+            chatboxInput.textContent = ''
+        }
+    }
+
+    isEmptyOrSpaces = (str) => {
+        return str === null || str.match(/^ *$/) !== null
+    } 
+
+    sleep = (ms) => {
+        return new Promise(resolve => setTimeout(resolve, ms))
     }
 }
