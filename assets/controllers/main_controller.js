@@ -49,6 +49,7 @@ export default class extends Controller {
         this.service = new Service()
 
         this.usersOnlineMap = new Map()
+        this.usersMap = new Map()
 
         Pusher.logToConsole = false;
         this.pusher = new Pusher('7c4d952c51d2be9a8302', { cluster: 'ap1', authEndpoint: '/pusher_auth' });
@@ -67,6 +68,8 @@ export default class extends Controller {
         users.forEach(async(user) => {
             await this.setSidebarUserClickEvent(user)
             await this.setUserPusherMessagesChannel(user)
+            
+            this.usersMap.set(user.id, user)
         }) 
 
         
@@ -100,7 +103,7 @@ export default class extends Controller {
             const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver))
             
             if (messageData.sender == this.userToChatId) {
-                const messageElement = Utils.createIncomingMessageTextElement(messageData.content)
+                const messageElement = Utils.createIncomingMessageTextElement(messageData.content, user.userDetails.avatar)
                 this.chatboxScrollToBottom()
                 chatbox.appendChild(messageElement)
             }
@@ -231,9 +234,9 @@ export default class extends Controller {
 
                     const imgCheck = messageElement.querySelector('.img-check')
                     imgCheck.src = '/green_checks.svg' 
-                } catch(e) {
+                } catch(e) { 
                     const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver)) 
-                    const messageElement = Utils.createIncomingMessageTextElement(messageData.content)
+                    const messageElement = Utils.createIncomingMessageTextElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar)
                     chatbox.appendChild(messageElement) 
                 }
             } 
@@ -364,18 +367,17 @@ export default class extends Controller {
         const sendMessageButton = document.getElementById('sendMessageButton')
 
         sendMessageButton.onclick = async () => {
-            const message = chatboxInput.textContent.trim() 
+            const message = chatboxInput.innerText.trim() 
             if (!this.isEmptyOrSpaces(message)) {
                 await this.sendTextMessage(message)
-            }
-
+            } 
         }
     }
 
     setSendMessageChatboxInputKeyDown = () => { 
         const chatboxInput = document.getElementById('chatboxInput')
         chatboxInput.onkeydown = async (e) => {
-            const message = e.target.textContent.trim()
+            const message = e.target.innerText.trim()
             if (this.getUserAgentPlatformType() == 'desktop') {
                 if (e.key === 'Enter' && !e.shiftKey) {  
                     e.preventDefault()

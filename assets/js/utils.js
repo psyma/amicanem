@@ -141,7 +141,7 @@ export default class Utils {
         groupDiv.classList.add('group', 'max-w-[31.25rem]', 'p-5', 'rounded-b', 'transition', 'duration-500', 'rounded-tl', 'ml-4', 'order-2', 'bg-indigo-50', 'dark:bg-gray-600')
  
         const chatMessage = document.createElement('p')
-        chatMessage.classList.add('whitespace-pre-wrap', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
+        chatMessage.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
         chatMessage.setAttribute('tabindex', '0')
         chatMessage.textContent = message
  
@@ -174,7 +174,7 @@ export default class Utils {
         return mainDiv 
     }
 
-    static createIncomingMessageTextElement = (message) => {  
+    static createIncomingMessageTextElement = (message, avatar) => {  
         const mainDiv = document.createElement('div')
  
         const innerDiv1 = document.createElement('div')
@@ -192,7 +192,7 @@ export default class Utils {
  
         const avatarImageDiv = document.createElement('div')
         avatarImageDiv.classList.add('w-[2.25rem]', 'h-[2.25rem]', 'bg-cover', 'bg-center', 'rounded-full')
-        avatarImageDiv.style.backgroundImage = 'url("https://images.unsplash.com/photo-1522556189639-b150ed9c4330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80")'
+        avatarImageDiv.style.backgroundImage = `url("${avatar}")`
  
         avatarDiv.appendChild(avatarImageDiv)
  
@@ -205,7 +205,7 @@ export default class Utils {
         chatMessageContainer.classList.add('group', 'max-w-[31.25rem]', 'p-5', 'rounded-b', 'transition', 'duration-500', 'rounded-tr', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
  
         const chatMessage = document.createElement('p')
-        chatMessage.classList.add('whitespace-pre-wrap', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
+        chatMessage.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
         chatMessage.setAttribute('tabindex', '0')
         chatMessage.textContent = message
  
