@@ -167,8 +167,7 @@ export default class extends Controller {
         userElement.onclick = async () => {
             const name = `${user.userDetails.firstname} ${user.userDetails.lastname}`
             const avatar = user.userDetails.avatar
-            const publickey = user.userDetails.publickey.publickey
-            //const userOnlineStatus = document.getElementById(`user${user.id}-online-status`)
+            const publickey = user.userDetails.publickey.publickey 
             this.userTochatPublickey = Utils.base64ToArrayBuffer(publickey)
             this.userToChatId = user.id
 
@@ -217,11 +216,14 @@ export default class extends Controller {
             chatbox.append(element)
         }
 
-        const response = await this.service.getMessages(this.uidValue, this.currentUserValue.id, this.userToChatId, this.page, this.pageSize) 
+        clearChatboxElement()
+        const chatbox = document.getElementById('chatbox')
+        const loader = Utils.createLoaderElement()
+        chatbox.appendChild(loader)
+
+        const response = await this.service.getMessages(this.uidValue, this.currentUserValue.id, this.userToChatId, this.page, this.pageSize)  
         if (response.ok) { 
-            const messages = await response.json() 
-            const chatbox = document.getElementById('chatbox')
-            clearChatboxElement()
+            const messages = await response.json()   
             for(let i = 0; i < messages.length; i++) {
                 const data = messages[i] 
                 const message = new Message(data)    
@@ -242,6 +244,8 @@ export default class extends Controller {
             } 
             this.chatboxScrollToBottom(true)
         }
+
+        chatbox.removeChild(loader)
     }
 
     setUserToChatName = (name) => {

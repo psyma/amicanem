@@ -121,6 +121,16 @@ export default class Utils {
         }
         return bytes.buffer;
     }  
+    
+    static createLoaderElement = () => {
+        const colorTheme = localStorage.getItem('color-theme') 
+        const loader = document.createElement("div")
+        loader.className = colorTheme === "dark" ? "loader-white absolute" : "loader-black absolute" 
+        loader.style.left = "calc(50% - 25px)"
+        loader.style.top = "50%"
+
+        return loader
+    }
 
     static createOutgoingMessageTextElement = (message) => {  
         const mainDiv = document.createElement('div')

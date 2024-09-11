@@ -39,19 +39,63 @@ input[type="range"] {
     width: 100%;
     accent-color: white;
 }
- 
-.loader { 
-    aspect-ratio: 5;
-    --_g: no-repeat radial-gradient(circle closest-side,gray 90%,#0000);
-    background: 
-      var(--_g) 0%   50%,
-      var(--_g) 50%  50%,
-      var(--_g) 100% 50%;
-    background-size: calc(100%/3) 100%;
-    animation: l7 1.25s infinite linear;
+  
+.loader-white {
+    width: 50px;
+    aspect-ratio: 1;
+    display: grid;
+    border-radius: 50%;
+    background:
+        linear-gradient(0deg ,rgba(255, 255, 255, 0.5) 30%,#0000 0 70%,rgb(255, 255, 255) 0) 50%/8% 100%,
+        linear-gradient(90deg,rgba(255, 255, 255, 0.5) 30%,#0000 0 70%,rgba(255, 255, 255, 0.75) 0) 50%/100% 8%;
+    background-repeat: no-repeat;
+    animation: l233 1s infinite steps(12);
 }
-@keyframes l7 {
-    33%{background-size:calc(100%/3) 0%  ,calc(100%/3) 100%,calc(100%/3) 100%}
-    50%{background-size:calc(100%/3) 100%,calc(100%/3) 0%  ,calc(100%/3) 100%}
-    66%{background-size:calc(100%/3) 100%,calc(100%/3) 100%,calc(100%/3) 0%  }
+.loader-white::before,
+.loader-white::after {
+    content: "";
+    grid-area: 1/1;
+    border-radius: 50%;
+    background: inherit;
+    opacity: 0.915;
+    transform: rotate(30deg);
+}
+.loader-white::after {
+    opacity: 0.83;
+    transform: rotate(60deg);
+}
+
+@keyframes l233 {
+    100% {transform: rotate(1turn)}
+}
+
+/* HTML: <div class="loader"></div> */
+.loader-black {
+    width: 50px;
+    aspect-ratio: 1;
+    display: grid;
+    border-radius: 50%;
+    background:
+        linear-gradient(0deg ,rgb(0 0 0/50%) 30%,#0000 0 70%,rgb(0 0 0/100%) 0) 50%/8% 100%,
+        linear-gradient(90deg,rgb(0 0 0/25%) 30%,#0000 0 70%,rgb(0 0 0/75% ) 0) 50%/100% 8%;
+    background-repeat: no-repeat;
+    animation: l234 1s infinite steps(12);
+}
+.loader-black::before,
+.loader-black::after {
+    content: "";
+    grid-area: 1/1;
+    border-radius: 50%;
+    background: inherit;
+    opacity: 0.915;
+    transform: rotate(30deg);
+}
+.loader-black::after {
+    opacity: 0.83;
+    transform: rotate(60deg);
+}
+
+
+@keyframes l234 {
+    100% {transform: rotate(1turn)}
 }
