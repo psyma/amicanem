@@ -48,8 +48,10 @@ export default class extends Controller {
         this.pageSize = 20
         this.service = new Service()
 
+        this.usersOnlineMap = new Map()
+
         Pusher.logToConsole = false;
-        this.pusher = new Pusher('7c4d952c51d2be9a8302', { cluster: 'ap1' });
+        this.pusher = new Pusher('7c4d952c51d2be9a8302', { cluster: 'ap1', authEndpoint: '/pusher_auth' });
 
         const response = await this.service.getUsers(this.uidValue)
         const users = await response.json()
@@ -57,14 +59,17 @@ export default class extends Controller {
         
         this.setDarkModeToggle() 
         this.setSendMessageButtonClick()
+        this.setUserPusherPresenceChannel()
         this.setSendMessageChatboxInputKeyDown()
         await this.setEncryptionDetails()  
         await this.setUserLastMessage()
 
         users.forEach(async(user) => {
             await this.setSidebarUserClickEvent(user)
-            await this.setUserPusherChannelSubscription(user)
+            await this.setUserPusherMessagesChannel(user)
         }) 
+
+        
     } 
 
     setEncryptionDetails = async () => {   
@@ -83,9 +88,9 @@ export default class extends Controller {
             this.currentUserPublickey = Utils.base64ToArrayBuffer(this.publickeyValue)
             this.currentUserPrivatekey = Utils.base64ToArrayBuffer(CryptoJS.AES.decrypt(this.privatekeyValue, this.passphraseValue).toString(CryptoJS.enc.Utf8))
         }
-    }
+    } 
 
-    setUserPusherChannelSubscription = async (user) => { 
+    setUserPusherMessagesChannel = async (user) => { 
         const chatbox = document.getElementById('chatbox')
         const channel = this.pusher.subscribe('messages')
 
@@ -106,17 +111,67 @@ export default class extends Controller {
         await this.sleep(1)
     }
 
+    setUserPusherPresenceChannel = () => {
+        let channel = this.pusher.subscribe('presence-online-users'); 
+        let myThis = this
+        channel.bind('pusher:subscription_succeeded', function(members) {  
+            members.each(function(member) {
+                const id = member.info.id
+                const userOnlineStatus = document.getElementById(`user${id}-online-status`)
+                userOnlineStatus.classList.remove('bg-red-400')
+                userOnlineStatus.classList.add('bg-green-400') 
+
+                myThis.usersOnlineMap.set(id, true) 
+            });
+        });
+        channel.bind('pusher:member_added', function(member) {
+            const id = member.info.id
+            const userOnlineStatus = document.getElementById(`user${id}-online-status`)
+            userOnlineStatus.classList.remove('bg-red-400')
+            userOnlineStatus.classList.add('bg-green-400') 
+
+            if (id == myThis.userToChatId) {
+                const userToChatOnlineStatus = document.getElementById('userToChatOnlineStatus')
+                const userToChatOnlineText = document.getElementById('userToChatOnlineText') 
+                userToChatOnlineStatus.classList.remove('bg-red-400')
+                userToChatOnlineStatus.classList.add('bg-green-400')
+                userToChatOnlineText.textContent = "Active now" 
+            }
+
+            myThis.usersOnlineMap.set(id, true)
+        });
+        
+        channel.bind('pusher:member_removed', function(member) {
+            const id = member.info.id
+            const userOnlineStatus = document.getElementById(`user${id}-online-status`)
+            userOnlineStatus.classList.add('bg-red-400')
+            userOnlineStatus.classList.remove('bg-green-400')
+
+            if (id == myThis.userToChatId) {
+                const userToChatOnlineStatus = document.getElementById('userToChatOnlineStatus')
+                const userToChatOnlineText = document.getElementById('userToChatOnlineText') 
+                userToChatOnlineStatus.classList.remove('bg-green-400')
+                userToChatOnlineStatus.classList.add('bg-red-400')
+                userToChatOnlineText.textContent = "Last seen 22 min ago" 
+            }
+
+            myThis.usersOnlineMap.set(id, false)
+        });
+    }
+
     setSidebarUserClickEvent = async (user) => {
         const userElement = document.getElementById(`user${user.id}`) // sidebar user list element   
         userElement.onclick = async () => {
             const name = `${user.userDetails.firstname} ${user.userDetails.lastname}`
             const avatar = user.userDetails.avatar
             const publickey = user.userDetails.publickey.publickey
+            //const userOnlineStatus = document.getElementById(`user${user.id}-online-status`)
             this.userTochatPublickey = Utils.base64ToArrayBuffer(publickey)
             this.userToChatId = user.id
 
             this.setUserToChatName(name)
             this.setUserToChatAvatar(avatar)
+            this.setUserToChatOnlineStatus()
             this.setSidebarUserToggleForMobile() 
             this.setMainChatbox()
 
@@ -194,6 +249,22 @@ export default class extends Controller {
     setUserToChatAvatar = (avatar) => {
         const userToChatAvatar = document.getElementById('userToChatAvatar')
         userToChatAvatar.style.backgroundImage = `url('${avatar}')`
+    }
+
+    setUserToChatOnlineStatus = () => {
+        const isOnline = this.usersOnlineMap.get(this.userToChatId)
+        const userToChatOnlineStatus = document.getElementById('userToChatOnlineStatus')
+        const userToChatOnlineText = document.getElementById('userToChatOnlineText')
+        if (isOnline) {
+            userToChatOnlineStatus.classList.remove('bg-red-400')
+            userToChatOnlineStatus.classList.add('bg-green-400')
+            userToChatOnlineText.textContent = "Active now"
+        }
+        else {
+            userToChatOnlineStatus.classList.add('bg-red-400')
+            userToChatOnlineStatus.classList.remove('bg-green-400')
+            userToChatOnlineText.textContent = "Last seen 22 min ago"
+        }
     }
 
     setDarkModeToggle = () => { 
