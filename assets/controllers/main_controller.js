@@ -49,6 +49,7 @@ export default class extends Controller {
         this.service = new Service()
 
         this.isReceivedFirstMessage = false
+        this.isLockInfiniteScrolling = false
         this.usersOnlineMap = new Map()
         this.usersMap = new Map()
 
@@ -172,6 +173,7 @@ export default class extends Controller {
             const publickey = user.userDetails.publickey.publickey 
             this.userTochatPublickey = Utils.base64ToArrayBuffer(publickey)
             this.userToChatId = user.id
+            this.isSidebarUserClickOnce = true
 
             this.setUserToChatName(name)
             this.setUserToChatAvatar(avatar)
@@ -212,8 +214,10 @@ export default class extends Controller {
     setChatboxInfiniteScrolling = async () => {
         const chatbox = document.getElementById('chatbox')
         chatbox.addEventListener('scroll', async () => {
-            if (chatbox.scrollTop == 0 && !this.isReceivedFirstMessage) {
-                this.page += 1 
+            const scrollTop = chatbox.scrollTop; 
+            if (scrollTop == 0 && !this.isReceivedFirstMessage && !this.isLockInfiniteScrolling) {
+                this.page += 1   
+                this.isLockInfiniteScrolling = true
                 const flexGrowChild = chatbox.removeChild(chatbox.children[0]) 
                 const firstChild = chatbox.children[0]
                 const loader = Utils.createLoaderElement()
@@ -249,6 +253,7 @@ export default class extends Controller {
                         setTimeout(() => {
                             firstChild.scrollIntoView({ behavior: "smooth", block: "end" })
                             chatbox.prepend(flexGrowChild)
+                            this.isLockInfiniteScrolling = false
                         }, 500)
                     }
                     else {
@@ -256,27 +261,33 @@ export default class extends Controller {
                     }
                 }
             }
-        })
+
+            else {
+                this.isSidebarUserClickOnce = false
+            }
+        }) 
 
         await this.sleep(1)
     }
 
     setConversations = async () => { 
-        function clearChatboxElement() {
-            const chatbox = document.getElementById('chatbox')
+        function clearChatboxElement() { 
+            const chatbox = document.getElementById('chatbox') 
             const element = document.createElement('div')
-            element.className = 'flex flex-grow'
-            chatbox.textContent = ''
-            chatbox.append(element)
+            element.className = 'flex flex-grow' 
+            chatbox.innerHTML = ''
+            chatbox.append(element) 
         }
 
+        this.page = 1 
+        this.isLockInfiniteScrolling = true
         clearChatboxElement()
         const chatbox = document.getElementById('chatbox')
         const loader = Utils.createLoaderElement()
         chatbox.appendChild(loader)
 
         const response = await this.service.getMessages(this.uidValue, this.currentUserValue.id, this.userToChatId, this.page, this.pageSize)  
-        if (response.ok) { 
+        if (response.ok) {  
             const messages = await response.json()   
             for(let i = 0; i < messages.length; i++) {
                 const data = messages[i] 
@@ -299,6 +310,7 @@ export default class extends Controller {
             this.chatboxScrollToBottom(true)
         }
 
+        this.isLockInfiniteScrolling = false
         chatbox.removeChild(loader) 
         Utils.setChatboxMessageAvatarHidden()
         Utils.setChatboxMessageBorderAndMargin()
