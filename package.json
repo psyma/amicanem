@@ -26,6 +26,7 @@
         "@hotwired/stimulus": "^3.2.2",
         "@symfony/stimulus-bridge": "^3.2.2",
         "axios": "^1.7.7",
+        "bowser": "^2.11.0",
         "crypto-js": "^4.2.0",
         "flowbite": "^2.5.1",
         "pusher-js": "^8.4.0-rc2"

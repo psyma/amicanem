@@ -3,18 +3,18 @@
     <div class="w-full min-h-[5rem] max-h-fit px-5 py-6 flex justify-between items-center">
         <div class="flex items-center gap-1">
             <p class="text-black opacity-60 dark:text-white text-xl leading-4 tracking-[.01rem] outline-none" tabindex="0">Messages</p>
-            <button id="theme-toggle" type="button" aria-hidden="false" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
+            <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
                 <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
                 <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
             </button> 
         </div>
         <button data-drawer-target="separator-sidebar" data-drawer-toggle="separator-sidebar" aria-controls="separator-sidebar" type="button" class="sm:hidden flex items-center rounded-full outline-none focus:outline-none hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-600 transition-all duration-200 w-7 h-7" aria-label="compose conversation" title="compose conversation">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 12" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="w-6 h-6 text-indigo-300 hover:text-indigo-400">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"></path>
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"></path>
             </svg>
         </button> 
     </div> 
-    <div class="px-5 xs:pb-6 md:pb-5">   
+    <div class="px-5 pb-5">   
         <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
         <div class="relative flex justify-start">
             <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none">
@@ -28,7 +28,7 @@
     <div role="list" aria-label="conversations" class="w-full h-full scroll-smooth scrollbar-hidden" style="overflow: visible auto;">
         {% for user in users %}
             {% if user != currentUser %}
-                <div id="user{{ user.id }}" class="select-none" role="listitem" publickey="{{ user.userDetails.publickey.publickey }}">
+                <div id="user{{ user.id }}" class="select-none" role="listitem" publickey="{{ user.userDetails.publickey.publickey }}" name="{{ user.userDetails.firstname }} {{ user.userDetails.lastname }}">
                     <button aria-label="conversation {{ user.userDetails.firstname }} {{ user.userDetails.lastname }}" tabindex="0" class="w-full h-[5.75rem] px-5 py-6 mb-3 flex rounded focus:bg-indigo-100 dark:active:bg-gray-600 dark:focus:bg-gray-600 dark:hover:bg-gray-600 hover:bg-indigo-100 active:bg-indigo-100 focus:outline-none transition duration-500 ease-out">
                         <div class="mr-4">
                             <div class="w-7 h-7 rounded-full bg-cover bg-center" style="background-image: url(&quot;https://images.unsplash.com/photo-1522556189639-b150ed9c4330?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=387&amp;q=80&quot;);"></div>
@@ -56,149 +56,7 @@
                     </button> 
                 </div>
             {% endif %}
-        {% endfor %}
-        <div class="hidden">
-            <div>
-                <button aria-label="toggle archived conversations" class="group w-full h-[5.75rem] px-5 py-6 mb-3 flex rounded focus:outline-none transition duration-300 ease-out focus:bg-indigo-100 dark:active:bg-gray-600 dark:focus:bg-gray-600 dark:hover:bg-gray-600 hover:bg-indigo-100 active:bg-indigo-100" tabindex="0">
-                    <div class="mr-4">
-                        <div class="w-7 h-7 flex justify-center items-center rounded-full bg-gray-100 dark:bg-gray-1000 transition duration-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="w-5 h-5 stroke-1 text-gray-500 dark:text-white transition duration-500">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="w-full h-full flex justify-center items-center hidden">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="w-5 h-5 mr-3 stroke-1">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                        <p class="outline-none text-sm font-normal leading-4 tracking-[.01rem] text-white dark:text-white group-hover:text-white group-focus:text-white"> Close Archive </p>
-                    </div>
-                    <div class="w-full flex flex-col">
-                        <div class="w-full">
-                            <div class="flex items-start">
-                                <div class="grow mb-4 text-start">
-                                    <p class="outline-none text-sm text-black opacity-60 dark:text-white dark:opacity-70 font-semibold leading-4 tracking-[.01rem]"> Archived Conversations </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div>
-                            <p class="outline-none text-sm text-black opacity-60 dark:text-white dark:opacity-70 font-normal leading-4 tracking-[.01rem] flex justify-start items-center">2 conversations </p>
-                        </div>
-                    </div>
-                </button>
-            </div>
-            <div>
-                <div data-v-f6655914="">
-                    <div class="select-none" role="listitem">
-                        <button aria-label="conversation withElijah Sabrina" tabindex="0" class="w-full h-[5.75rem] px-5 py-6 mb-3 flex rounded focus:bg-indigo-100 dark:active:bg-gray-600 dark:focus:bg-gray-600 dark:hover:bg-gray-600 hover:bg-indigo-100 active:bg-indigo-100 focus:outline-none transition duration-500 ease-out">
-                            <div class="mr-4">
-                                <div class="w-7 h-7 rounded-full bg-cover bg-center" style="background-image: url(&quot;https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=387&amp;q=80&quot;);"></div>
-                            </div>
-                            <div class="w-full flex flex-col">
-                                <div class="w-full">
-                                    <div class="flex items-start">
-                                        <div class="grow mb-4 text-start">
-                                            <p class="outline-none text-sm text-black opacity-60 dark:text-white dark:opacity-70 font-semibold leading-4 tracking-[.01rem]">Elijah Sabrina</p>
-                                        </div>
-                                        <p class="outline-none text-xs text-black opacity-60 dark:text-white dark:opacity-70 font-light leading-4 tracking-[.01rem]">6:20 pm</p>
-                                    </div>
-                                </div>
-                                <div class="flex justify-between">
-                                    <div>
-                                        <p class="outline-none text-sm text-black opacity-60 dark:text-white dark:opacity-70 font-normal leading-4 tracking-[.01rem] flex justify-start items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="w-4 h-4 mr-2 text-black opacity-60 dark:text-white dark:opacity-70 text-indigo-400">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"></path>
-                                            </svg>
-                                            <span class="text-indigo-400"> Recording 23s</span>
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <div class="w-[1.125rem] h-[1.125rem] flex justify-center items-center rounded-[50%] bg-indigo-300">
-                                            <p class="outline-none text-xs font-light leading-4 tracking-[.01rem] text-white">2</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </button> 
-                    </div>
-                    <div class="select-none" role="listitem">
-                        <button aria-label="conversation withDylan Billy" tabindex="0" class="w-full h-[5.75rem] px-5 py-6 mb-3 flex rounded focus:bg-indigo-100 dark:active:bg-gray-600 dark:focus:bg-gray-600 dark:hover:bg-gray-600 hover:bg-indigo-100 active:bg-indigo-100 focus:outline-none transition duration-500 ease-out">
-                            <div class="mr-4">
-                                <div class="w-7 h-7 rounded-full bg-cover bg-center" style="background-image: url(&quot;https://images.unsplash.com/photo-1522556189639-b150ed9c4330?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=387&amp;q=80&quot;);"></div>
-                            </div>
-                            <div class="w-full flex flex-col">
-                                <div class="w-full">
-                                    <div class="flex items-start">
-                                        <div class="grow mb-4 text-start">
-                                            <p class="outline-none text-sm text-black opacity-60 dark:text-white dark:opacity-70 font-semibold leading-4 tracking-[.01rem]">Dylan Billy</p>
-                                        </div>
-                                        <p class="outline-none text-xs text-black opacity-60 dark:text-white dark:opacity-70 font-light leading-4 tracking-[.01rem]">1:30 pm</p>
-                                    </div>
-                                </div>
-                                <div class="flex justify-between">
-                                    <div>
-                                        <p class="outline-none text-sm text-black opacity-60 dark:text-white dark:opacity-70 font-normal leading-4 tracking-[.01rem] flex justify-start items-center">
-                                            <span class="">You're welcome</span>
-                                        </p>
-                                    </div>
-                                    <!---->
-                                </div>
-                            </div>
-                        </button> 
-                    </div>
-                    <div class="select-none" role="listitem">
-                        <button aria-label="conversation withDesign Team" tabindex="0" class="w-full h-[5.75rem] px-5 py-6 mb-3 flex rounded focus:bg-indigo-100 dark:active:bg-gray-600 dark:focus:bg-gray-600 dark:hover:bg-gray-600 hover:bg-indigo-100 active:bg-indigo-100 focus:outline-none transition duration-500 ease-out md:bg-indigo-100 md:dark:bg-gray-600">
-                            <div class="mr-4">
-                                <div class="w-7 h-7 rounded-full bg-cover bg-center" style="background-image: url(&quot;https://images.unsplash.com/photo-1573867639040-6dd25fa5f597?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=870&amp;q=80&quot;);"></div>
-                            </div>
-                            <div class="w-full flex flex-col">
-                                <div class="w-full">
-                                    <div class="flex items-start">
-                                        <div class="grow mb-4 text-start">
-                                            <p class="outline-none text-sm text-black opacity-60 dark:text-white dark:opacity-70 font-semibold leading-4 tracking-[.01rem]">Design Team</p>
-                                        </div>
-                                        <p class="outline-none text-xs text-black opacity-60 dark:text-white dark:opacity-70 font-light leading-4 tracking-[.01rem]">5:00 pm</p>
-                                    </div>
-                                </div>
-                                <div class="flex justify-between">
-                                    <div>
-                                        <p class="outline-none text-sm text-black opacity-60 dark:text-white dark:opacity-70 font-normal leading-4 tracking-[.01rem] flex justify-start items-center">
-                                            <span class="">Ok next week then.</span>
-                                        </p>
-                                    </div>
-                                    <!---->
-                                </div>
-                            </div>
-                        </button> 
-                    </div>
-                    <div class="select-none" role="listitem">
-                        <button aria-label="conversation withBreaking News" tabindex="0" class="w-full h-[5.75rem] px-5 py-6 mb-3 flex rounded focus:bg-indigo-100 dark:active:bg-gray-600 dark:focus:bg-gray-600 dark:hover:bg-gray-600 hover:bg-indigo-100 active:bg-indigo-100 focus:outline-none transition duration-500 ease-out">
-                            <div class="mr-4">
-                                <div class="w-7 h-7 rounded-full bg-cover bg-center" style="background-image: url(&quot;https://images.unsplash.com/photo-1572949645841-094f3a9c4c94?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=387&amp;q=80&quot;);"></div>
-                            </div>
-                            <div class="w-full flex flex-col">
-                                <div class="w-full">
-                                    <div class="flex items-start">
-                                        <div class="grow mb-4 text-start">
-                                            <p class="outline-none text-sm text-black opacity-60 dark:text-white dark:opacity-70 font-semibold leading-4 tracking-[.01rem]">Breaking News</p>
-                                        </div>
-                                        <p class="outline-none text-xs text-black opacity-60 dark:text-white dark:opacity-70 font-light leading-4 tracking-[.01rem]">5:00 pm</p>
-                                    </div>
-                                </div>
-                                <div class="flex justify-between">
-                                    <div>
-                                        <p class="outline-none text-sm text-black opacity-60 dark:text-white dark:opacity-70 font-normal leading-4 tracking-[.01rem] flex justify-start items-center">
-                                            <span class="">Apple Watch Ultra and n...</span>
-                                        </p>
-                                    </div>
-                                    <!---->
-                                </div>
-                            </div>
-                        </button> 
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% endfor %} 
     </div>  
 </div>   
 
