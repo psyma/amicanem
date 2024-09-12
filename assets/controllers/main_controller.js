@@ -16,15 +16,7 @@ class MessageType {
     static get TEXT() { return TEXT }
     static get IMAGE() { return IMAGE }
     static get GIF() { return GIF }
-}
-
-class Message {
-    constructor(data) {
-        this.id = data.id
-        this.content = data.content
-        this.isSeen = data.isSeen
-    }
-}
+} 
 
 export default class extends Controller {
     static values = {
@@ -100,9 +92,9 @@ export default class extends Controller {
         const chatbox = document.getElementById('chatbox')
         const channel = this.pusher.subscribe('messages')
 
-        channel.bind(`messages/${user.id}/${this.currentUserValue.id}`, async (data) => {
-            const message = new Message(data)    
-            const { sender, receiver } = JSON.parse(atob(message.content))
+        channel.bind(`messages/${user.id}/${this.currentUserValue.id}`, async (data) => { 
+            const { id, content, isSeen } = data
+            const { sender, receiver } = JSON.parse(atob(content))
             const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver))
             
             if (messageData.sender == this.userToChatId) {
@@ -200,9 +192,9 @@ export default class extends Controller {
         const response = await this.service.getLastMessages(this.uidValue, this.currentUserValue.id)
         if (response.ok) {
             const messages = await response.json()
-            messages.forEach(async(data) => { 
-                const message = new Message(data)    
-                const { sender, receiver } = JSON.parse(atob(message.content)) 
+            messages.forEach(async(data) => {   
+                const { id, content, isSeen } = data
+                const { sender, receiver } = JSON.parse(atob(content)) 
 
                 try { 
                     const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender)) 
@@ -232,10 +224,9 @@ export default class extends Controller {
                     const messages = await response.json()
                     chatbox.removeChild(loader)
                     if (messages.length) { 
-                        for(let i = 0; i < messages.length; i++) {
-                            const data = messages[i] 
-                            const message = new Message(data)    
-                            const { sender, receiver } = JSON.parse(atob(message.content)) 
+                        for(let i = 0; i < messages.length; i++) { 
+                            const { id, content, isSeen } = messages[i] 
+                            const { sender, receiver } = JSON.parse(atob(content)) 
             
                             try {
                                 const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender)) 
@@ -297,10 +288,9 @@ export default class extends Controller {
         const response = await this.service.getMessages(this.uidValue, this.currentUserValue.id, this.userToChatId, this.page, this.pageSize)  
         if (response.ok) {  
             const messages = await response.json()   
-            for(let i = 0; i < messages.length; i++) {
-                const data = messages[i] 
-                const message = new Message(data)    
-                const { sender, receiver } = JSON.parse(atob(message.content)) 
+            for(let i = 0; i < messages.length; i++) { 
+                const { id, content, isSeen } = messages[i]
+                const { sender, receiver } = JSON.parse(atob(content)) 
 
                 try {
                     const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender)) 
