@@ -3,9 +3,9 @@
     <div class="w-full min-h-[5rem] max-h-fit px-5 py-6 flex justify-between items-center">
         <div class="flex items-center gap-1">
             <p class="text-black opacity-60 dark:text-white text-xl leading-4 tracking-[.01rem] outline-none" tabindex="0">Messages</p>
-            <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 rounded-lg text-sm p-2.5">
-                <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-                <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+            <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 rounded-lg text-sm p-2.5" aria-label="Toggle light/dark mode" title="Toggle light/dark mode" >
+                <svg id="theme-toggle-dark-icon" aria-hidden="true" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                <svg id="theme-toggle-light-icon" aria-hidden="true" title="Light mode" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
             </button> 
         </div>
         <button data-drawer-target="separator-sidebar" data-drawer-toggle="separator-sidebar" aria-controls="separator-sidebar" type="button" class="sm:hidden flex items-center rounded-full outline-none focus:outline-none hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-600 transition-all duration-200 w-7 h-7" aria-label="compose conversation" title="compose conversation">
@@ -22,13 +22,13 @@
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                 </svg>
             </div>
-            <input type="search" id="default-search" class="flex w-full p-3 ps-10 text-sm text-gray-900 border border-gray-400 rounded-sm bg-gray-200 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500" placeholder="Search messages or users" required />
+            <input type="search" id="default-search" aria-label="Search" title="Search" class="flex w-full p-3 ps-10 text-sm text-gray-900 border border-gray-400 rounded-sm bg-gray-200 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500" placeholder="Search messages or users" required />
         </div> 
     </div>
     <div id="usersList" role="list" aria-label="conversations" class="w-full h-full scroll-smooth scrollbar-hidden" style="overflow: visible auto;">
         {% for user in users %} 
             <div id="user{{ user.id }}" class="select-none {{ user == currentUser ? 'hidden' : '' }}" role="listitem">
-                <button aria-label="conversation {{ user.userDetails.firstname }} {{ user.userDetails.lastname }}" tabindex="0" class="w-full h-[5rem] px-5 py-5 flex items-center rounded focus:bg-indigo-100 dark:active:bg-gray-600 dark:focus:bg-gray-600 dark:hover:bg-gray-600 hover:bg-indigo-100 active:bg-indigo-100 focus:outline-none transition duration-500 ease-out">
+                <button aria-label="Chat with {{ user.userDetails.firstname }} {{ user.userDetails.lastname }}" title="Chat with {{ user.userDetails.firstname }} {{ user.userDetails.lastname }}" tabindex="0" class="w-full h-[5rem] px-5 py-5 flex items-center rounded focus:bg-indigo-100 dark:active:bg-gray-600 dark:focus:bg-gray-600 dark:hover:bg-gray-600 hover:bg-indigo-100 active:bg-indigo-100 focus:outline-none transition duration-500 ease-out">
                     <div class="relative mr-4">
                         <div class="w-12 h-12 rounded-full bg-contain bg-center shadow border border-gray-200 dark:border-gray-700" style="background-image: url('{{ user.userDetails.avatar }}');"></div>
                         <span id="user{{ user.id }}-online-status" class="bottom-0 left-8 absolute w-3.5 h-3.5 bg-red-400 border-2 border-white dark:border-gray-800 rounded-full"></span>
