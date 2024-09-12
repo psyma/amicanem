@@ -209,7 +209,7 @@ export default class Utils {
 
     static setUserLastMessageTimeAgo = (id, timestamp, timeAgo) => {
         const userLastMessageTimeAgo = document.getElementById(`user${id}-time-ago`) 
-        userLastMessageTimeAgo.textContent = timeAgo.format(timestamp, 'twitter')
+        userLastMessageTimeAgo.textContent = "·" + timeAgo.format(timestamp, 'twitter')
         if (this.isTimestampIsGreaterThanNminutes(timestamp, 60)) {
             var intervalId = setInterval(() => { 
                 const userLastMessage = document.getElementById(`user${id}-last-message`)
@@ -218,7 +218,7 @@ export default class Utils {
                     clearInterval(intervalId)
                 }
                 else {
-                    userLastMessageTimeAgo.textContent = timeAgo.format(timestamp, 'twitter')
+                    userLastMessageTimeAgo.textContent = "·" + timeAgo.format(timestamp, 'twitter')
                 }
  
             }, 30 * 1000)
@@ -260,7 +260,7 @@ export default class Utils {
         flexItemsDiv.classList.add('flex', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
-        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'ml-4', 'order-2', 'bg-indigo-50', 'dark:bg-gray-600')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'ml-4', 'order-2', 'bg-indigo-50', 'dark:bg-slate-600')
  
         const chatContent = document.createElement('p')
         chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
