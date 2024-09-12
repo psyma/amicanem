@@ -220,8 +220,7 @@ export default class Utils {
                 else {
                     userLastMessageTimeAgo.textContent = timeAgo.format(timestamp, 'twitter')
                 }
-
-                console.log(id)
+ 
             }, 30 * 1000)
         } 
     }
