@@ -10,7 +10,6 @@ use App\Entity\UserPublicKey;
 use App\Repository\UserRepository; 
 use Doctrine\ORM\EntityManagerInterface;
 
-
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
