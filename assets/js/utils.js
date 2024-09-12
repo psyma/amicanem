@@ -169,6 +169,26 @@ export default class Utils {
         } 
     }
     
+    static sortUsersListBaseOnLastMessageTimestamp = () => {
+        const usersList = document.getElementById('usersList')
+        const usersElements = Array.from(usersList.children)  
+        usersElements.sort((a, b) => {
+            const timestampA = parseInt(a.querySelector('.last-message').getAttribute('timestamp'))
+            const timestampB = parseInt(b.querySelector('.last-message').getAttribute('timestamp')) 
+            return timestampB - timestampA
+        }).forEach((element) => { 
+            usersList.removeChild(element)
+            usersList.appendChild(element)
+        }) 
+    }
+
+    static reOrderUsersListIfCurrentUserSendAMessage = (id) => { 
+        const usersList = document.getElementById('usersList')
+        const element = document.getElementById(`user${id}`)
+        usersList.removeChild(element)
+        usersList.prepend(element)
+    }
+
     static createLoaderElement = () => {
         const colorTheme = localStorage.getItem('color-theme') 
         const loader = document.createElement("div")

@@ -25,7 +25,7 @@
             <input type="search" id="default-search" class="flex w-full p-3 ps-10 text-sm text-gray-900 border border-gray-400 rounded-sm bg-gray-200 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500" placeholder="Search messages or users" required />
         </div> 
     </div>
-    <div role="list" aria-label="conversations" class="w-full h-full scroll-smooth scrollbar-hidden" style="overflow: visible auto;">
+    <div id="usersList" role="list" aria-label="conversations" class="w-full h-full scroll-smooth scrollbar-hidden" style="overflow: visible auto;">
         {% for user in users %} 
             <div id="user{{ user.id }}" class="select-none {{ user == currentUser ? 'hidden' : '' }}" role="listitem">
                 <button aria-label="conversation {{ user.userDetails.firstname }} {{ user.userDetails.lastname }}" tabindex="0" class="w-full h-[5rem] px-5 py-5 flex items-center rounded focus:bg-indigo-100 dark:active:bg-gray-600 dark:focus:bg-gray-600 dark:hover:bg-gray-600 hover:bg-indigo-100 active:bg-indigo-100 focus:outline-none transition duration-500 ease-out">
@@ -47,7 +47,7 @@
                         <div class="flex justify-between">
                             <div>
                                 <p class="outline-none text-sm text-black opacity-60 dark:text-white dark:opacity-70 font-normal leading-4 tracking-[.01rem] flex justify-start items-center">
-                                    <span id="user{{ user.id }}-last-message" class="whitespace-pre-wrap truncate line-clamp-1 break-all">...</span>
+                                    <span id="user{{ user.id }}-last-message" timestamp='1' class="last-message whitespace-pre-wrap truncate line-clamp-1 break-all">...</span>
                                 </p>
                             </div> 
                         </div>

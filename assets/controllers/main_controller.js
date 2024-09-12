@@ -115,7 +115,9 @@ export default class extends Controller {
                 Utils.setChatboxMessageBorderAndMargin()
             }
 
-            this.setUserLastMesasgeElement(messageData.sender, messageData.content)  
+            this.setUserLastMessageContent(messageData.sender, messageData.content)  
+            this.setUserLastMessageTimestamp(messageData.sender, messageData.timestamp)
+            Utils.sortUsersListBaseOnLastMessageTimestamp()
         })
 
         await this.sleep(1)
@@ -192,28 +194,37 @@ export default class extends Controller {
         await this.sleep(1)
     }
 
-    setUserLastMesasgeElement = (id, content) => {
+    setUserLastMessageContent = (id, content) => {
         const userLastMessage = document.getElementById(`user${id}-last-message`)
         userLastMessage.textContent = content
+    }
+
+    setUserLastMessageTimestamp = (id, timestamp) => {
+        const userLastMessage = document.getElementById(`user${id}-last-message`)
+        userLastMessage.setAttribute('timestamp', timestamp)
     }
 
     setUserLastMessage = async () => {
         const response = await this.service.getLastMessages(this.uidValue, this.currentUserValue.id)
         if (response.ok) {
             const messages = await response.json()
-            messages.forEach(async(data) => {   
-                const { id, content, isSeen } = data
-                const { sender, receiver } = JSON.parse(atob(content)) 
-
+            for (let i = 0; i < messages.length; i++) {
+                const { id, content, isSeen } = messages[i]
+                const { sender, receiver } = JSON.parse(atob(content))  
+                
                 try { 
                     const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender)) 
-                    this.setUserLastMesasgeElement(messageData.receiver, messageData.content) 
+                    this.setUserLastMessageContent(messageData.receiver, messageData.content) 
+                    this.setUserLastMessageTimestamp(messageData.receiver, messageData.timestamp)
                 } catch(e) { 
                     const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver)) 
-                    this.setUserLastMesasgeElement(messageData.sender, messageData.content) 
+                    this.setUserLastMessageContent(messageData.sender, messageData.content) 
+                    this.setUserLastMessageTimestamp(messageData.sender, messageData.timestamp)
                 }
-            })
+            } 
         }
+
+        Utils.sortUsersListBaseOnLastMessageTimestamp()
     }
 
     setChatboxInfiniteScrolling = async () => {
@@ -303,7 +314,6 @@ export default class extends Controller {
 
                 try {
                     const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender)) 
-                    console.log(messageData)
                     const messageElement = Utils.createOutgoingMessageTextElement(messageData.content)
                     chatbox.appendChild(messageElement)
 
@@ -408,12 +418,14 @@ export default class extends Controller {
     } 
 
     sendTextMessage = async (message) => {
+        const timestamp = Date.now()
+
         const data = JSON.stringify({
             sender: this.currentUserValue.id,
             receiver: this.userToChatId,
             type: MessageType.TEXT,
             content: message,
-            timestamp: Date.now()
+            timestamp: timestamp
         })
 
         const encryptedSenderTextMessage = await Utils.encryptMessage(this.currentUserPublickey, data)
@@ -432,12 +444,14 @@ export default class extends Controller {
         chatbox.appendChild(messageElement) 
 
         Utils.setChatboxMessageAvatarHidden()
-        Utils.setChatboxMessageBorderAndMargin()
+        Utils.setChatboxMessageBorderAndMargin()  
         
-        const response = await this.service.createTextMessage(this.uidValue, `messages/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, this.currentUserValue.id, this.userToChatId, MessageType.TEXT, content, Date.now(), true)
+        const response = await this.service.createTextMessage(this.uidValue, `messages/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, this.currentUserValue.id, this.userToChatId, MessageType.TEXT, content, timestamp, true)
         const imgCheck = messageElement.querySelector('.img-check')
         if (response.ok) { 
-            this.setUserLastMesasgeElement(this.userToChatId, message) 
+            this.setUserLastMessageContent(this.userToChatId, message) 
+            this.setUserLastMessageTimestamp(this.userToChatId, timestamp)
+            Utils.reOrderUsersListIfCurrentUserSendAMessage(this.userToChatId)
             imgCheck.src = '/green_checks.svg'
         }
         else {
