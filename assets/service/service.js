@@ -16,10 +16,11 @@ export default class Service {
         } 
     }
 
-    createTextMessage = async (uid, event, sender, receiver, type, content, timestamp, isSaveMessage=true) => {
+    createTextMessage = async (uid, event, channels, sender, receiver, type, content, timestamp, isSaveMessage=true) => {
         const data = new FormData()
         data.append("uid", uid)
         data.append("event", event)
+        data.append("channels", channels)
         data.append("sender", sender)
         data.append("receiver", receiver)
         data.append("type", type)

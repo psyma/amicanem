@@ -50,7 +50,8 @@ class MessageController extends AbstractController
         }
 
         $event = $request->request->get("event");
-        $this->pusher->trigger('messages', $event, $message);
+        $channels = $request->request->get("channels");
+        $this->pusher->trigger($channels, $event, $message);
         
         return new JsonResponse($message); 
     } 

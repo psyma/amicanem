@@ -97,9 +97,9 @@ export default class extends Controller {
         }
     } 
 
-    setUserPusherMessagesChannel = async (user) => { 
+    setUserPusherMessagesChannel = async (user) => {  
         const chatbox = document.getElementById('chatbox')
-        const channel = this.pusher.subscribe('messages')
+        const channel = this.pusher.subscribe(`${user.id}-${this.currentUserValue.id}`)
 
         channel.bind(`messages/${user.id}/${this.currentUserValue.id}`, async (data) => { 
             const { id, content, isSeen } = data
@@ -434,7 +434,7 @@ export default class extends Controller {
         Utils.setChatboxMessageAvatarHidden()
         Utils.setChatboxMessageBorderAndMargin()
         
-        const response = await this.service.createTextMessage(this.uidValue, `messages/${this.currentUserValue.id}/${this.userToChatId}`, this.currentUserValue.id, this.userToChatId, MessageType.TEXT, content, Date.now(), true)
+        const response = await this.service.createTextMessage(this.uidValue, `messages/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, this.currentUserValue.id, this.userToChatId, MessageType.TEXT, content, Date.now(), true)
         const imgCheck = messageElement.querySelector('.img-check')
         if (response.ok) { 
             this.setUserLastMesasgeElement(this.userToChatId, message) 
