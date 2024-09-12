@@ -189,6 +189,21 @@ export default class Utils {
         usersList.prepend(element)
     }
 
+    static setUserLastMessageContent = (id, content) => {
+        const userLastMessage = document.getElementById(`user${id}-last-message`)
+        userLastMessage.textContent = content
+    }
+
+    static setUserLastMessageTimestamp = (id, timestamp) => {
+        const userLastMessage = document.getElementById(`user${id}-last-message`)
+        userLastMessage.setAttribute('timestamp', timestamp)
+    }
+
+    static setUserLastMessageTimeAgo = (id, timestamp) => {
+        const userLastMessageTimeAgo = document.getElementById(`user${id}-time-ago`)
+        userLastMessageTimeAgo.textContent = timestamp
+    }
+
     static createLoaderElement = () => {
         const colorTheme = localStorage.getItem('color-theme') 
         const loader = document.createElement("div")
@@ -199,7 +214,7 @@ export default class Utils {
         return loader
     }
 
-    static createOutgoingMessageTextElement = (message) => {  
+    static createOutgoingMessageTextElement = (content, timestamp) => {  
         const mainDiv = document.createElement('div')
  
         const selectNoneDiv = document.createElement('div')
@@ -217,19 +232,19 @@ export default class Utils {
         const chatMessageContainer = document.createElement('div')
         chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'ml-4', 'order-2', 'bg-indigo-50', 'dark:bg-gray-600')
  
-        const chatMessage = document.createElement('p')
-        chatMessage.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
-        chatMessage.setAttribute('tabindex', '0')
-        chatMessage.textContent = message
+        const chatContent = document.createElement('p')
+        chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
+        chatContent.setAttribute('tabindex', '0')
+        chatContent.textContent = content
  
-        chatMessageContainer.appendChild(chatMessage);
+        chatMessageContainer.appendChild(chatContent);
  
         const timeDiv = document.createElement('div')
-        timeDiv.classList.add('ml-4', 'order-1')
+        timeDiv.classList.add('ml-1.5', 'order-1')
  
         const timeP = document.createElement('p')
         timeP.classList.add('outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
-        timeP.innerText = '2 mins ago'
+        timeP.innerText = timestamp
  
         timeDiv.appendChild(timeP)
  
@@ -251,7 +266,7 @@ export default class Utils {
         return mainDiv 
     }
 
-    static createIncomingMessageTextElement = (message, avatar) => {  
+    static createIncomingMessageTextElement = (content, avatar, timestamp) => {  
         const mainDiv = document.createElement('div')
  
         const innerDiv1 = document.createElement('div')
@@ -280,19 +295,19 @@ export default class Utils {
         const chatMessageContainer = document.createElement('div')
         chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
  
-        const chatMessage = document.createElement('p')
-        chatMessage.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
-        chatMessage.setAttribute('tabindex', '0')
-        chatMessage.textContent = message
+        const chatContent = document.createElement('p')
+        chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
+        chatContent.setAttribute('tabindex', '0')
+        chatContent.textContent = content
  
-        chatMessageContainer.appendChild(chatMessage)
+        chatMessageContainer.appendChild(chatContent)
  
         const timeContainer = document.createElement('div')
         timeContainer.classList.add('mr-4')
  
         const timeText = document.createElement('p')
         timeText.classList.add('outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
-        timeText.textContent = '1:00 pm'
+        timeText.textContent = timestamp
  
         timeContainer.appendChild(timeText)
  
