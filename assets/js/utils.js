@@ -209,7 +209,7 @@ export default class Utils {
  
         const timeP = document.createElement('p')
         timeP.classList.add('outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
-        timeP.innerText = '8:15 am'
+        timeP.innerText = '2 mins ago'
  
         timeDiv.appendChild(timeP)
  

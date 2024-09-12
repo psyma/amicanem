@@ -3,9 +3,10 @@ import { Controller } from '@hotwired/stimulus';
 import Utils from '../js/utils';
 import Service from "../service/service"   
  
-import CryptoJS from 'crypto-js';
 import Pusher from 'pusher-js' 
 import Bowser from 'bowser';
+import CryptoJS from 'crypto-js';
+import TimeAgo from 'javascript-time-ago';
 
 class MessageType {
     static TEXT = 0
@@ -44,13 +45,21 @@ export default class extends Controller {
         this.isLockInfiniteScrolling = false
         this.usersOnlineMap = new Map()
         this.usersMap = new Map()
-
+    
         Pusher.logToConsole = false;
-        this.pusher = new Pusher('7c4d952c51d2be9a8302', { cluster: 'ap1', authEndpoint: '/pusher_auth' });
+        this.pusher = new Pusher('7c4d952c51d2be9a8302', { 
+            cluster: 'ap1', 
+            authEndpoint: '/pusher_auth', 
+            auth: { 
+                params: { 
+                    'uid': 
+                    this.uidValue 
+                } 
+            } 
+        });
 
         const response = await this.service.getUsers(this.uidValue)
         const users = await response.json()
-
         
         this.setDarkModeToggle() 
         this.setSendMessageButtonClick()
@@ -294,6 +303,7 @@ export default class extends Controller {
 
                 try {
                     const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender)) 
+                    console.log(messageData)
                     const messageElement = Utils.createOutgoingMessageTextElement(messageData.content)
                     chatbox.appendChild(messageElement)
 

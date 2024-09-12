@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
-use App\Entity\UserDetails;
+use Pusher\Pusher;
+ 
 use App\Entity\UserPassphrase;
 use App\Entity\UserPrivateKey;
 use App\Entity\UserPublicKey;
@@ -19,8 +19,11 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class MainController extends AbstractController
 { 
-    public function __construct(private UserRepository $userRepository, private EntityManagerInterface $entityManager)
+    private $pusher;
+
+    public function __construct(Pusher $pusher, private UserRepository $userRepository, private EntityManagerInterface $entityManager)
     { 
+        $this->pusher = $pusher;
     }
     
     #[Route('/', name: 'app_main')]
@@ -54,6 +57,27 @@ class MainController extends AbstractController
         
         $users = $this->userRepository->findAll();
         return new JsonResponse($users);
+    }
+
+    #[Route('/pusher_auth', name: 'app_pusher_auth', methods: ["POST"])]
+    public function pusher_auth(Request $request): JsonResponse
+    {
+        $this->denyAccessUnlessGranted("ROLE_USER");  
+        $this->denyAccessUnlessCurrentUser($request->request->get("uid"));
+
+        $user = $this->userRepository->findOneByEmail($this->getUser()->getUserIdentifier());
+
+        $channelName = $request->request->get('channel_name');
+        $socketId = $request->request->get('socket_id');
+        $userId = $user->getId();
+
+        $userInfo = [
+            'id' => $user->getId()
+        ];
+
+        $auth = $this->pusher->authorizePresenceChannel($channelName, $socketId, $userId, $userInfo);
+
+        return new JsonResponse(json_decode($auth, true));
     }
 
     #[Route('/set_encryption_details', name: 'app_encryption_details', methods: ["POST"])]

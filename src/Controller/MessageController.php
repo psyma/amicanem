@@ -54,25 +54,7 @@ class MessageController extends AbstractController
         $this->pusher->trigger('messages', $event, $message);
         
         return new JsonResponse($message); 
-    }
-
-    #[Route('/pusher_auth', name: 'app_pusher_auth', methods: ["POST"])]
-    public function pusher_auth(Request $request): JsonResponse
-    {
-        $user = $this->userRepository->findOneByEmail($this->getUser()->getUserIdentifier());
-
-        $channelName = $request->request->get('channel_name');
-        $socketId = $request->request->get('socket_id');
-        $userId = $user->getId();
-
-        $userInfo = [
-            'id' => $user->getId()
-        ];
-
-        $auth = $this->pusher->authorizePresenceChannel($channelName, $socketId, $userId, $userInfo);
-
-        return new JsonResponse(json_decode($auth, true));
-    }
+    } 
 
     #[Route('/get_messages/{uid}/{currentUserId}/{userToChatId}/{page}/{pageSize}/{toReverse}', name: 'app_get_messages', methods: ["GET"])]
     public function get_messages(string $uid, int $currentUserId, int $userToChatId, int $page, int $pageSize, int $toReverse): JsonResponse {  
