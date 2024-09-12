@@ -104,7 +104,7 @@ export default class extends Controller {
             const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver))
             
             if (messageData.sender == this.userToChatId) {
-                const messageElement = Utils.createIncomingMessageTextElement(messageData.content, user.userDetails.avatar, this.timeAgo.format(messageData.timestamp))
+                const messageElement = Utils.createIncomingMessageTextElement(messageData.content, user.userDetails.avatar, timestamp, this.timeAgo)
                 this.chatboxScrollToBottom()
                 chatbox.appendChild(messageElement)
 
@@ -114,7 +114,7 @@ export default class extends Controller {
 
             Utils.setUserLastMessageContent(messageData.sender, messageData.content)  
             Utils.setUserLastMessageTimestamp(messageData.sender, messageData.timestamp)
-            Utils.setUserLastMessageTimeAgo(messageData.sender, this.timeAgo.format(messageData.timestamp, 'twitter'))
+            Utils.setUserLastMessageTimeAgo(messageData.sender, messageData.timestamp, this.timeAgo)
             Utils.sortUsersListBaseOnLastMessageTimestamp()
         })
 
@@ -204,12 +204,12 @@ export default class extends Controller {
                     const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender)) 
                     Utils.setUserLastMessageContent(messageData.receiver, messageData.content) 
                     Utils.setUserLastMessageTimestamp(messageData.receiver, messageData.timestamp)
-                    Utils.setUserLastMessageTimeAgo(messageData.receiver, this.timeAgo.format(messageData.timestamp, 'twitter'))
+                    Utils.setUserLastMessageTimeAgo(messageData.receiver, messageData.timestamp, this.timeAgo)
                 } catch(e) { 
                     const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver)) 
                     Utils.setUserLastMessageContent(messageData.sender, messageData.content) 
                     Utils.setUserLastMessageTimestamp(messageData.sender, messageData.timestamp)
-                    Utils.setUserLastMessageTimeAgo(messageData.sender, this.timeAgo.format(messageData.timestamp, 'twitter'))
+                    Utils.setUserLastMessageTimeAgo(messageData.sender, messageData.timestamp, this.timeAgo)
                 }
             } 
         }
@@ -240,14 +240,14 @@ export default class extends Controller {
             
                             try {
                                 const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender)) 
-                                const messageElement = Utils.createOutgoingMessageTextElement(messageData.content, this.timeAgo.format(messageData.timestamp))
+                                const messageElement = Utils.createOutgoingMessageTextElement(messageData.content, messageData.timestamp, this.timeAgo)
                                 chatbox.prepend(messageElement)
             
                                 const imgCheck = messageElement.querySelector('.img-check')
                                 imgCheck.src = '/green_checks.svg' 
                             } catch(e) { 
                                 const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver)) 
-                                const messageElement = Utils.createIncomingMessageTextElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, this.timeAgo.format(messageData.timestamp))
+                                const messageElement = Utils.createIncomingMessageTextElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
                                 chatbox.prepend(messageElement) 
                             }
                         } 
@@ -304,14 +304,14 @@ export default class extends Controller {
 
                 try {
                     const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender))  
-                    const messageElement = Utils.createOutgoingMessageTextElement(messageData.content, this.timeAgo.format(messageData.timestamp))
+                    const messageElement = Utils.createOutgoingMessageTextElement(messageData.content, messageData.timestamp, this.timeAgo)
                     chatbox.appendChild(messageElement)
 
                     const imgCheck = messageElement.querySelector('.img-check')
                     imgCheck.src = '/green_checks.svg' 
                 } catch(e) { 
                     const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver)) 
-                    const messageElement = Utils.createIncomingMessageTextElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, this.timeAgo.format(messageData.timestamp))
+                    const messageElement = Utils.createIncomingMessageTextElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
                     chatbox.appendChild(messageElement) 
                 }
             } 
@@ -429,7 +429,7 @@ export default class extends Controller {
 
         const chatbox = document.getElementById('chatbox')
         const chatboxInput = document.getElementById('chatboxInput')
-        const messageElement = Utils.createOutgoingMessageTextElement(message, this.timeAgo.format(timestamp))
+        const messageElement = Utils.createOutgoingMessageTextElement(message, timestamp, this.timeAgo)
         
         this.chatboxScrollToBottom(true)
         chatboxInput.textContent = ''
@@ -443,7 +443,7 @@ export default class extends Controller {
         if (response.ok) { 
             Utils.setUserLastMessageContent(this.userToChatId, message) 
             Utils.setUserLastMessageTimestamp(this.userToChatId, timestamp)
-            Utils.setUserLastMessageTimeAgo(this.userToChatId, this.timeAgo.format(timestamp, 'twitter'))
+            Utils.setUserLastMessageTimeAgo(this.userToChatId, timestamp, this.timeAgo)
             Utils.reOrderUsersListIfCurrentUserSendAMessage(this.userToChatId)
             imgCheck.src = '/green_checks.svg'
         }

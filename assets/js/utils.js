@@ -189,6 +189,14 @@ export default class Utils {
         usersList.prepend(element)
     }
 
+    static isTimestampIsGreaterThanNminutes = (timestamp, N) => {
+        const t = parseInt(timestamp)
+        const milliseconds = N * 60 * 1000
+        const currentTime = Date.now()
+
+        return t >= (currentTime - milliseconds)
+    }
+
     static setUserLastMessageContent = (id, content) => {
         const userLastMessage = document.getElementById(`user${id}-last-message`)
         userLastMessage.textContent = content
@@ -196,12 +204,35 @@ export default class Utils {
 
     static setUserLastMessageTimestamp = (id, timestamp) => {
         const userLastMessage = document.getElementById(`user${id}-last-message`)
-        userLastMessage.setAttribute('timestamp', timestamp)
+        userLastMessage.setAttribute('timestamp', timestamp) 
     }
 
-    static setUserLastMessageTimeAgo = (id, timestamp) => {
-        const userLastMessageTimeAgo = document.getElementById(`user${id}-time-ago`)
-        userLastMessageTimeAgo.textContent = timestamp
+    static setUserLastMessageTimeAgo = (id, timestamp, timeAgo) => {
+        const userLastMessageTimeAgo = document.getElementById(`user${id}-time-ago`) 
+        userLastMessageTimeAgo.textContent = timeAgo.format(timestamp, 'twitter')
+        if (this.isTimestampIsGreaterThanNminutes(timestamp, 60)) {
+            var intervalId = setInterval(() => { 
+                const userLastMessage = document.getElementById(`user${id}-last-message`)
+                const prevTimestamp = userLastMessage.getAttribute('timestamp')
+                if (prevTimestamp != timestamp) {
+                    clearInterval(intervalId)
+                }
+                else {
+                    userLastMessageTimeAgo.textContent = timeAgo.format(timestamp, 'twitter')
+                }
+
+                console.log(id)
+            }, 30 * 1000)
+        } 
+    }
+
+    static setMessageTextElementTimeAgo = (element, timestamp, timeAgo) => {
+        element.textContent = timeAgo.format(timestamp)
+        if (this.isTimestampIsGreaterThanNminutes(timestamp, 60)) {
+            setInterval(() => {
+                element.textContent = timeAgo.format(timestamp, 'round')
+            }, 30 * 1000)
+        }
     }
 
     static createLoaderElement = () => {
@@ -214,7 +245,7 @@ export default class Utils {
         return loader
     }
 
-    static createOutgoingMessageTextElement = (content, timestamp) => {  
+    static createOutgoingMessageTextElement = (content, timestamp, timeAgo) => {  
         const mainDiv = document.createElement('div')
  
         const selectNoneDiv = document.createElement('div')
@@ -242,11 +273,12 @@ export default class Utils {
         const timeDiv = document.createElement('div')
         timeDiv.classList.add('ml-1.5', 'order-1')
  
-        const timeP = document.createElement('p')
-        timeP.classList.add('outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
-        timeP.innerText = timestamp
+        const timeText = document.createElement('p')
+        timeText.classList.add('outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
+        timeText.textContent = timestamp
+        this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
  
-        timeDiv.appendChild(timeP)
+        timeDiv.appendChild(timeText)
  
         const img = document.createElement('img')
         img.src = '/gray_checks.svg'
@@ -266,7 +298,7 @@ export default class Utils {
         return mainDiv 
     }
 
-    static createIncomingMessageTextElement = (content, avatar, timestamp) => {  
+    static createIncomingMessageTextElement = (content, avatar, timestamp, timeAgo) => {  
         const mainDiv = document.createElement('div')
  
         const innerDiv1 = document.createElement('div')
@@ -308,6 +340,7 @@ export default class Utils {
         const timeText = document.createElement('p')
         timeText.classList.add('outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
         timeText.textContent = timestamp
+        this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
  
         timeContainer.appendChild(timeText)
  
