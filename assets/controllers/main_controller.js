@@ -123,8 +123,9 @@ export default class extends Controller {
     }
 
     setUserPusherPresenceChannel = () => {
-        let channel = this.pusher.subscribe('presence-online-users'); 
-        let myThis = this
+        const myThis = this
+        const channel = this.pusher.subscribe('presence-online-users'); 
+        
         channel.bind('pusher:subscription_succeeded', function(members) {  
             members.each(function(member) {
                 const id = member.info.id
@@ -135,6 +136,7 @@ export default class extends Controller {
                 myThis.usersOnlineMap.set(id, true) 
             });
         });
+        
         channel.bind('pusher:member_added', function(member) {
             const id = member.info.id
             const userOnlineStatus = document.getElementById(`user${id}-online-status`)
@@ -304,9 +306,10 @@ export default class extends Controller {
         const loader = Utils.createLoaderElement()
         chatbox.appendChild(loader)
 
+        let hasMessages = false
         const response = await this.service.getMessages(this.uidValue, this.currentUserValue.id, this.userToChatId, this.page, this.pageSize)  
         if (response.ok) {  
-            const messages = await response.json()   
+            const messages = await response.json()    
             for(let i = 0; i < messages.length; i++) { 
                 const { id, content, isSeen } = messages[i]
                 const { sender, receiver } = JSON.parse(atob(content)) 
@@ -327,12 +330,21 @@ export default class extends Controller {
                 }
             } 
             this.chatboxScrollToBottom(true)
+
+            hasMessages = messages.length ? true : false
         }
 
         this.isLockInfiniteScrolling = false
         chatbox.removeChild(loader) 
         Utils.setChatboxMessageAvatarHidden()
-        Utils.setChatboxMessageBorderAndMargin()
+        Utils.setChatboxMessageBorderAndMargin() 
+        
+        if (!hasMessages) {
+            const user = this.usersMap.get(this.userToChatId)
+            const name = `${user.userDetails.firstname} ${user.userDetails.lastname}`
+            const avatar = user.userDetails.avatar
+            Utils.setIntroductionElement(name, avatar)
+        }
     }
 
     setUserToChatName = (name) => {

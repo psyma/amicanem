@@ -234,6 +234,64 @@ export default class Utils {
         }
     }
 
+    static setIntroductionElement = (name, avatar) => {
+        const chatbox = document.getElementById('chatbox') 
+        const container = document.createElement('div')
+
+        const flexContainer = document.createElement('div')
+        flexContainer.className = 'flex flex-col justify-center items-center absolute left-0 right-0 top-0 bottom-0'
+
+        const profileImage = document.createElement('div')
+        profileImage.className = 'w-16 h-16 rounded-full bg-contain bg-center shadow border border-gray-200 dark:border-gray-700 mb-2'
+        profileImage.style.backgroundImage = `url('${avatar}')`
+
+        const nameParagraph = document.createElement('p')
+        nameParagraph.className = 'outline-none text-sm text-black opacity-60 dark:text-white dark:opacity-70 font-semibold leading-4 tracking-[.01rem] default-outline'
+        nameParagraph.tabIndex = 0
+        nameParagraph.textContent = name
+
+        const encryptedContainer = document.createElement('div')
+        encryptedContainer.className = 'bg-indigo-50 dark:bg-slate-600 rounded p-3 mt-8 mx-5 sm:mx-0'
+
+        const flexInnerContainer = document.createElement('div')
+        flexInnerContainer.className = 'flex justify-center items-center gap-1'
+
+        const svgIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+        svgIcon.setAttribute('viewBox', '0 0 24 24')
+        svgIcon.setAttribute('fill', 'currentColor')
+        svgIcon.setAttribute('aria-hidden', 'true')
+        svgIcon.setAttribute('class','w-5 h-6 group-focus:text-indigo-400 hover:text-indigo-400 active:text-indigo-400 active:scale-110 dark:text-gray-500 transition ease-out duration-200 text-gray-300')
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+        path.setAttribute('fill-rule', 'evenodd')
+        path.setAttribute('d', 'M8 10V7a4 4 0 1 1 8 0v3h1a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h1Zm2-3a2 2 0 1 1 4 0v3h-4V7Zm2 6a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-3a1 1 0 0 1 1-1Z')
+        path.setAttribute('clip-rule', 'evenodd')
+        svgIcon.appendChild(path)
+
+        const encryptedText = document.createElement('span')
+        encryptedText.className = 'flex align-middle outline-none text-xs text-black opacity-60 dark:text-white dark:opacity-70 font-bold leading-4 tracking-[.01rem] default-outline'
+        encryptedText.tabIndex = 0
+        encryptedText.textContent = 'End-to-end encrypted'
+
+        flexInnerContainer.appendChild(svgIcon)
+        flexInnerContainer.appendChild(encryptedText)
+
+        const messageText = document.createElement('div')
+        messageText.className = 'text-center mx-auto outline-none text-xs text-black opacity-60 dark:text-white dark:opacity-70 leading-4 tracking-[.01rem] default-outline'
+        messageText.tabIndex = 0
+        messageText.innerHTML = 'Messages and calls are secured with end-to-end encryption. <span class="text-blue-500">Learn more</span>'
+
+        encryptedContainer.appendChild(flexInnerContainer)
+        encryptedContainer.appendChild(messageText)
+
+        flexContainer.appendChild(profileImage)
+        flexContainer.appendChild(nameParagraph)
+        flexContainer.appendChild(encryptedContainer)
+
+        container.appendChild(flexContainer)
+
+        chatbox.appendChild(container) 
+    }
+
     static createLoaderElement = () => {
         const colorTheme = localStorage.getItem('color-theme') 
         const loader = document.createElement("div")
