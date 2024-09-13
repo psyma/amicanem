@@ -142,8 +142,8 @@ export default class extends Controller {
             userOnlineStatus.classList.add('bg-green-400') 
 
             if (id == myThis.userToChatId) {
-                const userToChatOnlineStatus = document.getElementById('userToChatOnlineStatus')
-                const userToChatOnlineText = document.getElementById('userToChatOnlineText') 
+                const userToChatOnlineStatus = document.getElementById('usertochat-online-status')
+                const userToChatOnlineText = document.getElementById('usertochat-online-text') 
                 userToChatOnlineStatus.classList.remove('bg-red-400')
                 userToChatOnlineStatus.classList.add('bg-green-400')
                 userToChatOnlineText.textContent = "Active now" 
@@ -159,8 +159,8 @@ export default class extends Controller {
             userOnlineStatus.classList.remove('bg-green-400')
 
             if (id == myThis.userToChatId) {
-                const userToChatOnlineStatus = document.getElementById('userToChatOnlineStatus')
-                const userToChatOnlineText = document.getElementById('userToChatOnlineText') 
+                const userToChatOnlineStatus = document.getElementById('usertochat-online-status')
+                const userToChatOnlineText = document.getElementById('usertochat-online-text') 
                 userToChatOnlineStatus.classList.remove('bg-green-400')
                 userToChatOnlineStatus.classList.add('bg-red-400')
                 userToChatOnlineText.textContent = this.lastSeenTimestamp == null ? "Offline" : "Last seen " + this.timeAgo.format(this.lastSeenTimestamp, 'round')
@@ -341,14 +341,14 @@ export default class extends Controller {
     }
 
     setUserToChatAvatar = (avatar) => {
-        const userToChatAvatar = document.getElementById('userToChatAvatar')
+        const userToChatAvatar = document.getElementById('usertochat-avatar')
         userToChatAvatar.style.backgroundImage = `url('${avatar}')`
     }
 
     setUserToChatOnlineStatus = () => {
         const isOnline = this.usersOnlineMap.get(this.userToChatId)
-        const userToChatOnlineStatus = document.getElementById('userToChatOnlineStatus')
-        const userToChatOnlineText = document.getElementById('userToChatOnlineText')
+        const userToChatOnlineStatus = document.getElementById('usertochat-online-status')
+        const userToChatOnlineText = document.getElementById('usertochat-online-text')
         if (isOnline) {
             userToChatOnlineStatus.classList.remove('bg-red-400')
             userToChatOnlineStatus.classList.add('bg-green-400')
@@ -407,14 +407,14 @@ export default class extends Controller {
     setSidebarUserToggleForMobile = () => { 
         if (this.getUserAgentPlatformType() == 'mobile') {
             setTimeout(() => {
-                document.getElementById('separatorSidebarButton').click()
+                document.getElementById('separator-sidebar-button').click()
             }, 200)
         } 
     }
 
     setMainChatbox = () => {
-        const mainChatbox = document.getElementById('mainChatbox')
-        const mainChatboxIntro = document.getElementById('mainChatboxIntro')
+        const mainChatbox = document.getElementById('main-chatbox')
+        const mainChatboxIntro = document.getElementById('main-chatbox-intro')
 
         mainChatbox.classList.remove('hidden')
         mainChatboxIntro.classList.add('hidden') 
@@ -439,7 +439,7 @@ export default class extends Controller {
         }))
 
         const chatbox = document.getElementById('chatbox')
-        const chatboxInput = document.getElementById('chatboxInput')
+        const chatboxInput = document.getElementById('chatbox-input')
         const messageElement = Utils.createOutgoingMessageTextElement(message, timestamp, this.timeAgo)
         
         this.chatboxScrollToBottom(true)
@@ -464,8 +464,8 @@ export default class extends Controller {
     }
 
     setSendMessageButtonClick = () => { 
-        const chatboxInput = document.getElementById('chatboxInput')
-        const sendMessageButton = document.getElementById('sendMessageButton')
+        const chatboxInput = document.getElementById('chatbox-input')
+        const sendMessageButton = document.getElementById('send-message-button')
 
         sendMessageButton.onclick = async () => {
             const message = chatboxInput.innerText.trim() 
@@ -476,7 +476,7 @@ export default class extends Controller {
     }
 
     setSendMessageChatboxInputKeyDown = () => { 
-        const chatboxInput = document.getElementById('chatboxInput')
+        const chatboxInput = document.getElementById('chatbox-input')
         chatboxInput.onkeydown = async (e) => {
             const message = e.target.innerText.trim()
             if (this.getUserAgentPlatformType() == 'desktop') {

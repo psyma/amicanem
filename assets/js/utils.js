@@ -170,7 +170,7 @@ export default class Utils {
     }
     
     static sortUsersListBaseOnLastMessageTimestamp = () => {
-        const usersList = document.getElementById('usersList')
+        const usersList = document.getElementById('users-list')
         const usersElements = Array.from(usersList.children)  
         usersElements.sort((a, b) => {
             const timestampA = parseInt(a.querySelector('.last-message').getAttribute('timestamp'))
@@ -183,7 +183,7 @@ export default class Utils {
     }
 
     static reOrderUsersListIfCurrentUserSendAMessage = (id) => { 
-        const usersList = document.getElementById('usersList')
+        const usersList = document.getElementById('users-list')
         const element = document.getElementById(`user${id}`)
         usersList.removeChild(element)
         usersList.prepend(element)
