@@ -18,7 +18,7 @@ class MessageController extends AbstractController
 {
     private $pusher;
 
-    public function __construct(Pusher $pusher, private UserRepository $userRepository, private EntityManagerInterface $entityManager, private MessageRepository $messageRepository)
+    public function __construct(Pusher $pusher, private UserRepository $userRepository, private MessageRepository $messageRepository, private EntityManagerInterface $entityManager)
     {
         $this->pusher = $pusher;
     }

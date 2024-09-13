@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\UserRepository; 
+use App\Repository\MessageRepository;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController; 
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -10,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class UserController extends AbstractController
 {
-    public function __construct(private UserRepository $userRepository)
+    public function __construct(private UserRepository $userRepository, private MessageRepository $messageRepository)
     { 
     }
 
@@ -22,6 +23,16 @@ class UserController extends AbstractController
         
         $users = $this->userRepository->findAll();
         return new JsonResponse($users);
+    }
+
+    #[Route('/get_user_last_seen/{uid}/{id}', name: 'app_get_user_last_seen', methods: ["GET"])]
+    public function get_user_last_seen(string $uid, string $id): JsonResponse
+    {
+        $this->denyAccessUnlessGranted("ROLE_USER");  
+        $this->denyAccessUnlessCurrentUser($uid);
+
+        $message = $this->messageRepository->findLastMessageBySender($id); 
+        return new JsonResponse(['timestamp' => $message->getTimestamp()]);
     }
 
     private function denyAccessUnlessCurrentUser($uid) {

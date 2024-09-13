@@ -52,8 +52,7 @@ export default class extends Controller {
         this.isReceivedFirstMessage = false
         this.isLockInfiniteScrolling = false
         this.usersOnlineMap = new Map()
-        this.usersMap = new Map()
-        this.lastSeenTimestamp = null
+        this.usersMap = new Map() 
 
         const response = await this.service.getUsers(this.uidValue)
         if (response.ok) {
@@ -165,7 +164,7 @@ export default class extends Controller {
                 const userToChatOnlineText = document.getElementById('usertochat-online-text') 
                 userToChatOnlineStatus.classList.remove('bg-green-400')
                 userToChatOnlineStatus.classList.add('bg-red-400')
-                userToChatOnlineText.textContent = this.lastSeenTimestamp == null ? "Offline" : "Last seen " + this.timeAgo.format(this.lastSeenTimestamp, 'round')
+                userToChatOnlineText.textContent = "Offline"
             }
 
             myThis.usersOnlineMap.set(id, false)
@@ -282,15 +281,8 @@ export default class extends Controller {
     setDefaultValues = () => {
         this.page = 1 
         this.isReceivedFirstMessage = false
-        this.isLockInfiniteScrolling = true
-        this.lastSeenTimestamp = null
-    }
-
-    setLastSeenTimestamp = (id, timestamp) => {
-        if (this.userToChatId == id) {
-            this.lastSeenTimestamp = timestamp
-        }
-    }
+        this.isLockInfiniteScrolling = true 
+    } 
 
     setConversations = async () => {  
         function clearChatboxElement() { 
@@ -324,9 +316,7 @@ export default class extends Controller {
                 } catch(e) { 
                     const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver)) 
                     const messageElement = Utils.createIncomingMessageTextElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
-                    chatbox.appendChild(messageElement) 
-
-                    this.setLastSeenTimestamp(messageData.sender, messageData.timestamp) 
+                    chatbox.appendChild(messageElement)  
                 }
             } 
             this.chatboxScrollToBottom(true)
@@ -368,8 +358,19 @@ export default class extends Controller {
         }
         else {
             userToChatOnlineStatus.classList.add('bg-red-400')
-            userToChatOnlineStatus.classList.remove('bg-green-400')
-            userToChatOnlineText.textContent = this.lastSeenTimestamp == null ? "Offline" : "Last seen " + this.timeAgo.format(this.lastSeenTimestamp, 'round')
+            userToChatOnlineStatus.classList.remove('bg-green-400') 
+            setTimeout(async() => {
+                await this.setUserLastSeen(userToChatOnlineText)
+            }, 1)
+        }
+    }
+
+    setUserLastSeen = async (element) => {
+        element.textContent = 'Offline'
+        const response = await this.service.getUserLastSeen(this.uidValue, this.userToChatId) 
+        if (response.ok) {
+            const data = await response.json()  
+            element.textContent = "Last seen " + this.timeAgo.format(parseInt(data.timestamp), 'round')
         }
     }
 

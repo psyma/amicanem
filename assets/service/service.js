@@ -36,6 +36,15 @@ export default class Service {
         } 
     }
 
+    getUserLastSeen = async (uid, id) => {
+        try {
+            const response = await fetch(`/get_user_last_seen/${uid}/${id}`, { method: "GET" }) 
+            return await response
+        } catch(e) {
+            return { ok: false }
+        }
+    }
+
     createMessage = async (uid, sender, receiver, type, content, timestamp, saveMessages) => {
         const data = new FormData()
         data.append("uid", uid)

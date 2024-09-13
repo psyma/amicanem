@@ -49,6 +49,17 @@ class MessageRepository extends ServiceEntityRepository
             ->getResult();
     } 
 
+    public function findLastMessageBySender(int $sender): ?Message
+    {
+        return $this->createQueryBuilder('m')
+            ->where('m.sender = :sender')
+            ->setParameter('sender', $sender) 
+            ->orderBy('m.id', 'DESC')
+            ->setMaxResults(1) 
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     public function findLastMessageBetweenUsers(int $sender, int $receiver): ?Message 
     {
         return $this->createQueryBuilder('m')

@@ -209,7 +209,7 @@ export default class Utils {
 
     static setUserLastMessageTimeAgo = (id, timestamp, timeAgo) => {
         const userLastMessageTimeAgo = document.getElementById(`user${id}-time-ago`) 
-        userLastMessageTimeAgo.textContent = "·" + timeAgo.format(timestamp, 'twitter')
+        userLastMessageTimeAgo.textContent = "·" + timeAgo.format(timestamp, 'mini-now')
         if (this.isTimestampIsGreaterThanNminutes(timestamp, 60)) {
             var intervalId = setInterval(() => { 
                 const userLastMessage = document.getElementById(`user${id}-last-message`)
@@ -218,7 +218,7 @@ export default class Utils {
                     clearInterval(intervalId)
                 }
                 else {
-                    userLastMessageTimeAgo.textContent = "·" + timeAgo.format(timestamp, 'twitter')
+                    userLastMessageTimeAgo.textContent = "·" + timeAgo.format(timestamp, 'mini-now')
                 }
  
             }, 30 * 1000)
@@ -226,10 +226,10 @@ export default class Utils {
     }
 
     static setMessageTextElementTimeAgo = (element, timestamp, timeAgo) => {
-        element.textContent = timeAgo.format(timestamp)
+        element.textContent = timeAgo.format(timestamp, 'round')
         if (this.isTimestampIsGreaterThanNminutes(timestamp, 60)) {
             setInterval(() => {
-                element.textContent = timeAgo.format(timestamp, 'round')
+                element.textContent = timeAgo.format(timestamp, 'round') 
             }, 30 * 1000)
         }
     }
