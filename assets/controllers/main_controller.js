@@ -6,6 +6,8 @@ import Service from "../service/service"
 import Pusher from 'pusher-js' 
 import Bowser from 'bowser';
 import CryptoJS from 'crypto-js';
+import WaveSurfer from 'wavesurfer.js'
+import RecordPlugin from 'wavesurfer.js/dist/plugins/record.esm.js'
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en'
 
@@ -74,6 +76,29 @@ export default class extends Controller {
                 this.usersMap.set(user.id, user)
             }) 
         } 
+ 
+        const wavesurfer = WaveSurfer.create({
+            container: '#waveform-input',
+            waveColor: 'rgb(200, 0, 200)', 
+            hideScrollbar: true,   
+            autoCenter: true,
+            height: 30,
+            barHeight: 30, 
+            cursorWidth: 0, 
+        })
+ 
+
+        const record = wavesurfer.registerPlugin(RecordPlugin.create({ scrollingWaveform: false, renderRecordedAudio: false }))
+        // Render recorded audio
+        record.on('record-end', (blob) => {
+            const container = document.querySelector('#recordings')
+            const recordedUrl = URL.createObjectURL(blob)
+
+           
+ 
+        })
+
+        await record.startRecording()
     } 
 
     setEncryptionDetails = async () => {   

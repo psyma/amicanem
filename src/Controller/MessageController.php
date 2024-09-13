@@ -9,6 +9,7 @@ use App\Repository\UserRepository;
 use App\Repository\MessageRepository;
 use Doctrine\ORM\EntityManagerInterface; 
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request; 
@@ -55,6 +56,28 @@ class MessageController extends AbstractController
         
         return new JsonResponse($message); 
     } 
+
+    #[Route('/create_audio_message', name: 'app_create_audio_message', methods: ["POST"])]
+    public function createAudioMessage(Request $request): JsonResponse
+    {
+        $this->denyAccessUnlessGranted("ROLE_USER");
+        $this->denyAccessUnlessCurrentUser($request->request->get("uid"));
+        
+        $file = $request->files->get("file");    
+        $format = ".webm";
+
+        $uploadPath = $this->getParameter('kernel.project_dir') . '/public/uploads/';
+        $file->move($uploadPath, $file->getClientOriginalName() . $format);
+
+        $filepath = $uploadPath . $file->getClientOriginalName() . $format;
+        $filename = (string)time() . md5(uniqid()) . $format;
+
+        $filesystem = new Filesystem(); 
+        $filesystem->copy($filepath, $uploadPath . $filename); 
+        $filesystem->remove($filepath);
+         
+        return new JsonResponse("uploads/" . $filename);
+    }
 
     #[Route('/get_messages/{uid}/{currentUserId}/{userToChatId}/{page}/{pageSize}/{toReverse}', name: 'app_get_messages', methods: ["GET"])]
     public function get_messages(string $uid, int $currentUserId, int $userToChatId, int $page, int $pageSize, int $toReverse): JsonResponse {  

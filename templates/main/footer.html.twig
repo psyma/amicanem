@@ -20,7 +20,23 @@
                 </svg>
             </button>  
         </div> 
-        <div contenteditable="true" placeholder="Your message..." id="chatbox-input" class="whitespace-pre-wrap  w-full relative max-h-44 overflow-y-auto px-5 py-4 text-sm rounded-sm content-center outline-none text-sm placeholder:text-black placeholder:opacity-40 text-opacity-70 dark:placeholder:text-white dark:placeholder:opacity-70 focus:outline-none transition duration-200 ease-out text-black bg-gray-100 dark:text-white border-opacity-0 dark:bg-gray-700 dark:bg-opacity-70 dark:border-opacity-70 dark:border-gray-700"></div>
+
+        <div contenteditable="true" placeholder="Your message..." id="chatbox-input" class="hidden whitespace-pre-wrap w-full relative max-h-44 overflow-y-auto px-5 py-4 text-sm rounded-sm content-center outline-none text-sm placeholder:text-black placeholder:opacity-40 text-opacity-70 dark:placeholder:text-white dark:placeholder:opacity-70 focus:outline-none transition duration-200 ease-out text-black bg-gray-100 dark:text-white border-opacity-0 dark:bg-gray-700 dark:bg-opacity-70 dark:border-opacity-70 dark:border-gray-700"></div>
+     
+        <div class="group w-full p-2 self-center rounded transition duration-500 bg-indigo-50 dark:bg-gray-600">  
+            <div class="flex items-center outline-none" tabindex="0" aria-label="audio message">
+                <button class="px-2.5 py-2 mr-1 flex justify-center items-center rounded-[.75rem] outline-none transition-all duration-200 bg-indigo-300 active:bg-indigo-400" aria-label="play">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="w-3.5 h-3.5 text-white">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"></path>
+                    </svg>
+                </button>
+                <div  class="w-full mr-1 flex items-center">
+                        <div id="waveform-input" class="w-full"></div>
+                </div>
+                <p class="outline-none text-xs font-light leading-4 tracking-[.01rem] text-black dark:text-white opacity-40 dark:opacity-70" tabindex="0" aria-label="11 seconds"> 00:11 </p>
+            </div> 
+        </div>  
+
         <div class="min-h-[2.75rem] mr-2 ml-1"> 
             <button id="send-message-button" class="group flex justify-center items-center outline-none rounded-full focus:outline-none transition-all duration-200 group w-7 h-7 bg-indigo-300 hover:bg-indigo-400 focus:bg-indigo-400 dark:focus:bg-indigo-300 dark:bg-indigo-400 dark:hover:bg-indigo-400 active:scale-110" title="send message" aria-label="send message">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="w-[1.0625rem] h-[1.0625rem] text-white">

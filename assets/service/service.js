@@ -36,6 +36,25 @@ export default class Service {
         } 
     }
 
+    createAudioMessage = async (uid, sender, file, progressCircle) => {
+        const data = new FormData()
+        data.append('uid', uid)
+        data.append('sender', sender)
+        data.append('file', file)
+
+        try {  
+            const response = await axios.post('/audio', data, {
+                onUploadProgress: function (progressEvent) {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);  
+                    progressCircle.setAttribute("stroke-dashoffset", `calc(251.2px - (251.2px * ${percentCompleted - 1}) / 100)`);
+                }
+            })  
+            return response
+        } catch(e) {  
+            return { status: 500 }
+        }
+    } 
+
     getUserLastSeen = async (uid, id) => {
         try {
             const response = await fetch(`/get_user_last_seen/${uid}/${id}`, { method: "GET" }) 
