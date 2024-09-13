@@ -116,7 +116,7 @@ export default class extends Controller {
             Utils.setUserLastMessageContent(messageData.sender, messageData.content)  
             Utils.setUserLastMessageTimestamp(messageData.sender, messageData.timestamp)
             Utils.setUserLastMessageTimeAgo(messageData.sender, messageData.timestamp, this.timeAgo)
-            Utils.sortUsersListBaseOnLastMessageTimestamp()
+            Utils.reOrderUsersListIfNewMessageIsBeingSentOrReceived(messageData.sender)
         })
 
         await this.sleep(1)
@@ -455,7 +455,7 @@ export default class extends Controller {
             Utils.setUserLastMessageContent(this.userToChatId, message) 
             Utils.setUserLastMessageTimestamp(this.userToChatId, timestamp)
             Utils.setUserLastMessageTimeAgo(this.userToChatId, timestamp, this.timeAgo)
-            Utils.reOrderUsersListIfCurrentUserSendAMessage(this.userToChatId)
+            Utils.reOrderUsersListIfNewMessageIsBeingSentOrReceived(this.userToChatId)
             imgCheck.src = '/green_checks.svg'
         }
         else {

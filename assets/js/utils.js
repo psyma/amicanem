@@ -182,7 +182,7 @@ export default class Utils {
         }) 
     }
 
-    static reOrderUsersListIfCurrentUserSendAMessage = (id) => { 
+    static reOrderUsersListIfNewMessageIsBeingSentOrReceived = (id) => { 
         const usersList = document.getElementById('users-list')
         const element = document.getElementById(`user${id}`)
         usersList.removeChild(element)
