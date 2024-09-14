@@ -3,8 +3,7 @@ import { Controller } from '@hotwired/stimulus';
 import Utils from '../js/utils';
 import Service from "../service/service"   
  
-import Pusher from 'pusher-js' 
-import Bowser from 'bowser';
+import Pusher from 'pusher-js'  
 import CryptoJS from 'crypto-js';
 import WaveSurfer from 'wavesurfer.js'
 import RecordPlugin from 'wavesurfer.js/dist/plugins/record.esm.js'
@@ -65,6 +64,7 @@ export default class extends Controller {
             this.setUserPusherPresenceChannel()
             this.setSendMessageChatboxInputKeyDown()
             this.setVoiceChatRecording()
+            this.setChatboxEventListener()
 
             await this.setEncryptionDetails()  
             await this.setUserLastMessage()
@@ -267,9 +267,7 @@ export default class extends Controller {
                     Math.floor((time % 60000) / 1000),
                 ].map((v) => (v < 10 ? '0' + v : v)).join(':')
                 voiceChatRecordTime.textContent = formattedTime
-            }) 
-
-            await record.startRecording() 
+            })  
 
             voiceChatRecordStart.onclick = () => {
                 record.stopRecording()
@@ -304,10 +302,16 @@ export default class extends Controller {
             }
 
             voiceChatRecordClose.onclick = () => {
-                wavesurfer.destroy()
+                wavesurfer.destroy() 
+                record.destroy()
+                Utils.unHideMediaGroup()
+
                 chatboxInput.classList.remove('hidden')
                 voiceChatRecordInput.classList.add('hidden')
             }
+
+            Utils.hideMediaGroup()
+            await record.startRecording() 
         }  
     }
 
@@ -336,9 +340,21 @@ export default class extends Controller {
         Utils.sortUsersListBaseOnLastMessageTimestamp()
     }
 
+    setChatboxEventListener = () => {
+        const chatbox = document.getElementById('chatbox-input') 
+
+        chatbox.onblur = () => {  
+            Utils.unHideMediaGroup()
+        }
+
+        chatbox.onfocus = () => { 
+            Utils.hideMediaGroup()
+        }
+    }
+
     setChatboxInfiniteScrolling = async () => {
-        const chatbox = document.getElementById('chatbox')
-        chatbox.addEventListener('scroll', async () => {
+        const chatbox = document.getElementById('chatbox') 
+        chatbox.onscroll = async () => {
             const scrollTop = chatbox.scrollTop; 
             if (scrollTop == 0 && !this.isReceivedFirstMessage && !this.isLockInfiniteScrolling) {
                 this.page += 1   
@@ -389,7 +405,7 @@ export default class extends Controller {
             else {
                 this.isSidebarUserClickOnce = false
             }
-        }) 
+        } 
 
         await this.sleep(1)
     }
@@ -505,7 +521,7 @@ export default class extends Controller {
 
         var themeToggleBtn = document.getElementById('theme-toggle');
 
-        themeToggleBtn.addEventListener('click', function() { 
+        themeToggleBtn.onclick = () => {
             // toggle icons inside button
             themeToggleDarkIcon.classList.toggle('hidden');
             themeToggleLightIcon.classList.toggle('hidden');
@@ -530,11 +546,11 @@ export default class extends Controller {
                     localStorage.setItem('color-theme', 'dark');
                 }
             } 
-        });  
+        } 
     }
 
     setSidebarUserToggleForMobile = () => { 
-        if (this.getUserAgentPlatformType() == 'mobile') {
+        if (Utils.getUserAgentPlatformType() == 'mobile') {
             setTimeout(() => {
                 document.getElementById('separator-sidebar-button').click()
             }, 200)
@@ -608,7 +624,7 @@ export default class extends Controller {
         const chatboxInput = document.getElementById('chatbox-input')
         chatboxInput.onkeydown = async (e) => {
             const message = e.target.innerText.trim()
-            if (this.getUserAgentPlatformType() == 'desktop') {
+            if (Utils.getUserAgentPlatformType() == 'desktop') {
                 if (e.key === 'Enter' && !e.shiftKey) {  
                     e.preventDefault()
                     
@@ -618,12 +634,7 @@ export default class extends Controller {
                 }
             }
         }
-    }
-
-    getUserAgentPlatformType = () => {
-        const browser = Bowser.getParser(window.navigator.userAgent); 
-        return browser.parsedResult.platform.type  
-    }
+    } 
 
     chatboxScrollToBottom = (force=false) => {
         const chatbox = document.getElementById('chatbox')

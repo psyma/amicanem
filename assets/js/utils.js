@@ -1,3 +1,5 @@
+import Bowser from 'bowser';
+
 export default class Utils {
     static encryptMessage = async (publicKey, message, chunkSize=190) => {
         const importedPublicKey = await window.crypto.subtle.importKey(
@@ -195,6 +197,23 @@ export default class Utils {
         const currentTime = Date.now()
 
         return t >= (currentTime - milliseconds)
+    }
+
+    static getUserAgentPlatformType = () => {
+        const browser = Bowser.getParser(window.navigator.userAgent); 
+        return browser.parsedResult.platform.type  
+    }
+
+    static hideMediaGroup = () => {
+        const group = document.getElementById('media-group')
+        if (this.getUserAgentPlatformType() == 'mobile') {
+            group.classList.add('hidden') 
+        }
+    }
+
+    static unHideMediaGroup = () => {
+        const group = document.getElementById('media-group')
+        group.classList.remove('hidden') 
     }
 
     static setUserLastMessageContent = (id, content) => {
