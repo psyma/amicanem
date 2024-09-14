@@ -64,6 +64,7 @@ export default class extends Controller {
             this.setSendMessageButtonClick()
             this.setUserPusherPresenceChannel()
             this.setSendMessageChatboxInputKeyDown()
+            this.setVoiceChatRecording()
 
             await this.setEncryptionDetails()  
             await this.setUserLastMessage()
@@ -75,30 +76,7 @@ export default class extends Controller {
                 
                 this.usersMap.set(user.id, user)
             }) 
-        } 
- 
-        const wavesurfer = WaveSurfer.create({
-            container: '#waveform-input',
-            waveColor: 'rgb(200, 0, 200)', 
-            hideScrollbar: true,   
-            autoCenter: true,
-            height: 30,
-            barHeight: 30, 
-            cursorWidth: 0, 
-        })
- 
-
-        const record = wavesurfer.registerPlugin(RecordPlugin.create({ scrollingWaveform: false, renderRecordedAudio: false }))
-        // Render recorded audio
-        record.on('record-end', (blob) => {
-            const container = document.querySelector('#recordings')
-            const recordedUrl = URL.createObjectURL(blob)
-
-           
- 
-        })
-
-        await record.startRecording()
+        }   
     } 
 
     setEncryptionDetails = async () => {   
@@ -219,6 +197,119 @@ export default class extends Controller {
 
         await this.sleep(1)
     } 
+
+    setVoiceChatRecording = () => {
+        let wavesurfer = WaveSurfer.create({
+            container: '#waveform-input',
+            waveColor: 'rgb(200, 0, 200)', 
+            hideScrollbar: true,   
+            autoCenter: true,
+            height: 30,
+            barHeight: 25, 
+            barWidth: 1.5,
+            cursorWidth: 0, 
+        })
+
+        const voiceChatRecordButton = document.getElementById('voicechat-record-button')
+        voiceChatRecordButton.onclick = async () => {
+            const chatboxInput = document.getElementById('chatbox-input')
+            const voiceChatRecordInput = document.getElementById('voicechat-record-input')
+            const voiceChatRecordTime = document.getElementById('voicechat-record-time')
+            const voiceChatRecordStart = document.getElementById('voicechat-record-start')
+            const voiceChatRecordSvgPlay = document.getElementById('voicechat-record-svg-play')
+            const voiceChatRecordSvgStop = document.getElementById('voicechat-record-svg-stop')
+            const voiceChatRecordDelete = document.getElementById('voicechat-record-delete')
+            const voiceChatRecordClose = document.getElementById('voicechat-record-close')
+
+            chatboxInput.classList.add('hidden')
+            voiceChatRecordInput.classList.remove('hidden')
+
+            const record = wavesurfer.registerPlugin(RecordPlugin.create({ scrollingWaveform: false, renderRecordedAudio: false }))
+            record.on('record-end', async (blob) => {
+                const container = document.getElementById('waveform-input')
+                const recordedUrl = URL.createObjectURL(blob)
+          
+                wavesurfer.destroy() 
+                wavesurfer = WaveSurfer.create({
+                    container: container,
+                    waveColor: 'rgb(200, 0, 200)', 
+                    progressColor: 'rgb(100, 50, 0)',
+                    hideScrollbar: true,   
+                    autoCenter: true,
+                    height: 30,
+                    barHeight: 25, 
+                    barWidth: 1.5,
+                    cursorWidth: 0, 
+                    url: recordedUrl
+                })
+                
+                voiceChatRecordStart.onclick = () => wavesurfer.playPause()  
+                wavesurfer.on('pause', () => { 
+                    voiceChatRecordSvgPlay.classList.remove('hidden')
+                    voiceChatRecordSvgStop.classList.add('hidden')
+                })
+                wavesurfer.on('play', () => {
+                    voiceChatRecordSvgPlay.classList.add('hidden')
+                    voiceChatRecordSvgStop.classList.remove('hidden')
+                }) 
+                wavesurfer.on('timeupdate', (currentTime) => { 
+                    const remainingTime = wavesurfer.getDuration() - currentTime
+                    const minutes = Math.floor(remainingTime / 60)
+                    const seconds = Math.floor(remainingTime % 60)
+                    const formattedTime = `0${minutes}:${seconds.toString().padStart(2, '0')}`
+                    voiceChatRecordTime.textContent = formattedTime
+                })
+            })
+
+            record.on('record-progress', (time) => { 
+                const formattedTime = [
+                    Math.floor((time % 3600000) / 60000),
+                    Math.floor((time % 60000) / 1000),
+                ].map((v) => (v < 10 ? '0' + v : v)).join(':')
+                voiceChatRecordTime.textContent = formattedTime
+            }) 
+
+            await record.startRecording() 
+
+            voiceChatRecordStart.onclick = () => {
+                record.stopRecording()
+
+                voiceChatRecordSvgPlay.classList.remove('hidden')
+                voiceChatRecordSvgStop.classList.add('hidden')
+                voiceChatRecordDelete.classList.remove('hidden')
+                voiceChatRecordClose.classList.add('hidden')
+            }
+
+            voiceChatRecordDelete.onclick = async () => {
+                voiceChatRecordSvgPlay.classList.add('hidden')
+                voiceChatRecordSvgStop.classList.remove('hidden')
+                voiceChatRecordDelete.classList.add('hidden')
+                voiceChatRecordClose.classList.remove('hidden')
+
+                wavesurfer.destroy()
+
+                wavesurfer = WaveSurfer.create({
+                    container: '#waveform-input',
+                    waveColor: 'rgb(200, 0, 200)', 
+                    hideScrollbar: true,   
+                    autoCenter: true,
+                    height: 30,
+                    barHeight: 25, 
+                    barWidth: 1.5,
+                    cursorWidth: 0, 
+                })
+
+                voiceChatRecordButton.click()
+                await record.startRecording() 
+            }
+
+            voiceChatRecordClose.onclick = () => {
+                wavesurfer.destroy()
+                chatboxInput.classList.remove('hidden')
+                voiceChatRecordInput.classList.add('hidden')
+            }
+        }  
+    }
 
     setUserLastMessage = async () => {
         const response = await this.service.getLastMessages(this.uidValue, this.currentUserValue.id)
