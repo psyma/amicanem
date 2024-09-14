@@ -1,4 +1,5 @@
 import Bowser from 'bowser';
+import WaveSurfer from 'wavesurfer.js'
 
 export default class Utils {
     static encryptMessage = async (publicKey, message, chunkSize=190) => {
@@ -374,6 +375,168 @@ export default class Utils {
         return mainDiv 
     }
 
+    static createOutgoingMessageVoiceElement = (url, timestamp, timeAgo) => {
+        const mainDiv = document.createElement('div')
+ 
+        const selectNoneDiv = document.createElement('div')
+        selectNoneDiv.classList.add('select-none')
+ 
+        const flexDiv = document.createElement('div')
+        flexDiv.classList.add( 'flex', 'justify-end')
+ 
+        const mr4Div = document.createElement('div')
+        mr4Div.classList.add('mr-4');
+ 
+        const flexItemsDiv = document.createElement('div')
+        flexItemsDiv.classList.add('flex', 'items-end')
+ 
+        const chatMessageContainer = document.createElement('div')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'ml-4', 'order-2', 'bg-indigo-50', 'dark:bg-slate-600')
+ 
+        const chatContent = document.createElement('p')
+        chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
+        chatContent.setAttribute('tabindex', '0')
+        //chatContent.textContent = url
+
+        // Create div for voicechat record input
+        const recordInput = document.createElement('div'); 
+        recordInput.classList.add("group", "w-full", "self-center", "rounded", "transition", "duration-500", "bg-indigo-50", "dark:bg-gray-600");
+
+        // Create inner div for flexbox container
+        const flexContainer = document.createElement('div');
+        flexContainer.classList.add("flex", "items-center", "outline-none", "gap-2");
+        flexContainer.setAttribute("tabindex", "0");
+        flexContainer.setAttribute("aria-label", "audio message");
+
+        // Create start button
+        const startBtn = document.createElement('button'); 
+        startBtn.classList.add("px-2.5", "py-2", "flex", "justify-center", "items-center", "rounded-[.75rem]", "outline-none", "transition-all", "duration-200", "bg-indigo-300", "active:bg-indigo-400");
+        startBtn.setAttribute("title", "Play");
+        startBtn.setAttribute("aria-label", "Play");
+        startBtn.type = "button";
+
+        // Create and append play SVG icon
+        const playSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); 
+        playSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        playSvg.setAttribute('fill', 'none');
+        playSvg.setAttribute('viewBox', '0 0 24 24');
+        playSvg.setAttribute('stroke-width', '1.5');
+        playSvg.setAttribute('stroke', 'currentColor');
+        playSvg.setAttribute('aria-hidden', 'true');
+        playSvg.classList.add("w-3.5", "h-3.5", "text-white");
+        const playPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        playPath.setAttribute('stroke-linecap', 'round');
+        playPath.setAttribute('stroke-linejoin', 'round');
+        playPath.setAttribute('d', 'M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z');
+        playSvg.appendChild(playPath);
+
+        // Create and append stop SVG icon
+        const stopSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        stopSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        stopSvg.setAttribute('fill', 'none');
+        stopSvg.setAttribute('viewBox', '0 0 24 24');
+        stopSvg.setAttribute('stroke-width', '1.5');
+        stopSvg.setAttribute('stroke', 'currentColor');
+        stopSvg.setAttribute('aria-hidden', 'true');
+        stopSvg.classList.add("hidden", "w-3.5", "h-3.5", "text-white");
+        const stopRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        stopRect.setAttribute('width', '12');
+        stopRect.setAttribute('height', '12');
+        stopRect.setAttribute('x', '6');
+        stopRect.setAttribute('y', '6');
+        stopRect.setAttribute('stroke', 'currentColor');
+        stopRect.setAttribute('stroke-linejoin', 'round');
+        stopRect.setAttribute('stroke-width', '2');
+        stopRect.setAttribute('rx', '1');
+        stopSvg.appendChild(stopRect);
+
+        startBtn.appendChild(playSvg);
+        startBtn.appendChild(stopSvg);
+
+         // Create waveform div
+        const waveformDiv = document.createElement('div');
+        waveformDiv.classList.add("sm:w-[9.375rem]", "w-[6.375rem]");
+        const wavesurfer = WaveSurfer.create({
+            container: waveformDiv,
+            waveColor: 'rgb(200, 0, 200)', 
+            hideScrollbar: true,   
+            autoCenter: true,
+            height: 30,
+            barHeight: 25, 
+            barWidth: 1.5,
+            cursorWidth: 0, 
+            url: url
+        }) 
+
+        // Create timer paragraph
+        const timer = document.createElement('p');
+        timer.classList.add("outline-none", "text-xs", "font-light", "leading-4", "tracking-[.01rem]", "text-black", "dark:text-white", "opacity-40", "dark:opacity-70");
+        timer.setAttribute("tabindex", "0");
+        timer.setAttribute("aria-label", "00:00");
+        startBtn.onclick = () => wavesurfer.playPause()  
+       
+        wavesurfer.on('ready', (duration) => {
+            const remainingTime = wavesurfer.getDuration() 
+            const minutes = Math.floor(remainingTime / 60)
+            const seconds = Math.floor(remainingTime % 60)
+            const formattedTime = `0${minutes}:${seconds.toString().padStart(2, '0')}`
+            timer.textContent = formattedTime
+        })
+
+        wavesurfer.on('pause', () => { 
+            playSvg.classList.remove('hidden')
+            stopSvg.classList.add('hidden')
+        })
+        wavesurfer.on('play', () => {
+            playSvg.classList.add('hidden')
+            stopSvg.classList.remove('hidden')
+        }) 
+        wavesurfer.on('timeupdate', (currentTime) => { 
+            const remainingTime = Math.abs(wavesurfer.getDuration() - currentTime)
+            const minutes = Math.floor(remainingTime / 60)
+            const seconds = Math.floor(remainingTime % 60)
+            const formattedTime = `0${minutes}:${seconds.toString().padStart(2, '0')}`
+            timer.textContent = formattedTime
+        })
+
+        flexContainer.appendChild(startBtn);
+        flexContainer.appendChild(waveformDiv);
+        flexContainer.appendChild(timer);
+
+        // Append flexContainer to recordInput
+        recordInput.appendChild(flexContainer);
+        //chatContent.appendChild(recordInput)
+ 
+        chatMessageContainer.appendChild(recordInput);
+ 
+        const timeDiv = document.createElement('div')
+        timeDiv.classList.add('ml-1.5', 'order-1')
+ 
+        const timeText = document.createElement('p')
+        timeText.classList.add('outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
+        timeText.textContent = timestamp
+        this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
+ 
+        timeDiv.appendChild(timeText)
+ 
+        const img = document.createElement('img')
+        img.src = '/gray_checks.svg'
+        img.classList.add('w-[.875rem]', 'h-[.875rem]', 'img-check')
+ 
+        flexItemsDiv.appendChild(chatMessageContainer)
+        flexItemsDiv.appendChild(timeDiv)
+        flexItemsDiv.appendChild(img)
+ 
+        flexDiv.appendChild(mr4Div)
+        flexDiv.appendChild(flexItemsDiv)
+
+        selectNoneDiv.appendChild(flexDiv)
+ 
+        mainDiv.appendChild(selectNoneDiv)
+
+        return mainDiv 
+    }
+
     static createIncomingMessageTextElement = (content, avatar, timestamp, timeAgo) => {  
         const mainDiv = document.createElement('div')
  
@@ -409,6 +572,173 @@ export default class Utils {
         chatContent.textContent = content
  
         chatMessageContainer.appendChild(chatContent)
+ 
+        const timeContainer = document.createElement('div')
+        timeContainer.classList.add('mr-4')
+ 
+        const timeText = document.createElement('p')
+        timeText.classList.add('outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
+        timeText.textContent = timestamp
+        this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
+ 
+        timeContainer.appendChild(timeText)
+ 
+        chatContainer.appendChild(chatMessageContainer)
+        chatContainer.appendChild(timeContainer)
+ 
+        flexDiv.appendChild(avatarDivContainer)
+        flexDiv.appendChild(chatContainer)
+ 
+        innerDiv1.appendChild(flexDiv)
+ 
+        mainDiv.appendChild(innerDiv1)
+
+        return mainDiv 
+    }
+
+    static createIncomingMessageVoiceElement = (url, avatar, timestamp, timeAgo) => {
+        const mainDiv = document.createElement('div')
+ 
+        const innerDiv1 = document.createElement('div')
+        innerDiv1.classList.add('select-none')
+ 
+        const flexDiv = document.createElement('div')
+        flexDiv.classList.add( 'flex')
+ 
+        const avatarDivContainer = document.createElement('div')
+        avatarDivContainer.classList.add('mr-4', 'flex', 'items-end')
+ 
+        const avatarDiv = document.createElement('div')
+        avatarDiv.classList.add('outline-none')
+ 
+        const avatarImageDiv = document.createElement('div')
+        avatarImageDiv.classList.add('avatar', 'w-[2.25rem]', 'h-[2.25rem]', 'bg-cover', 'bg-center', 'rounded-full')
+        avatarImageDiv.style.backgroundImage = `url("${avatar}")`
+ 
+        avatarDiv.appendChild(avatarImageDiv)
+ 
+        avatarDivContainer.appendChild(avatarDiv)
+ 
+        const chatContainer = document.createElement('div')
+        chatContainer.classList.add('flex', 'items-end')
+ 
+        const chatMessageContainer = document.createElement('div')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
+ 
+        const chatContent = document.createElement('p')
+        chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
+        chatContent.setAttribute('tabindex', '0')
+        //chatContent.textContent = content
+
+        // Create div for voicechat record input
+        const recordInput = document.createElement('div'); 
+        recordInput.classList.add("group", "w-full", "self-center", "rounded", "transition", "duration-500", "bg-indigo-50", "dark:bg-gray-600");
+
+        // Create inner div for flexbox container
+        const flexContainer = document.createElement('div');
+        flexContainer.classList.add("flex", "items-center", "outline-none", "gap-2");
+        flexContainer.setAttribute("tabindex", "0");
+        flexContainer.setAttribute("aria-label", "audio message");
+
+        // Create start button
+        const startBtn = document.createElement('button'); 
+        startBtn.classList.add("px-2.5", "py-2", "flex", "justify-center", "items-center", "rounded-[.75rem]", "outline-none", "transition-all", "duration-200", "bg-indigo-300", "active:bg-indigo-400");
+        startBtn.setAttribute("title", "Play");
+        startBtn.setAttribute("aria-label", "Play");
+        startBtn.type = "button";
+
+        // Create and append play SVG icon
+        const playSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); 
+        playSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        playSvg.setAttribute('fill', 'none');
+        playSvg.setAttribute('viewBox', '0 0 24 24');
+        playSvg.setAttribute('stroke-width', '1.5');
+        playSvg.setAttribute('stroke', 'currentColor');
+        playSvg.setAttribute('aria-hidden', 'true');
+        playSvg.classList.add("w-3.5", "h-3.5", "text-white");
+        const playPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        playPath.setAttribute('stroke-linecap', 'round');
+        playPath.setAttribute('stroke-linejoin', 'round');
+        playPath.setAttribute('d', 'M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z');
+        playSvg.appendChild(playPath);
+
+        // Create and append stop SVG icon
+        const stopSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        stopSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        stopSvg.setAttribute('fill', 'none');
+        stopSvg.setAttribute('viewBox', '0 0 24 24');
+        stopSvg.setAttribute('stroke-width', '1.5');
+        stopSvg.setAttribute('stroke', 'currentColor');
+        stopSvg.setAttribute('aria-hidden', 'true');
+        stopSvg.classList.add("hidden", "w-3.5", "h-3.5", "text-white");
+        const stopRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        stopRect.setAttribute('width', '12');
+        stopRect.setAttribute('height', '12');
+        stopRect.setAttribute('x', '6');
+        stopRect.setAttribute('y', '6');
+        stopRect.setAttribute('stroke', 'currentColor');
+        stopRect.setAttribute('stroke-linejoin', 'round');
+        stopRect.setAttribute('stroke-width', '2');
+        stopRect.setAttribute('rx', '1');
+        stopSvg.appendChild(stopRect);
+
+        startBtn.appendChild(playSvg);
+        startBtn.appendChild(stopSvg);
+
+         // Create waveform div
+        const waveformDiv = document.createElement('div');
+        waveformDiv.classList.add("sm:w-[9.375rem]", "w-[4.375rem]");
+        const wavesurfer = WaveSurfer.create({
+            container: waveformDiv,
+            waveColor: 'rgb(200, 0, 200)', 
+            hideScrollbar: true,   
+            autoCenter: true,
+            height: 30,
+            barHeight: 25, 
+            barWidth: 1.5,
+            cursorWidth: 0, 
+            url: url
+        }) 
+
+        // Create timer paragraph
+        const timer = document.createElement('p');
+        timer.classList.add("outline-none", "text-xs", "font-light", "leading-4", "tracking-[.01rem]", "text-black", "dark:text-white", "opacity-40", "dark:opacity-70");
+        timer.setAttribute("tabindex", "0");
+        timer.setAttribute("aria-label", "00:00");
+        startBtn.onclick = () => wavesurfer.playPause()   
+        
+        
+
+        wavesurfer.on('ready', (duration) => {
+            const remainingTime = wavesurfer.getDuration() 
+            const minutes = Math.floor(remainingTime / 60)
+            const seconds = Math.floor(remainingTime % 60)
+            const formattedTime = `0${minutes}:${seconds.toString().padStart(2, '0')}`
+            timer.textContent = formattedTime
+        })
+
+        wavesurfer.on('pause', () => { 
+            playSvg.classList.remove('hidden')
+            stopSvg.classList.add('hidden')
+        })
+        wavesurfer.on('play', () => {
+            playSvg.classList.add('hidden')
+            stopSvg.classList.remove('hidden')
+        }) 
+        wavesurfer.on('timeupdate', (currentTime) => { 
+            const remainingTime = Math.abs(wavesurfer.getDuration() - currentTime)
+            const minutes = Math.floor(remainingTime / 60)
+            const seconds = Math.floor(remainingTime % 60)
+            const formattedTime = `0${minutes}:${seconds.toString().padStart(2, '0')}`
+            timer.textContent = formattedTime
+        })
+
+        flexContainer.appendChild(startBtn);
+        flexContainer.appendChild(waveformDiv);
+        flexContainer.appendChild(timer);
+        recordInput.appendChild(flexContainer);
+ 
+        chatMessageContainer.appendChild(recordInput)
  
         const timeContainer = document.createElement('div')
         timeContainer.classList.add('mr-4')

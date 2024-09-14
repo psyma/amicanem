@@ -43,10 +43,11 @@ export default class Service {
         data.append('file', file)
 
         try {  
-            const response = await axios.post('/audio', data, {
+            const response = await axios.post('/create_audio_message', data, {
                 onUploadProgress: function (progressEvent) {
-                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);  
-                    progressCircle.setAttribute("stroke-dashoffset", `calc(251.2px - (251.2px * ${percentCompleted - 1}) / 100)`);
+                    console.log(progressEvent)
+                    //const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);  
+                    //progressCircle.setAttribute("stroke-dashoffset", `calc(251.2px - (251.2px * ${percentCompleted - 1}) / 100)`);
                 }
             })  
             return response

@@ -3,6 +3,9 @@ import { Controller } from '@hotwired/stimulus';
 import Utils from '../js/utils';
 import Service from "../service/service"   
  
+import { FFmpeg } from '@ffmpeg/ffmpeg'
+import { toBlobURL } from '@ffmpeg/util'
+
 import Pusher from 'pusher-js'  
 import CryptoJS from 'crypto-js';
 import WaveSurfer from 'wavesurfer.js'
@@ -39,8 +42,7 @@ export default class extends Controller {
             authEndpoint: '/pusher_auth', 
             auth: { 
                 params: { 
-                    'uid': 
-                    this.uidValue 
+                    'uid': this.uidValue 
                 } 
             } 
         });
@@ -54,6 +56,12 @@ export default class extends Controller {
         this.isLockInfiniteScrolling = false
         this.usersOnlineMap = new Map()
         this.usersMap = new Map() 
+        this.ffmpeg = new FFmpeg()
+
+        await this.ffmpeg.load({
+            coreURL: await toBlobURL('/ffmpeg-core.js', 'text/javascript'),
+            wasmURL: await toBlobURL('/ffmpeg-core.wasm', 'application/wasm'),
+        }) 
 
         const response = await this.service.getUsers(this.uidValue)
         if (response.ok) {
@@ -227,7 +235,7 @@ export default class extends Controller {
             const record = wavesurfer.registerPlugin(RecordPlugin.create({ scrollingWaveform: false, renderRecordedAudio: false }))
             record.on('record-end', async (blob) => {
                 const container = document.getElementById('waveform-input')
-                const recordedUrl = URL.createObjectURL(blob)
+                const recordedUrl = URL.createObjectURL(blob) 
           
                 wavesurfer.destroy() 
                 wavesurfer = WaveSurfer.create({
@@ -259,6 +267,8 @@ export default class extends Controller {
                     const formattedTime = `0${minutes}:${seconds.toString().padStart(2, '0')}`
                     voiceChatRecordTime.textContent = formattedTime
                 })
+
+                await this.sendVoiceMessage(blob)
             })
 
             record.on('record-progress', (time) => { 
@@ -440,15 +450,29 @@ export default class extends Controller {
 
                 try {
                     const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender))  
-                    const messageElement = Utils.createOutgoingMessageTextElement(messageData.content, messageData.timestamp, this.timeAgo)
-                    chatbox.appendChild(messageElement)
+                    if (messageData.type == MessageType.TEXT) {
 
-                    const imgCheck = messageElement.querySelector('.img-check')
-                    imgCheck.src = '/green_checks.svg'  
+                        const messageElement = Utils.createOutgoingMessageTextElement(messageData.content, messageData.timestamp, this.timeAgo)
+                        chatbox.appendChild(messageElement)
+                        
+                        const imgCheck = messageElement.querySelector('.img-check')
+                        imgCheck.src = '/green_checks.svg'  
+                    }
+                    else if (messageData.type == MessageType.AUDIO) { 
+                        const messageElement = Utils.createOutgoingMessageVoiceElement(messageData.content, messageData.timestamp, this.timeAgo)
+                        chatbox.appendChild(messageElement)
+                    }
+                    
                 } catch(e) { 
                     const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver)) 
-                    const messageElement = Utils.createIncomingMessageTextElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
-                    chatbox.appendChild(messageElement)  
+                    if (messageData.type == MessageType.TEXT) { 
+                        const messageElement = Utils.createIncomingMessageTextElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
+                        chatbox.appendChild(messageElement)  
+                    }
+                    else if (messageData.type == MessageType.AUDIO) {
+                        const messageElement = Utils.createIncomingMessageVoiceElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
+                        chatbox.appendChild(messageElement)
+                    }
                 }
             } 
             this.chatboxScrollToBottom(true)
@@ -565,13 +589,13 @@ export default class extends Controller {
         mainChatboxIntro.classList.add('hidden') 
     } 
 
-    sendTextMessage = async (message) => {
+    sendTextMessage = async (message, type) => {
         const timestamp = Date.now()
 
         const data = JSON.stringify({
             sender: this.currentUserValue.id,
             receiver: this.userToChatId,
-            type: MessageType.TEXT,
+            type: type,
             content: message,
             timestamp: timestamp
         })
@@ -608,6 +632,18 @@ export default class extends Controller {
         }
     }
 
+    sendVoiceMessage = async (blob) => {
+        await this.ffmpeg.writeFile('input.webm', new Uint8Array(await blob.arrayBuffer()))
+        await this.ffmpeg.exec(['-i', 'input.webm', '-c:a', 'libopus', '-b:a', '0', 'output.webm']);
+        
+        const file = new File([await this.ffmpeg.readFile('output.webm')], 'audio.webm', { type: 'audio/webm' }) 
+        const response = await this.service.createAudioMessage(this.uidValue, this.currentUserValue.id, file, null)
+
+        if (response.status == 200) {
+            await this.sendTextMessage(response.data, MessageType.AUDIO)
+        }
+    }
+
     setSendMessageButtonClick = () => { 
         const chatboxInput = document.getElementById('chatbox-input')
         const sendMessageButton = document.getElementById('send-message-button')
@@ -615,7 +651,7 @@ export default class extends Controller {
         sendMessageButton.onclick = async () => {
             const message = chatboxInput.innerText.trim() 
             if (!this.isEmptyOrSpaces(message)) {
-                await this.sendTextMessage(message)
+                await this.sendTextMessage(message, MessageType.TEXT)
             } 
         }
     }
@@ -629,7 +665,7 @@ export default class extends Controller {
                     e.preventDefault()
                     
                     if (!this.isEmptyOrSpaces(message)) {
-                        await this.sendTextMessage(message)
+                        await this.sendTextMessage(message, MessageType.TEXT)
                     } 
                 }
             }

@@ -70,7 +70,7 @@ class MessageController extends AbstractController
         $file->move($uploadPath, $file->getClientOriginalName() . $format);
 
         $filepath = $uploadPath . $file->getClientOriginalName() . $format;
-        $filename = (string)time() . md5(uniqid()) . $format;
+        $filename = md5(uniqid()) . (string)time() . md5(uniqid()) . $format;
 
         $filesystem = new Filesystem(); 
         $filesystem->copy($filepath, $uploadPath . $filename); 
