@@ -52,6 +52,8 @@ export default class extends Controller {
         this.service = new Service()
         this.timeAgo = new TimeAgo('en-US')
 
+        this.audioBlob = null
+        this.isVoiceRecording = false
         this.isReceivedFirstMessage = false
         this.isLockInfiniteScrolling = false
         this.usersOnlineMap = new Map()
@@ -72,11 +74,7 @@ export default class extends Controller {
             this.setUserPusherPresenceChannel()
             this.setSendMessageChatboxInputKeyDown()
             this.setVoiceChatRecording()
-            this.setChatboxEventListener()
-
-            await this.setEncryptionDetails()  
-            await this.setUserLastMessage()
-            await this.setChatboxInfiniteScrolling()
+            this.setChatboxEventListener() 
 
             users.forEach(async(user) => {
                 await this.setSidebarUserClickEvent(user)
@@ -84,6 +82,10 @@ export default class extends Controller {
                 
                 this.usersMap.set(user.id, user)
             }) 
+
+            await this.setEncryptionDetails()  
+            await this.setUserLastMessage()
+            await this.setChatboxInfiniteScrolling()
         }   
     } 
 
@@ -123,7 +125,14 @@ export default class extends Controller {
                 Utils.setChatboxMessageBorderAndMargin()
             }
 
-            Utils.setUserLastMessageContent(messageData.sender, messageData.content)  
+            if (messageData.type == MessageType.TEXT) {
+                Utils.setUserLastMessageContent(messageData.sender, messageData.content)  
+            }
+            else if (messageData.type == MessageType.AUDIO) {
+                const firstname = this.usersMap.get(messageData.sender).userDetails.firstname
+                Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent an audio') 
+            }
+
             Utils.setUserLastMessageTimestamp(messageData.sender, messageData.timestamp)
             Utils.setUserLastMessageTimeAgo(messageData.sender, messageData.timestamp, this.timeAgo)
             Utils.reOrderUsersListIfNewMessageIsBeingSentOrReceived(messageData.sender)
@@ -206,20 +215,21 @@ export default class extends Controller {
         await this.sleep(1)
     } 
 
-    setVoiceChatRecording = () => {
-        let wavesurfer = WaveSurfer.create({
-            container: '#waveform-input',
-            waveColor: 'rgb(200, 0, 200)', 
-            hideScrollbar: true,   
-            autoCenter: true,
-            height: 30,
-            barHeight: 25, 
-            barWidth: 1.5,
-            cursorWidth: 0, 
-        })
-
+    setVoiceChatRecording = () => { 
         const voiceChatRecordButton = document.getElementById('voicechat-record-button')
-        voiceChatRecordButton.onclick = async () => {
+        voiceChatRecordButton.onclick = async () => { 
+            var wavesurfer = WaveSurfer.create({
+                container: '#waveform-input',
+                waveColor: 'rgb(200, 0, 200)', 
+                hideScrollbar: true,   
+                autoCenter: true,
+                height: 30,
+                barHeight: 25, 
+                barWidth: 1.5,
+                cursorWidth: 0, 
+            })
+
+            this.isVoiceRecording = true
             const chatboxInput = document.getElementById('chatbox-input')
             const voiceChatRecordInput = document.getElementById('voicechat-record-input')
             const voiceChatRecordTime = document.getElementById('voicechat-record-time')
@@ -233,13 +243,13 @@ export default class extends Controller {
             voiceChatRecordInput.classList.remove('hidden')
 
             const record = wavesurfer.registerPlugin(RecordPlugin.create({ scrollingWaveform: false, renderRecordedAudio: false }))
-            record.on('record-end', async (blob) => {
-                const container = document.getElementById('waveform-input')
+            record.on('record-end', async (blob) => {  
                 const recordedUrl = URL.createObjectURL(blob) 
-          
+                
+                wavesurfer.empty()
                 wavesurfer.destroy() 
                 wavesurfer = WaveSurfer.create({
-                    container: container,
+                    container: '#waveform-input',
                     waveColor: 'rgb(200, 0, 200)', 
                     progressColor: 'rgb(100, 50, 0)',
                     hideScrollbar: true,   
@@ -249,7 +259,7 @@ export default class extends Controller {
                     barWidth: 1.5,
                     cursorWidth: 0, 
                     url: recordedUrl
-                })
+                }) 
                 
                 voiceChatRecordStart.onclick = () => wavesurfer.playPause()  
                 wavesurfer.on('pause', () => { 
@@ -268,7 +278,7 @@ export default class extends Controller {
                     voiceChatRecordTime.textContent = formattedTime
                 })
 
-                await this.sendVoiceMessage(blob)
+                this.audioBlob = blob 
             })
 
             record.on('record-progress', (time) => { 
@@ -294,30 +304,23 @@ export default class extends Controller {
                 voiceChatRecordDelete.classList.add('hidden')
                 voiceChatRecordClose.classList.remove('hidden')
 
-                wavesurfer.destroy()
-
-                wavesurfer = WaveSurfer.create({
-                    container: '#waveform-input',
-                    waveColor: 'rgb(200, 0, 200)', 
-                    hideScrollbar: true,   
-                    autoCenter: true,
-                    height: 30,
-                    barHeight: 25, 
-                    barWidth: 1.5,
-                    cursorWidth: 0, 
-                })
+                wavesurfer.empty()
+                wavesurfer.destroy() 
 
                 voiceChatRecordButton.click()
                 await record.startRecording() 
             }
 
             voiceChatRecordClose.onclick = () => {
+                this.isVoiceRecording = false
+                
+                wavesurfer.empty()
                 wavesurfer.destroy() 
                 record.destroy()
                 Utils.unHideMediaGroup()
 
                 chatboxInput.classList.remove('hidden')
-                voiceChatRecordInput.classList.add('hidden')
+                voiceChatRecordInput.classList.add('hidden') 
             }
 
             Utils.hideMediaGroup()
@@ -335,12 +338,25 @@ export default class extends Controller {
                 
                 try { 
                     const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender)) 
-                    Utils.setUserLastMessageContent(messageData.receiver, messageData.content) 
+                    if (messageData.type == MessageType.TEXT) {
+                        Utils.setUserLastMessageContent(messageData.receiver, messageData.content) 
+                    }
+                    else if (messageData.type == MessageType.AUDIO) {  
+                        Utils.setUserLastMessageContent(messageData.receiver, 'You sent an audio') 
+                    }
+
                     Utils.setUserLastMessageTimestamp(messageData.receiver, messageData.timestamp)
                     Utils.setUserLastMessageTimeAgo(messageData.receiver, messageData.timestamp, this.timeAgo)
                 } catch(e) { 
-                    const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver)) 
-                    Utils.setUserLastMessageContent(messageData.sender, messageData.content) 
+                    const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver))
+                    if (messageData.type == MessageType.TEXT) {
+                        Utils.setUserLastMessageContent(messageData.sender, messageData.content) 
+                    } 
+                    else if (messageData.type == MessageType.AUDIO) {
+                        const firstname = this.usersMap.get(messageData.sender).userDetails.firstname
+                        Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent an audio') 
+                    }
+
                     Utils.setUserLastMessageTimestamp(messageData.sender, messageData.timestamp)
                     Utils.setUserLastMessageTimeAgo(messageData.sender, messageData.timestamp, this.timeAgo)
                 }
@@ -589,7 +605,7 @@ export default class extends Controller {
         mainChatboxIntro.classList.add('hidden') 
     } 
 
-    sendTextMessage = async (message, type) => {
+    sendMessage = async (message, type) => {
         const timestamp = Date.now()
 
         const data = JSON.stringify({
@@ -609,10 +625,16 @@ export default class extends Controller {
 
         const chatbox = document.getElementById('chatbox')
         const chatboxInput = document.getElementById('chatbox-input')
-        const messageElement = Utils.createOutgoingMessageTextElement(message, timestamp, this.timeAgo)
+        let messageElement = null
+        if (type == MessageType.TEXT) {
+            messageElement = Utils.createOutgoingMessageTextElement(message, timestamp, this.timeAgo)
+            chatboxInput.textContent = ''
+        }
+        else if (type == MessageType.AUDIO) {
+            messageElement = Utils.createOutgoingMessageVoiceElement(URL.createObjectURL(this.audioBlob), timestamp, this.timeAgo)
+        }
         
         this.chatboxScrollToBottom(true)
-        chatboxInput.textContent = ''
         chatbox.appendChild(messageElement) 
 
         Utils.setChatboxMessageAvatarHidden()
@@ -621,7 +643,12 @@ export default class extends Controller {
         const response = await this.service.createTextMessage(this.uidValue, `messages/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, this.currentUserValue.id, this.userToChatId, MessageType.TEXT, content, timestamp, true)
         const imgCheck = messageElement.querySelector('.img-check')
         if (response.ok) { 
-            Utils.setUserLastMessageContent(this.userToChatId, message) 
+            if (type == MessageType.TEXT) { 
+                Utils.setUserLastMessageContent(this.userToChatId, message) 
+            }
+            else if (type == MessageType.AUDIO) {
+                Utils.setUserLastMessageContent(this.userToChatId, 'You sent an audio') 
+            }
             Utils.setUserLastMessageTimestamp(this.userToChatId, timestamp)
             Utils.setUserLastMessageTimeAgo(this.userToChatId, timestamp, this.timeAgo)
             Utils.reOrderUsersListIfNewMessageIsBeingSentOrReceived(this.userToChatId)
@@ -633,14 +660,19 @@ export default class extends Controller {
     }
 
     sendVoiceMessage = async (blob) => {
+        const voiceChatRecordDelete = document.getElementById('voicechat-record-delete')
+        const voiceChatRecordClose = document.getElementById('voicechat-record-close')
+        voiceChatRecordDelete.click()
+        voiceChatRecordClose.click()
+
         await this.ffmpeg.writeFile('input.webm', new Uint8Array(await blob.arrayBuffer()))
         await this.ffmpeg.exec(['-i', 'input.webm', '-c:a', 'libopus', '-b:a', '0', 'output.webm']);
-        
         const file = new File([await this.ffmpeg.readFile('output.webm')], 'audio.webm', { type: 'audio/webm' }) 
         const response = await this.service.createAudioMessage(this.uidValue, this.currentUserValue.id, file, null)
-
+        
         if (response.status == 200) {
-            await this.sendTextMessage(response.data, MessageType.AUDIO)
+            await this.sendMessage(response.data, MessageType.AUDIO)
+            this.audioBlob = null
         }
     }
 
@@ -649,10 +681,13 @@ export default class extends Controller {
         const sendMessageButton = document.getElementById('send-message-button')
 
         sendMessageButton.onclick = async () => {
-            const message = chatboxInput.innerText.trim() 
-            if (!this.isEmptyOrSpaces(message)) {
-                await this.sendTextMessage(message, MessageType.TEXT)
+            const message = chatboxInput.innerText.trim()  
+            if (!this.isEmptyOrSpaces(message) && this.audioBlob == null && !this.isVoiceRecording) {
+                await this.sendMessage(message, MessageType.TEXT)
             } 
+            else if (this.audioBlob != null) { 
+                await this.sendVoiceMessage(this.audioBlob)
+            }
         }
     }
 
@@ -665,7 +700,7 @@ export default class extends Controller {
                     e.preventDefault()
                     
                     if (!this.isEmptyOrSpaces(message)) {
-                        await this.sendTextMessage(message, MessageType.TEXT)
+                        await this.sendMessage(message, MessageType.TEXT)
                     } 
                 }
             }
