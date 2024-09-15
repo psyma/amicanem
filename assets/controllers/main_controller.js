@@ -449,30 +449,30 @@ export default class extends Controller {
                 const { sender, receiver } = JSON.parse(atob(content)) 
 
                 try {
+                    let messageElement = null
                     const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender))  
                     if (messageData.type == MessageType.TEXT) {
-
-                        const messageElement = Utils.createOutgoingMessageTextElement(messageData.content, messageData.timestamp, this.timeAgo)
-                        chatbox.appendChild(messageElement)
-                        
-                        const imgCheck = messageElement.querySelector('.img-check')
-                        imgCheck.src = '/green_checks.svg'  
+                        messageElement = Utils.createOutgoingMessageTextElement(messageData.content, messageData.timestamp, this.timeAgo) 
                     }
                     else if (messageData.type == MessageType.AUDIO) { 
-                        const messageElement = Utils.createOutgoingMessageVoiceElement(messageData.content, messageData.timestamp, this.timeAgo)
-                        chatbox.appendChild(messageElement)
+                        messageElement = Utils.createOutgoingMessageVoiceElement(messageData.content, messageData.timestamp, this.timeAgo) 
                     }
+
+                    chatbox.appendChild(messageElement)
+                    const imgCheck = messageElement.querySelector('.img-check')
+                    imgCheck.src = '/green_checks.svg'  
                     
                 } catch(e) { 
+                    let messageElement = null
                     const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver)) 
                     if (messageData.type == MessageType.TEXT) { 
-                        const messageElement = Utils.createIncomingMessageTextElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
-                        chatbox.appendChild(messageElement)  
+                        messageElement = Utils.createIncomingMessageTextElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
                     }
                     else if (messageData.type == MessageType.AUDIO) {
-                        const messageElement = Utils.createIncomingMessageVoiceElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
-                        chatbox.appendChild(messageElement)
+                        messageElement = Utils.createIncomingMessageVoiceElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
                     }
+
+                    chatbox.appendChild(messageElement)  
                 }
             } 
             this.chatboxScrollToBottom(true)

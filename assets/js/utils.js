@@ -322,6 +322,110 @@ export default class Utils {
         return loader
     }
 
+    static createVoiceMessageElement = (url) => {
+        const recordInput = document.createElement('div')
+        recordInput.classList.add("group", "w-full", "self-center", "rounded", "transition", "duration-500", "bg-indigo-50", "dark:bg-gray-600")
+
+        const flexContainer = document.createElement('div')
+        flexContainer.classList.add("flex", "items-center", "outline-none", "gap-2")
+        flexContainer.setAttribute("tabindex", "0")
+        flexContainer.setAttribute("aria-label", "audio message")
+
+        const startBtn = document.createElement('button')
+        startBtn.classList.add("px-2.5", "py-2", "flex", "justify-center", "items-center", "rounded-[.75rem]", "outline-none", "transition-all", "duration-200", "bg-indigo-300", "active:bg-indigo-400")
+        startBtn.setAttribute("title", "Play")
+        startBtn.setAttribute("aria-label", "Play")
+        startBtn.type = "button"
+
+        const playSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+        playSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+        playSvg.setAttribute('fill', 'none')
+        playSvg.setAttribute('viewBox', '0 0 24 24')
+        playSvg.setAttribute('stroke-width', '1.5')
+        playSvg.setAttribute('stroke', 'currentColor')
+        playSvg.setAttribute('aria-hidden', 'true')
+        playSvg.classList.add("w-3.5", "h-3.5", "text-white")
+        const playPath = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+        playPath.setAttribute('stroke-linecap', 'round')
+        playPath.setAttribute('stroke-linejoin', 'round')
+        playPath.setAttribute('d', 'M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z')
+        playSvg.appendChild(playPath)
+
+        const stopSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+        stopSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+        stopSvg.setAttribute('fill', 'none')
+        stopSvg.setAttribute('viewBox', '0 0 24 24')
+        stopSvg.setAttribute('stroke-width', '1.5')
+        stopSvg.setAttribute('stroke', 'currentColor')
+        stopSvg.setAttribute('aria-hidden', 'true')
+        stopSvg.classList.add("hidden", "w-3.5", "h-3.5", "text-white")
+        const stopRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+        stopRect.setAttribute('width', '12')
+        stopRect.setAttribute('height', '12')
+        stopRect.setAttribute('x', '6')
+        stopRect.setAttribute('y', '6')
+        stopRect.setAttribute('stroke', 'currentColor')
+        stopRect.setAttribute('stroke-linejoin', 'round')
+        stopRect.setAttribute('stroke-width', '2')
+        stopRect.setAttribute('rx', '1')
+        stopSvg.appendChild(stopRect)
+
+        startBtn.appendChild(playSvg)
+        startBtn.appendChild(stopSvg)
+
+        const waveformDiv = document.createElement('div')
+        waveformDiv.classList.add("sm:w-[9.375rem]", "w-[6.375rem]")
+        const wavesurfer = WaveSurfer.create({
+            container: waveformDiv,
+            waveColor: 'rgb(200, 0, 200)', 
+            hideScrollbar: true,   
+            autoCenter: true,
+            height: 30,
+            barHeight: 25, 
+            barWidth: 1.5,
+            cursorWidth: 0, 
+            url: url
+        }) 
+
+        const timer = document.createElement('p')
+        timer.classList.add("outline-none", "text-xs", "font-light", "leading-4", "tracking-[.01rem]", "text-black", "dark:text-white", "opacity-40", "dark:opacity-70")
+        timer.setAttribute("tabindex", "0")
+        timer.setAttribute("aria-label", "00:00")
+        startBtn.onclick = () => wavesurfer.playPause()  
+       
+        wavesurfer.on('ready', (duration) => {
+            const remainingTime = wavesurfer.getDuration() 
+            const minutes = Math.floor(remainingTime / 60)
+            const seconds = Math.floor(remainingTime % 60)
+            const formattedTime = `0${minutes}:${seconds.toString().padStart(2, '0')}`
+            timer.textContent = formattedTime
+        })
+
+        wavesurfer.on('pause', () => { 
+            playSvg.classList.remove('hidden')
+            stopSvg.classList.add('hidden')
+        })
+        wavesurfer.on('play', () => {
+            playSvg.classList.add('hidden')
+            stopSvg.classList.remove('hidden')
+        }) 
+        wavesurfer.on('timeupdate', (currentTime) => { 
+            const remainingTime = Math.abs(wavesurfer.getDuration() - currentTime)
+            const minutes = Math.floor(remainingTime / 60)
+            const seconds = Math.floor(remainingTime % 60)
+            const formattedTime = `0${minutes}:${seconds.toString().padStart(2, '0')}`
+            timer.textContent = formattedTime
+        })
+
+        flexContainer.appendChild(startBtn)
+        flexContainer.appendChild(waveformDiv)
+        flexContainer.appendChild(timer)
+ 
+        recordInput.appendChild(flexContainer);
+
+        return recordInput
+    }
+
     static createOutgoingMessageTextElement = (content, timestamp, timeAgo) => {  
         const mainDiv = document.createElement('div')
  
@@ -395,119 +499,10 @@ export default class Utils {
  
         const chatContent = document.createElement('p')
         chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
-        chatContent.setAttribute('tabindex', '0')
-        //chatContent.textContent = url
+        chatContent.setAttribute('tabindex', '0') 
 
-        // Create div for voicechat record input
-        const recordInput = document.createElement('div'); 
-        recordInput.classList.add("group", "w-full", "self-center", "rounded", "transition", "duration-500", "bg-indigo-50", "dark:bg-gray-600");
-
-        // Create inner div for flexbox container
-        const flexContainer = document.createElement('div');
-        flexContainer.classList.add("flex", "items-center", "outline-none", "gap-2");
-        flexContainer.setAttribute("tabindex", "0");
-        flexContainer.setAttribute("aria-label", "audio message");
-
-        // Create start button
-        const startBtn = document.createElement('button'); 
-        startBtn.classList.add("px-2.5", "py-2", "flex", "justify-center", "items-center", "rounded-[.75rem]", "outline-none", "transition-all", "duration-200", "bg-indigo-300", "active:bg-indigo-400");
-        startBtn.setAttribute("title", "Play");
-        startBtn.setAttribute("aria-label", "Play");
-        startBtn.type = "button";
-
-        // Create and append play SVG icon
-        const playSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); 
-        playSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-        playSvg.setAttribute('fill', 'none');
-        playSvg.setAttribute('viewBox', '0 0 24 24');
-        playSvg.setAttribute('stroke-width', '1.5');
-        playSvg.setAttribute('stroke', 'currentColor');
-        playSvg.setAttribute('aria-hidden', 'true');
-        playSvg.classList.add("w-3.5", "h-3.5", "text-white");
-        const playPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        playPath.setAttribute('stroke-linecap', 'round');
-        playPath.setAttribute('stroke-linejoin', 'round');
-        playPath.setAttribute('d', 'M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z');
-        playSvg.appendChild(playPath);
-
-        // Create and append stop SVG icon
-        const stopSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        stopSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-        stopSvg.setAttribute('fill', 'none');
-        stopSvg.setAttribute('viewBox', '0 0 24 24');
-        stopSvg.setAttribute('stroke-width', '1.5');
-        stopSvg.setAttribute('stroke', 'currentColor');
-        stopSvg.setAttribute('aria-hidden', 'true');
-        stopSvg.classList.add("hidden", "w-3.5", "h-3.5", "text-white");
-        const stopRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        stopRect.setAttribute('width', '12');
-        stopRect.setAttribute('height', '12');
-        stopRect.setAttribute('x', '6');
-        stopRect.setAttribute('y', '6');
-        stopRect.setAttribute('stroke', 'currentColor');
-        stopRect.setAttribute('stroke-linejoin', 'round');
-        stopRect.setAttribute('stroke-width', '2');
-        stopRect.setAttribute('rx', '1');
-        stopSvg.appendChild(stopRect);
-
-        startBtn.appendChild(playSvg);
-        startBtn.appendChild(stopSvg);
-
-         // Create waveform div
-        const waveformDiv = document.createElement('div');
-        waveformDiv.classList.add("sm:w-[9.375rem]", "w-[6.375rem]");
-        const wavesurfer = WaveSurfer.create({
-            container: waveformDiv,
-            waveColor: 'rgb(200, 0, 200)', 
-            hideScrollbar: true,   
-            autoCenter: true,
-            height: 30,
-            barHeight: 25, 
-            barWidth: 1.5,
-            cursorWidth: 0, 
-            url: url
-        }) 
-
-        // Create timer paragraph
-        const timer = document.createElement('p');
-        timer.classList.add("outline-none", "text-xs", "font-light", "leading-4", "tracking-[.01rem]", "text-black", "dark:text-white", "opacity-40", "dark:opacity-70");
-        timer.setAttribute("tabindex", "0");
-        timer.setAttribute("aria-label", "00:00");
-        startBtn.onclick = () => wavesurfer.playPause()  
-       
-        wavesurfer.on('ready', (duration) => {
-            const remainingTime = wavesurfer.getDuration() 
-            const minutes = Math.floor(remainingTime / 60)
-            const seconds = Math.floor(remainingTime % 60)
-            const formattedTime = `0${minutes}:${seconds.toString().padStart(2, '0')}`
-            timer.textContent = formattedTime
-        })
-
-        wavesurfer.on('pause', () => { 
-            playSvg.classList.remove('hidden')
-            stopSvg.classList.add('hidden')
-        })
-        wavesurfer.on('play', () => {
-            playSvg.classList.add('hidden')
-            stopSvg.classList.remove('hidden')
-        }) 
-        wavesurfer.on('timeupdate', (currentTime) => { 
-            const remainingTime = Math.abs(wavesurfer.getDuration() - currentTime)
-            const minutes = Math.floor(remainingTime / 60)
-            const seconds = Math.floor(remainingTime % 60)
-            const formattedTime = `0${minutes}:${seconds.toString().padStart(2, '0')}`
-            timer.textContent = formattedTime
-        })
-
-        flexContainer.appendChild(startBtn);
-        flexContainer.appendChild(waveformDiv);
-        flexContainer.appendChild(timer);
-
-        // Append flexContainer to recordInput
-        recordInput.appendChild(flexContainer);
-        //chatContent.appendChild(recordInput)
- 
-        chatMessageContainer.appendChild(recordInput);
+        const voiceElement = this.createVoiceMessageElement(url) 
+        chatMessageContainer.appendChild(voiceElement)
  
         const timeDiv = document.createElement('div')
         timeDiv.classList.add('ml-1.5', 'order-1')
@@ -628,117 +623,9 @@ export default class Utils {
         const chatContent = document.createElement('p')
         chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
         chatContent.setAttribute('tabindex', '0')
-        //chatContent.textContent = content
 
-        // Create div for voicechat record input
-        const recordInput = document.createElement('div'); 
-        recordInput.classList.add("group", "w-full", "self-center", "rounded", "transition", "duration-500", "bg-indigo-50", "dark:bg-gray-600");
-
-        // Create inner div for flexbox container
-        const flexContainer = document.createElement('div');
-        flexContainer.classList.add("flex", "items-center", "outline-none", "gap-2");
-        flexContainer.setAttribute("tabindex", "0");
-        flexContainer.setAttribute("aria-label", "audio message");
-
-        // Create start button
-        const startBtn = document.createElement('button'); 
-        startBtn.classList.add("px-2.5", "py-2", "flex", "justify-center", "items-center", "rounded-[.75rem]", "outline-none", "transition-all", "duration-200", "bg-indigo-300", "active:bg-indigo-400");
-        startBtn.setAttribute("title", "Play");
-        startBtn.setAttribute("aria-label", "Play");
-        startBtn.type = "button";
-
-        // Create and append play SVG icon
-        const playSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); 
-        playSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-        playSvg.setAttribute('fill', 'none');
-        playSvg.setAttribute('viewBox', '0 0 24 24');
-        playSvg.setAttribute('stroke-width', '1.5');
-        playSvg.setAttribute('stroke', 'currentColor');
-        playSvg.setAttribute('aria-hidden', 'true');
-        playSvg.classList.add("w-3.5", "h-3.5", "text-white");
-        const playPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        playPath.setAttribute('stroke-linecap', 'round');
-        playPath.setAttribute('stroke-linejoin', 'round');
-        playPath.setAttribute('d', 'M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z');
-        playSvg.appendChild(playPath);
-
-        // Create and append stop SVG icon
-        const stopSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        stopSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-        stopSvg.setAttribute('fill', 'none');
-        stopSvg.setAttribute('viewBox', '0 0 24 24');
-        stopSvg.setAttribute('stroke-width', '1.5');
-        stopSvg.setAttribute('stroke', 'currentColor');
-        stopSvg.setAttribute('aria-hidden', 'true');
-        stopSvg.classList.add("hidden", "w-3.5", "h-3.5", "text-white");
-        const stopRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        stopRect.setAttribute('width', '12');
-        stopRect.setAttribute('height', '12');
-        stopRect.setAttribute('x', '6');
-        stopRect.setAttribute('y', '6');
-        stopRect.setAttribute('stroke', 'currentColor');
-        stopRect.setAttribute('stroke-linejoin', 'round');
-        stopRect.setAttribute('stroke-width', '2');
-        stopRect.setAttribute('rx', '1');
-        stopSvg.appendChild(stopRect);
-
-        startBtn.appendChild(playSvg);
-        startBtn.appendChild(stopSvg);
-
-         // Create waveform div
-        const waveformDiv = document.createElement('div');
-        waveformDiv.classList.add("sm:w-[9.375rem]", "w-[4.375rem]");
-        const wavesurfer = WaveSurfer.create({
-            container: waveformDiv,
-            waveColor: 'rgb(200, 0, 200)', 
-            hideScrollbar: true,   
-            autoCenter: true,
-            height: 30,
-            barHeight: 25, 
-            barWidth: 1.5,
-            cursorWidth: 0, 
-            url: url
-        }) 
-
-        // Create timer paragraph
-        const timer = document.createElement('p');
-        timer.classList.add("outline-none", "text-xs", "font-light", "leading-4", "tracking-[.01rem]", "text-black", "dark:text-white", "opacity-40", "dark:opacity-70");
-        timer.setAttribute("tabindex", "0");
-        timer.setAttribute("aria-label", "00:00");
-        startBtn.onclick = () => wavesurfer.playPause()   
-        
-        
-
-        wavesurfer.on('ready', (duration) => {
-            const remainingTime = wavesurfer.getDuration() 
-            const minutes = Math.floor(remainingTime / 60)
-            const seconds = Math.floor(remainingTime % 60)
-            const formattedTime = `0${minutes}:${seconds.toString().padStart(2, '0')}`
-            timer.textContent = formattedTime
-        })
-
-        wavesurfer.on('pause', () => { 
-            playSvg.classList.remove('hidden')
-            stopSvg.classList.add('hidden')
-        })
-        wavesurfer.on('play', () => {
-            playSvg.classList.add('hidden')
-            stopSvg.classList.remove('hidden')
-        }) 
-        wavesurfer.on('timeupdate', (currentTime) => { 
-            const remainingTime = Math.abs(wavesurfer.getDuration() - currentTime)
-            const minutes = Math.floor(remainingTime / 60)
-            const seconds = Math.floor(remainingTime % 60)
-            const formattedTime = `0${minutes}:${seconds.toString().padStart(2, '0')}`
-            timer.textContent = formattedTime
-        })
-
-        flexContainer.appendChild(startBtn);
-        flexContainer.appendChild(waveformDiv);
-        flexContainer.appendChild(timer);
-        recordInput.appendChild(flexContainer);
- 
-        chatMessageContainer.appendChild(recordInput)
+        const voiceElement = this.createVoiceMessageElement(url) 
+        chatMessageContainer.appendChild(voiceElement)
  
         const timeContainer = document.createElement('div')
         timeContainer.classList.add('mr-4')
