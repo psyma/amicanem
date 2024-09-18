@@ -57,6 +57,28 @@ class MessageController extends AbstractController
         return new JsonResponse($message); 
     } 
 
+    #[Route('/create_image_message', name: 'app_create_image_message', methods: ["POST"])]
+    public function createImageMessage(Request $request): JsonResponse
+    {
+        $this->denyAccessUnlessGranted("ROLE_USER");
+        $this->denyAccessUnlessCurrentUser($request->request->get("uid"));
+
+        $file = $request->files->get("file");    
+        $format = $request->files->get("format");
+
+        $uploadPath = $this->getParameter('kernel.project_dir') . '/public/uploads/';
+        $file->move($uploadPath, $file->getClientOriginalName() . $format);
+
+        $filepath = $uploadPath . $file->getClientOriginalName() . $format;
+        $filename = md5(uniqid()) . (string)time() . md5(uniqid()) . $format;
+
+        $filesystem = new Filesystem(); 
+        $filesystem->copy($filepath, $uploadPath . $filename); 
+        $filesystem->remove($filepath);
+
+        return new JsonResponse("uploads/" . $filename);
+    }
+
     #[Route('/create_audio_message', name: 'app_create_audio_message', methods: ["POST"])]
     public function createAudioMessage(Request $request): JsonResponse
     {

@@ -36,10 +36,9 @@ export default class Service {
         } 
     }
 
-    createAudioMessage = async (uid, sender, file, progressCircle) => {
+    createAudioMessage = async (uid, file, progressCircle) => {
         const data = new FormData()
-        data.append('uid', uid)
-        data.append('sender', sender)
+        data.append('uid', uid) 
         data.append('file', file)
 
         try {  
@@ -55,6 +54,25 @@ export default class Service {
             return { status: 500 }
         }
     } 
+
+    createImageMessage = async (uid, file) => {
+        const data = new FormData()
+        data.append('uid', uid) 
+        data.append('file', file)
+
+        try {  
+            const response = await axios.post('/create_image_message', data, {
+                onUploadProgress: function (progressEvent) {
+                    console.log(progressEvent)
+                    //const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);  
+                    //progressCircle.setAttribute("stroke-dashoffset", `calc(251.2px - (251.2px * ${percentCompleted - 1}) / 100)`);
+                }
+            })  
+            return response
+        } catch(e) {  
+            return { status: 500 }
+        }
+    }
 
     getUserLastSeen = async (uid, id) => {
         try {

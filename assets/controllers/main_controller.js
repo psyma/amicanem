@@ -70,6 +70,8 @@ export default class extends Controller {
             const users = await response.json() 
 
             this.setDarkModeToggle() 
+            this.setImageButtonClick()
+            this.setOnChangeImageFileInput()
             this.setSendTextButtonClick()
             this.setSendVoiceButtonClick()
             this.setUserPusherPresenceChannel()
@@ -78,10 +80,10 @@ export default class extends Controller {
             this.setChatboxEventListener() 
 
             users.forEach(async(user) => {
-                await this.setSidebarUserClickEvent(user)
-                await this.setUserPusherMessagesChannel(user)
-                
                 this.usersMap.set(user.id, user)
+
+                await this.setSidebarUserClickEvent(user)
+                await this.setUserPusherMessagesChannel(user) 
             }) 
 
             await this.setEncryptionDetails()  
@@ -306,7 +308,6 @@ export default class extends Controller {
             })
 
             record.on('record-progress', (time) => {   
-                console.log(parseInt((time) / 1000))
                 if (parseInt((time) / 1000) >= MAX_RECORDING_LIMIT + 1) {
                     voiceChatRecordStart.click()
                 }
@@ -703,7 +704,7 @@ export default class extends Controller {
         await this.ffmpeg.writeFile('input.webm', new Uint8Array(await blob.arrayBuffer()))
         await this.ffmpeg.exec(['-i', 'input.webm', '-c:a', 'libopus', '-b:a', '0', 'output.webm']);
         const file = new File([await this.ffmpeg.readFile('output.webm')], 'audio.webm', { type: 'audio/webm' }) 
-        const response = await this.service.createAudioMessage(this.uidValue, this.currentUserValue.id, file, null)
+        const response = await this.service.createAudioMessage(this.uidValue, file, null)
         
         if (response.status == 200) {  
             const type = MessageType.AUDIO
@@ -726,6 +727,46 @@ export default class extends Controller {
  
             const messageElement = Utils.createOutgoingMessageVoiceElement(URL.createObjectURL(blob) , timestamp, this.timeAgo)
             await this.setSentMessage(content, messageElement, null, type, timestamp)
+        }
+    }
+
+    setOnChangeImageFileInput = () => {
+        const imageFileInput = document.getElementById('image-file-input')
+        imageFileInput.onchange = async (e) => {
+            const files = e.target.files
+            const chatboxInput = document.getElementById('chatbox-input')
+             
+            // Ensure that there's at least one file selected
+            if (files.length > 0) {
+                const file = files[0];
+                
+                // Create an img element
+                const img = document.createElement('img');
+
+                // Read the file as a Data URL
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    // Set the image src to the Data URL
+                    img.src = event.target.result;
+                    img.style.width = '50px'; // Set the image size to fit in the div
+                    img.style.height = '50px';
+
+                    // Append the img element to the chatboxInput div
+                    chatboxInput.appendChild(img);
+                };
+
+                // Read the image file
+                reader.readAsDataURL(file);
+            }
+        }
+    }
+
+    setImageButtonClick = () => {
+        const imageInputButton = document.getElementById('image-input-button')
+
+        imageInputButton.onclick = () => {
+            const imageFileInput = document.getElementById('image-file-input')
+            imageFileInput.click()
         }
     }
 
