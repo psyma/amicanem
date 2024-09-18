@@ -379,8 +379,8 @@ export default class Utils {
         startBtn.appendChild(stopSvg)
 
         const waveformDiv = document.createElement('div')
-        //waveformDiv.classList.add("sm:w-[9.375rem]", "w-[6.375rem]")
-        waveformDiv.classList.add("w-[9.375rem]")
+        //waveformDiv.classList.add("sm:w-[9.375rem]", "w-[5.375rem]") 
+        waveformDiv.classList.add("w-40") 
         const wavesurfer = WaveSurfer.create({
             container: waveformDiv,
             waveColor: 'rgb(200, 0, 200)', 
@@ -439,13 +439,13 @@ export default class Utils {
         selectNoneDiv.classList.add('select-none')
  
         const flexDiv = document.createElement('div')
-        flexDiv.classList.add( 'flex', 'justify-end')
+        flexDiv.classList.add('flex', 'justify-end')
  
         const mr4Div = document.createElement('div')
         mr4Div.classList.add('mr-4');
  
         const flexItemsDiv = document.createElement('div')
-        flexItemsDiv.classList.add('flex', 'items-end')
+        flexItemsDiv.classList.add('flex', 'relative', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
         chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'ml-2', 'order-2', 'bg-indigo-50', 'dark:bg-slate-600')
@@ -461,16 +461,17 @@ export default class Utils {
         timeDiv.classList.add('ml-1.5', 'order-1')
  
         const timeText = document.createElement('p')
-        timeText.classList.add('hidden', 'outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
+        timeText.classList.add('hidden', 'flex', 'justify-end', 'outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
         timeText.textContent = timestamp
+
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
- 
-        timeDiv.appendChild(timeText)
+        mainDiv.appendChild(timeText) 
  
         const img = document.createElement('img')
         img.src = '/gray_checks.svg'
         img.classList.add('w-[.875rem]', 'h-[.875rem]', 'img-check')
- 
+         
+        console.log(chatMessageContainer.getBoundingClientRect().width)
         flexItemsDiv.appendChild(chatMessageContainer)
         flexItemsDiv.appendChild(timeDiv)
         flexItemsDiv.appendChild(img)
@@ -481,6 +482,9 @@ export default class Utils {
         selectNoneDiv.appendChild(flexDiv)
  
         mainDiv.appendChild(selectNoneDiv)
+        mainDiv.onclick = () => {
+            timeText.classList.remove('hidden')
+        }
 
         return mainDiv 
     }
@@ -514,11 +518,11 @@ export default class Utils {
         timeDiv.classList.add('ml-1.5', 'order-1')
  
         const timeText = document.createElement('p')
-        timeText.classList.add('hidden', 'outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
+        timeText.classList.add('hidden', 'flex', 'justify-end', 'outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
         timeText.textContent = timestamp
+
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
- 
-        timeDiv.appendChild(timeText)
+        mainDiv.appendChild(timeText) 
  
         const img = document.createElement('img')
         img.src = '/gray_checks.svg'
@@ -534,6 +538,9 @@ export default class Utils {
         selectNoneDiv.appendChild(flexDiv)
  
         mainDiv.appendChild(selectNoneDiv)
+        mainDiv.onclick = () => {
+            timeText.classList.remove('hidden')
+        }
 
         return mainDiv 
     }
@@ -578,12 +585,11 @@ export default class Utils {
         timeContainer.classList.add('mr-4')
  
         const timeText = document.createElement('p')
-        timeText.classList.add('hidden', 'outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
+        timeText.classList.add('hidden', 'pl-12', 'outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
         timeText.textContent = timestamp
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
- 
-        timeContainer.appendChild(timeText)
- 
+        mainDiv.append(timeText)  
+        
         chatContainer.appendChild(chatMessageContainer)
         chatContainer.appendChild(timeContainer)
  
@@ -593,6 +599,9 @@ export default class Utils {
         innerDiv1.appendChild(flexDiv)
  
         mainDiv.appendChild(innerDiv1)
+        mainDiv.onclick = () => {
+            timeText.classList.remove('hidden')
+        }
 
         return mainDiv 
     }
@@ -637,11 +646,10 @@ export default class Utils {
         timeContainer.classList.add('mr-4')
  
         const timeText = document.createElement('p')
-        timeText.classList.add('hidden', 'outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
+        timeText.classList.add('hidden', 'pl-12', 'outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
         timeText.textContent = timestamp
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
- 
-        timeContainer.appendChild(timeText)
+        mainDiv.append(timeText) 
  
         chatContainer.appendChild(chatMessageContainer)
         chatContainer.appendChild(timeContainer)
@@ -652,6 +660,9 @@ export default class Utils {
         innerDiv1.appendChild(flexDiv)
  
         mainDiv.appendChild(innerDiv1)
+        mainDiv.onclick = () => {
+            timeText.classList.remove('hidden')
+        }
 
         return mainDiv 
     }
