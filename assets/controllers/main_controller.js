@@ -306,7 +306,8 @@ export default class extends Controller {
             })
 
             record.on('record-progress', (time) => {   
-                if (parseInt((time % 60000) / 1000) == MAX_RECORDING_LIMIT + 1) {
+                console.log(parseInt((time) / 1000))
+                if (parseInt((time) / 1000) >= MAX_RECORDING_LIMIT + 1) {
                     voiceChatRecordStart.click()
                 }
                 else {
