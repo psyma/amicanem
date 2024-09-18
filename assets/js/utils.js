@@ -152,23 +152,28 @@ export default class Utils {
             const avatar1 = current.querySelector('.avatar')
             const avatar2 = next.querySelector('.avatar')
             if (avatar1 != null && avatar2 != null) { 
-                current.classList.remove('mb-10')
+                current.classList.remove('mb-5')
                 current.querySelector('.chat-message-container').classList.remove('rounded-bl-none')
                 
                 if (i != elements.length - 2) {
-                    next.classList.add('mb-10')
+                    next.classList.add('mb-5') 
                 }
             }
             else if (avatar1 == null && avatar2 == null) {
                 try { 
-                    current.classList.remove('mb-10')
+                    current.classList.remove('mb-5')
                     current.querySelector('.chat-message-container').classList.remove('rounded-br-none')
                     
                     if (i != elements.length - 2) {
-                        next.classList.add('mb-10')
+                        next.classList.add('mb-5') 
                     }
                 } catch(e) { }
             } 
+            else {
+                if (i != elements.length - 2) {
+                    next.classList.add('mb-5') 
+                }
+            }
         } 
     }
     
@@ -374,7 +379,8 @@ export default class Utils {
         startBtn.appendChild(stopSvg)
 
         const waveformDiv = document.createElement('div')
-        waveformDiv.classList.add("sm:w-[9.375rem]", "w-[6.375rem]")
+        //waveformDiv.classList.add("sm:w-[9.375rem]", "w-[6.375rem]")
+        waveformDiv.classList.add("w-[9.375rem]")
         const wavesurfer = WaveSurfer.create({
             container: waveformDiv,
             waveColor: 'rgb(200, 0, 200)', 
@@ -442,7 +448,7 @@ export default class Utils {
         flexItemsDiv.classList.add('flex', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
-        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'ml-4', 'order-2', 'bg-indigo-50', 'dark:bg-slate-600')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'ml-2', 'order-2', 'bg-indigo-50', 'dark:bg-slate-600')
  
         const chatContent = document.createElement('p')
         chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
@@ -455,7 +461,7 @@ export default class Utils {
         timeDiv.classList.add('ml-1.5', 'order-1')
  
         const timeText = document.createElement('p')
-        timeText.classList.add('outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
+        timeText.classList.add('hidden', 'outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
         timeText.textContent = timestamp
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
  
@@ -495,7 +501,7 @@ export default class Utils {
         flexItemsDiv.classList.add('flex', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
-        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'ml-4', 'order-2', 'bg-indigo-50', 'dark:bg-slate-600')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'ml-2', 'order-2', 'bg-indigo-50', 'dark:bg-slate-600')
  
         const chatContent = document.createElement('p')
         chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
@@ -508,7 +514,7 @@ export default class Utils {
         timeDiv.classList.add('ml-1.5', 'order-1')
  
         const timeText = document.createElement('p')
-        timeText.classList.add('outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
+        timeText.classList.add('hidden', 'outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
         timeText.textContent = timestamp
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
  
@@ -572,7 +578,7 @@ export default class Utils {
         timeContainer.classList.add('mr-4')
  
         const timeText = document.createElement('p')
-        timeText.classList.add('outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
+        timeText.classList.add('hidden', 'outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
         timeText.textContent = timestamp
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
  
@@ -631,7 +637,7 @@ export default class Utils {
         timeContainer.classList.add('mr-4')
  
         const timeText = document.createElement('p')
-        timeText.classList.add('outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
+        timeText.classList.add('hidden', 'outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
         timeText.textContent = timestamp
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
  
