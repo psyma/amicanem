@@ -241,6 +241,7 @@ export default class extends Controller {
 
             this.audioBlob = null
             this.isVoiceRecording = true
+            const MAX_RECORDING_LIMIT = 60
             const chatboxInput = document.getElementById('chatbox-input')
             const sendTextButton = document.getElementById('send-text-button')
             const sendVoiceButton = document.getElementById('send-voice-button')
@@ -257,8 +258,8 @@ export default class extends Controller {
             sendTextButton.classList.add('hidden')
             sendVoiceButton.classList.remove('hidden')
 
-            const record = wavesurfer.registerPlugin(RecordPlugin.create({ scrollingWaveform: false, renderRecordedAudio: false }))
             wavesurfer.empty()
+            const record = wavesurfer.registerPlugin(RecordPlugin.create({ scrollingWaveform: false, renderRecordedAudio: false }))
             record.on('record-end', async (blob) => {   
                 const recordedUrl = URL.createObjectURL(blob) 
                 
@@ -304,12 +305,17 @@ export default class extends Controller {
                 this.isVoiceRecording = false
             })
 
-            record.on('record-progress', (time) => { 
-                const formattedTime = [
-                    Math.floor((time % 3600000) / 60000),
-                    Math.floor((time % 60000) / 1000),
-                ].map((v) => (v < 10 ? '0' + v : v)).join(':')
-                voiceChatRecordTime.textContent = formattedTime
+            record.on('record-progress', (time) => {   
+                if (parseInt((time % 60000) / 1000) == MAX_RECORDING_LIMIT + 1) {
+                    voiceChatRecordStart.click()
+                }
+                else {
+                    const formattedTime = [
+                        Math.floor((time % 3600000) / 60000),
+                        Math.floor((time % 60000) / 1000),
+                    ].map((v) => (v < 10 ? '0' + v : v)).join(':')
+                    voiceChatRecordTime.textContent = formattedTime 
+                }
             })  
 
             voiceChatRecordStart.onclick = () => {

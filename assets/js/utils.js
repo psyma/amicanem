@@ -475,8 +475,7 @@ export default class Utils {
         const img = document.createElement('img')
         img.src = '/gray_checks.svg'
         img.classList.add('w-[.875rem]', 'h-[.875rem]', 'img-check')
-         
-        console.log(chatMessageContainer.getBoundingClientRect().width)
+          
         flexItemsDiv.appendChild(chatMessageContainer)
         flexItemsDiv.appendChild(timeDiv)
         flexItemsDiv.appendChild(img)
