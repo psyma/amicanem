@@ -276,21 +276,28 @@ export default class extends Controller {
                     url: recordedUrl
                 }) 
                 
-                voiceChatRecordStart.onclick = () => wavesurfer.playPause()  
+                voiceChatRecordStart.onclick = () => wavesurfer.playPause()   
+
                 wavesurfer.on('pause', () => { 
                     voiceChatRecordSvgPlay.classList.remove('hidden')
                     voiceChatRecordSvgStop.classList.add('hidden')
                 })
+
                 wavesurfer.on('play', () => {
                     voiceChatRecordSvgPlay.classList.add('hidden')
                     voiceChatRecordSvgStop.classList.remove('hidden')
                 }) 
+
                 wavesurfer.on('timeupdate', (currentTime) => { 
-                    const remainingTime = wavesurfer.getDuration() - currentTime
+                    const remainingTime = Math.abs(wavesurfer.getDuration() - currentTime)
                     const minutes = Math.floor(remainingTime / 60)
                     const seconds = Math.floor(remainingTime % 60)
                     const formattedTime = `0${minutes}:${seconds.toString().padStart(2, '0')}`
                     voiceChatRecordTime.textContent = formattedTime
+                })
+
+                wavesurfer.on('finish', ( ) => {
+                    wavesurfer.seekTo(0)
                 })
 
                 this.audioBlob = blob  

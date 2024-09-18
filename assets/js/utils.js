@@ -378,8 +378,7 @@ export default class Utils {
         startBtn.appendChild(playSvg)
         startBtn.appendChild(stopSvg)
 
-        const waveformDiv = document.createElement('div')
-        //waveformDiv.classList.add("sm:w-[9.375rem]", "w-[5.375rem]") 
+        const waveformDiv = document.createElement('div') 
         waveformDiv.classList.add("w-40") 
         const wavesurfer = WaveSurfer.create({
             container: waveformDiv,
@@ -407,14 +406,20 @@ export default class Utils {
             timer.textContent = formattedTime
         })
 
+        wavesurfer.on('finish', ( ) => {
+            wavesurfer.seekTo(0)
+        })
+
         wavesurfer.on('pause', () => { 
             playSvg.classList.remove('hidden')
             stopSvg.classList.add('hidden')
         })
+
         wavesurfer.on('play', () => {
             playSvg.classList.add('hidden')
             stopSvg.classList.remove('hidden')
         }) 
+        
         wavesurfer.on('timeupdate', (currentTime) => { 
             const remainingTime = Math.abs(wavesurfer.getDuration() - currentTime)
             const minutes = Math.floor(remainingTime / 60)
