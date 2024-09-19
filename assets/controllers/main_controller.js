@@ -130,6 +130,10 @@ export default class extends Controller {
                 else if (messageData.type == MessageType.AUDIO) {
                     messageElement = Utils.createIncomingMessageVoiceElement(messageData.content, user.userDetails.avatar, messageData.timestamp, this.timeAgo)
                 }
+                else if (messageData.type == MessageType.IMAGE) {
+                    messageElement = Utils.createIncommingMessageImageElement(messageData.content, user.userDetails.avatar, messageData.timestamp, this.timeAgo)
+
+                }
                 this.chatboxScrollToBottom()
                 chatbox.appendChild(messageElement)
 
@@ -143,6 +147,10 @@ export default class extends Controller {
             else if (messageData.type == MessageType.AUDIO) {
                 const firstname = this.usersMap.get(messageData.sender).userDetails.firstname
                 Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent an audio') 
+            }
+            else if (messageData.type == MessageType.IMAGE) {
+                const firstname = this.usersMap.get(messageData.sender).userDetails.firstname
+                Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent an image') 
             }
 
             Utils.setUserLastMessageTimestamp(messageData.sender, messageData.timestamp)
@@ -806,6 +814,7 @@ export default class extends Controller {
             const sendVoiceButton = document.getElementById('send-voice-button')
             const sendImageButton = document.getElementById('send-image-button')
 
+            chatboxImageInput.innerHTML = ''
             if (files.length) { 
                 Utils.hideMediaGroup()
                 chatboxMessageInput.classList.add('hidden')
