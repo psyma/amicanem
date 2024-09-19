@@ -348,12 +348,67 @@ export default class Utils {
         chatbox.appendChild(container) 
     }
 
+    static isTotalImagesToSendNotExceeded = (totalFiles) => {
+        const MAX_IMAGES_UPLOAD = 5
+
+        if (totalFiles > MAX_IMAGES_UPLOAD) {
+            const title = 'Maximum files to upload exceeded'
+            const content = `You can upload a maximum of ${MAX_IMAGES_UPLOAD} files, but you have attempted to upload ${totalFiles} files.`
+            Utils.showAlertMessage(title, content) 
+
+            return false
+        }
+
+        return true
+    }
+
+    static isImageFilesizeNotExceeded = (images) => {
+        function toOrdinal(num) {
+            if (typeof num !== 'number' || !Number.isInteger(num)) {
+                throw new Error('Input must be an integer.');
+            }
+            
+            const suffixes = ["th", "st", "nd", "rd"];
+            const v = num % 100;
+            
+            return num + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
+        }
+
+        const MAX_SIZE_IN_BYTES = 10 * 1024 * 1024; // 10MB
+        for (let i = 0; i < images.length; i++) {
+            const [key, value] = images[i]
+            const filesize = value['file'].size
+            if (filesize > MAX_SIZE_IN_BYTES) {
+                const title = 'Maximum upload filesize exceeded';
+                const content = `The ${toOrdinal(i + 1)} image size (${Math.round(filesize / 1048576)} MB) exceeds the maximum allowed filesize of 10 MB.`;
+                Utils.showAlertMessage(title, content) 
+                return false
+            }
+        }
+
+        return true
+    }
+
+    static showAlertMessage = (title, content) => {
+        const alertMessageContainer = document.getElementById('alert-message-container')
+        const alertMessageTitle = alertMessageContainer.querySelector('#alert-message-title')
+        const alertMessageContent = alertMessageContainer.querySelector('#alert-message-content')
+
+        alertMessageTitle.textContent = title
+        alertMessageContent.textContent = content
+
+        alertMessageContainer.classList.remove('hidden')
+        setTimeout(() => {
+            alertMessageContainer.classList.add('hidden')
+        }, 5000)
+    }
+
     static progressSvgElementCallback = (messageTempElement, percentCompleted) => { 
         const svgCircleElement = messageTempElement.querySelector(".svgCircle")  
         const progressCircleElement = messageTempElement.querySelector(".progressCircle")  
         const imgCheck = messageTempElement.querySelector('.img-check')
         imgCheck.classList.add('hidden')  
-        
+
         if (percentCompleted == 100) {
             svgCircleElement.classList.add('hidden')
         }

@@ -819,7 +819,7 @@ export default class extends Controller {
         }
     }
 
-    setOnChangeImageFileInput = () => {
+    setOnChangeImageFileInput = () => { 
         const imageFileInput = document.getElementById('image-file-input')
         imageFileInput.onchange = async (e) => { 
             const files = e.target.files
@@ -828,8 +828,8 @@ export default class extends Controller {
             const chatboxImageInput = document.getElementById('chatbox-image-input')
             const sendTextButton = document.getElementById('send-text-button')
             const sendVoiceButton = document.getElementById('send-voice-button')
-            const sendImageButton = document.getElementById('send-image-button')
-
+            const sendImageButton = document.getElementById('send-image-button') 
+            
             chatboxImageInput.innerHTML = ''
             if (files.length) { 
                 Utils.hideMediaGroup()
@@ -956,7 +956,7 @@ export default class extends Controller {
         }
     }
 
-    setSendImageButtonClick = () => {
+    setSendImageButtonClick = () => { 
         const chatboxMessageInput = document.getElementById('chatbox-message-input') 
         const chatboxVoiceInput = document.getElementById('chatbox-voice-input')
         const chatboxImageInput = document.getElementById('chatbox-image-input')
@@ -965,6 +965,9 @@ export default class extends Controller {
         const sendImageButton = document.getElementById('send-image-button') 
 
         sendImageButton.onclick = () => {  
+            if (!Utils.isTotalImagesToSendNotExceeded(this.toSendImagesMap.size)) { return }
+            if (!Utils.isImageFilesizeNotExceeded(Array.from(this.toSendImagesMap))) { return }
+
             this.toSendImagesMap.forEach(async (value, key) => { 
                 const blob = value['file']
                 const input = value['file'].name
