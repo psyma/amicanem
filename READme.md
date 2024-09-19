@@ -2,11 +2,11 @@
 
 # Features
 ```
-Audio Calls ✅
-Video Calls ✅
+Audio Calls ❌
+Video Calls ❌
 End-to-End Encryption ✅
-Two-Factor Authentication (2FA) ✅
-Optional Message Saving ✅
+Two-Factor Authentication (2FA) ❌
+Optional Message Saving ❌
 ```
 
 # Environment variable
