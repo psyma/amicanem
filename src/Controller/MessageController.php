@@ -64,13 +64,18 @@ class MessageController extends AbstractController
         $this->denyAccessUnlessCurrentUser($request->request->get("uid"));
 
         $file = $request->files->get("file");    
-        $format = $request->files->get("format");
+        $extension = $request->files->get("extension");
 
         $uploadPath = $this->getParameter('kernel.project_dir') . '/public/uploads/';
-        $file->move($uploadPath, $file->getClientOriginalName() . $format);
+        $file->move($uploadPath, $file->getClientOriginalName() . $extension);
 
-        $filepath = $uploadPath . $file->getClientOriginalName() . $format;
-        $filename = md5(uniqid()) . (string)time() . md5(uniqid()) . $format;
+        $currentDate = date('m-d-Y'); 
+        $dateTime = \DateTime::createFromFormat('m-d-Y H:i:s', $currentDate . ' 00:00:00', new \DateTimeZone('UTC'));
+        $epochTimestamp = $dateTime->getTimestamp();
+        $directoryPath = (string) $epochTimestamp; 
+
+        $filepath = $uploadPath . $file->getClientOriginalName() . $extension;
+        $filename = $directoryPath . '/' . md5(uniqid()) . md5(uniqid()) . $extension;
 
         $filesystem = new Filesystem(); 
         $filesystem->copy($filepath, $uploadPath . $filename); 
@@ -86,13 +91,18 @@ class MessageController extends AbstractController
         $this->denyAccessUnlessCurrentUser($request->request->get("uid"));
         
         $file = $request->files->get("file");    
-        $format = ".webm";
+        $extension = ".webm";
 
         $uploadPath = $this->getParameter('kernel.project_dir') . '/public/uploads/';
-        $file->move($uploadPath, $file->getClientOriginalName() . $format);
+        $file->move($uploadPath, $file->getClientOriginalName() . $extension);
 
-        $filepath = $uploadPath . $file->getClientOriginalName() . $format;
-        $filename = md5(uniqid()) . (string)time() . md5(uniqid()) . $format;
+        $currentDate = date('m-d-Y'); 
+        $dateTime = \DateTime::createFromFormat('m-d-Y H:i:s', $currentDate . ' 00:00:00', new \DateTimeZone('UTC'));
+        $epochTimestamp = $dateTime->getTimestamp();
+        $directoryPath = (string) $epochTimestamp; 
+
+        $filepath = $uploadPath . $file->getClientOriginalName() . $extension;
+        $filename = $directoryPath . '/' . md5(uniqid()) . md5(uniqid()) . $extension;
 
         $filesystem = new Filesystem(); 
         $filesystem->copy($filepath, $uploadPath . $filename); 

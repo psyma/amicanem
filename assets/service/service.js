@@ -55,10 +55,11 @@ export default class Service {
         }
     } 
 
-    createImageMessage = async (uid, file) => {
+    createImageMessage = async (uid, file, extension) => {
         const data = new FormData()
         data.append('uid', uid) 
         data.append('file', file)
+        data.append('extension', extension)
 
         try {  
             const response = await axios.post('/create_image_message', data, {

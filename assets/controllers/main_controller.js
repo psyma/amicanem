@@ -54,10 +54,12 @@ export default class extends Controller {
 
         this.audioBlob = null
         this.isVoiceRecording = false
+        this.isCloseVoiceRecording = true
         this.isReceivedFirstMessage = false
         this.isLockInfiniteScrolling = false
         this.usersOnlineMap = new Map()
         this.usersMap = new Map() 
+        this.toSendImagesMap = new Map()
         this.ffmpeg = new FFmpeg()
 
         await this.ffmpeg.load({
@@ -74,6 +76,7 @@ export default class extends Controller {
             this.setOnChangeImageFileInput()
             this.setSendTextButtonClick()
             this.setSendVoiceButtonClick()
+            this.setSendImageButtonClick()
             this.setUserPusherPresenceChannel()
             this.setSendMessageChatboxInputKeyDown()
             this.setVoiceChatRecording()
@@ -89,7 +92,7 @@ export default class extends Controller {
             await this.setEncryptionDetails()  
             await this.setUserLastMessage()
             await this.setChatboxInfiniteScrolling()
-        }   
+        }     
     } 
 
     setEncryptionDetails = async () => {   
@@ -227,137 +230,142 @@ export default class extends Controller {
     setVoiceChatRecording = () => { 
         const voiceChatRecordButton = document.getElementById('voicechat-record-button')
         voiceChatRecordButton.onclick = async () => { 
-            const waveFormContainer = document.getElementById('waveform-input')
-            waveFormContainer.textContent = ''
+            if (!this.toSendImagesMap) { 
+                const waveFormContainer = document.getElementById('waveform-input')
+                waveFormContainer.textContent = ''
 
-            var wavesurfer = WaveSurfer.create({
-                container: waveFormContainer,
-                waveColor: 'rgb(200, 0, 200)', 
-                hideScrollbar: true,   
-                autoCenter: true,
-                height: 30,
-                barHeight: 25, 
-                barWidth: 1.5,
-                cursorWidth: 0, 
-            })
-
-            this.audioBlob = null
-            this.isVoiceRecording = true
-            const MAX_RECORDING_LIMIT = 60
-            const chatboxInput = document.getElementById('chatbox-input')
-            const sendTextButton = document.getElementById('send-text-button')
-            const sendVoiceButton = document.getElementById('send-voice-button')
-            const voiceChatRecordInput = document.getElementById('voicechat-record-input')
-            const voiceChatRecordTime = document.getElementById('voicechat-record-time')
-            const voiceChatRecordStart = document.getElementById('voicechat-record-start')
-            const voiceChatRecordSvgPlay = document.getElementById('voicechat-record-svg-play')
-            const voiceChatRecordSvgStop = document.getElementById('voicechat-record-svg-stop')
-            const voiceChatRecordDelete = document.getElementById('voicechat-record-delete')
-            const voiceChatRecordClose = document.getElementById('voicechat-record-close')
-
-            chatboxInput.classList.add('hidden')
-            voiceChatRecordInput.classList.remove('hidden')
-            sendTextButton.classList.add('hidden')
-            sendVoiceButton.classList.remove('hidden')
-
-            wavesurfer.empty()
-            const record = wavesurfer.registerPlugin(RecordPlugin.create({ scrollingWaveform: false, renderRecordedAudio: false }))
-            record.on('record-end', async (blob) => {   
-                const recordedUrl = URL.createObjectURL(blob) 
-                
-                wavesurfer.destroy() 
-                wavesurfer = WaveSurfer.create({
+                var wavesurfer = WaveSurfer.create({
                     container: waveFormContainer,
                     waveColor: 'rgb(200, 0, 200)', 
-                    progressColor: 'rgb(100, 50, 0)',
                     hideScrollbar: true,   
                     autoCenter: true,
                     height: 30,
                     barHeight: 25, 
                     barWidth: 1.5,
                     cursorWidth: 0, 
-                    url: recordedUrl
-                }) 
-                
-                voiceChatRecordStart.onclick = () => wavesurfer.playPause()   
+                })
 
-                wavesurfer.on('pause', () => { 
+                this.audioBlob = null
+                this.isVoiceRecording = true
+                this.isCloseVoiceRecording = false
+                const MAX_RECORDING_LIMIT = 60
+                const chatboxMessageInput = document.getElementById('chatbox-message-input')
+                const sendTextButton = document.getElementById('send-text-button')
+                const sendVoiceButton = document.getElementById('send-voice-button')
+                const voiceChatRecordInput = document.getElementById('chatbox-voice-input')
+                const voiceChatRecordTime = document.getElementById('voicechat-record-time')
+                const voiceChatRecordStart = document.getElementById('voicechat-record-start')
+                const voiceChatRecordSvgPlay = document.getElementById('voicechat-record-svg-play')
+                const voiceChatRecordSvgStop = document.getElementById('voicechat-record-svg-stop')
+                const voiceChatRecordDelete = document.getElementById('voicechat-record-delete')
+                const voiceChatRecordClose = document.getElementById('voicechat-record-close')
+
+                chatboxMessageInput.classList.add('hidden')
+                voiceChatRecordInput.classList.remove('hidden')
+                sendTextButton.classList.add('hidden')
+                sendVoiceButton.classList.remove('hidden')
+
+                wavesurfer.empty()
+                const record = wavesurfer.registerPlugin(RecordPlugin.create({ scrollingWaveform: false, renderRecordedAudio: false }))
+                record.on('record-end', async (blob) => {   
+                    const recordedUrl = URL.createObjectURL(blob) 
+                    
+                    wavesurfer.destroy() 
+                    wavesurfer = WaveSurfer.create({
+                        container: waveFormContainer,
+                        waveColor: 'rgb(200, 0, 200)', 
+                        progressColor: 'rgb(100, 50, 0)',
+                        hideScrollbar: true,   
+                        autoCenter: true,
+                        height: 30,
+                        barHeight: 25, 
+                        barWidth: 1.5,
+                        cursorWidth: 0, 
+                        url: recordedUrl
+                    }) 
+                    
+                    voiceChatRecordStart.onclick = () => wavesurfer.playPause()   
+
+                    wavesurfer.on('pause', () => { 
+                        voiceChatRecordSvgPlay.classList.remove('hidden')
+                        voiceChatRecordSvgStop.classList.add('hidden')
+                    })
+
+                    wavesurfer.on('play', () => {
+                        voiceChatRecordSvgPlay.classList.add('hidden')
+                        voiceChatRecordSvgStop.classList.remove('hidden')
+                    }) 
+
+                    wavesurfer.on('timeupdate', (currentTime) => { 
+                        const remainingTime = Math.abs(wavesurfer.getDuration() - currentTime)
+                        const minutes = Math.floor(remainingTime / 60)
+                        const seconds = Math.floor(remainingTime % 60)
+                        const formattedTime = `0${minutes}:${seconds.toString().padStart(2, '0')}`
+                        voiceChatRecordTime.textContent = formattedTime
+                    })
+
+                    wavesurfer.on('finish', ( ) => {
+                        wavesurfer.seekTo(0)
+                    })
+
+                    this.audioBlob = blob  
+                    this.isVoiceRecording = false
+                })
+
+                record.on('record-progress', (time) => {   
+                    if (parseInt((time) / 1000) >= MAX_RECORDING_LIMIT + 1) {
+                        voiceChatRecordStart.click()
+                    }
+                    else {
+                        const formattedTime = [
+                            Math.floor((time % 3600000) / 60000),
+                            Math.floor((time % 60000) / 1000),
+                        ].map((v) => (v < 10 ? '0' + v : v)).join(':')
+                        voiceChatRecordTime.textContent = formattedTime 
+                    }
+                })  
+
+                voiceChatRecordStart.onclick = () => {
+                    record.stopRecording()
+
                     voiceChatRecordSvgPlay.classList.remove('hidden')
                     voiceChatRecordSvgStop.classList.add('hidden')
-                })
+                    voiceChatRecordDelete.classList.remove('hidden')
+                    voiceChatRecordClose.classList.add('hidden')
+                }
 
-                wavesurfer.on('play', () => {
+                voiceChatRecordDelete.onclick = async () => {
                     voiceChatRecordSvgPlay.classList.add('hidden')
                     voiceChatRecordSvgStop.classList.remove('hidden')
-                }) 
+                    voiceChatRecordDelete.classList.add('hidden')
+                    voiceChatRecordClose.classList.remove('hidden')
 
-                wavesurfer.on('timeupdate', (currentTime) => { 
-                    const remainingTime = Math.abs(wavesurfer.getDuration() - currentTime)
-                    const minutes = Math.floor(remainingTime / 60)
-                    const seconds = Math.floor(remainingTime % 60)
-                    const formattedTime = `0${minutes}:${seconds.toString().padStart(2, '0')}`
-                    voiceChatRecordTime.textContent = formattedTime
-                })
+                    wavesurfer.empty()
+                    wavesurfer.destroy() 
 
-                wavesurfer.on('finish', ( ) => {
-                    wavesurfer.seekTo(0)
-                })
-
-                this.audioBlob = blob  
-                this.isVoiceRecording = false
-            })
-
-            record.on('record-progress', (time) => {   
-                if (parseInt((time) / 1000) >= MAX_RECORDING_LIMIT + 1) {
-                    voiceChatRecordStart.click()
+                    voiceChatRecordButton.click()
+                    await record.startRecording() 
                 }
-                else {
-                    const formattedTime = [
-                        Math.floor((time % 3600000) / 60000),
-                        Math.floor((time % 60000) / 1000),
-                    ].map((v) => (v < 10 ? '0' + v : v)).join(':')
-                    voiceChatRecordTime.textContent = formattedTime 
+
+                voiceChatRecordClose.onclick = () => {  
+                    this.isCloseVoiceRecording = true
+
+                    wavesurfer.empty()
+                    wavesurfer.destroy() 
+
+                    record.destroy()
+                    Utils.unHideMediaGroup()
+
+                    chatboxMessageInput.classList.remove('hidden')
+                    voiceChatRecordInput.classList.add('hidden') 
+                    sendTextButton.classList.remove('hidden')
+                    sendVoiceButton.classList.add('hidden')
+                    record.stopRecording()
                 }
-            })  
 
-            voiceChatRecordStart.onclick = () => {
-                record.stopRecording()
-
-                voiceChatRecordSvgPlay.classList.remove('hidden')
-                voiceChatRecordSvgStop.classList.add('hidden')
-                voiceChatRecordDelete.classList.remove('hidden')
-                voiceChatRecordClose.classList.add('hidden')
-            }
-
-            voiceChatRecordDelete.onclick = async () => {
-                voiceChatRecordSvgPlay.classList.add('hidden')
-                voiceChatRecordSvgStop.classList.remove('hidden')
-                voiceChatRecordDelete.classList.add('hidden')
-                voiceChatRecordClose.classList.remove('hidden')
-
-                wavesurfer.empty()
-                wavesurfer.destroy() 
-
-                voiceChatRecordButton.click()
+                Utils.hideMediaGroup()
                 await record.startRecording() 
             }
-
-            voiceChatRecordClose.onclick = () => {  
-                wavesurfer.empty()
-                wavesurfer.destroy() 
-
-                record.destroy()
-                Utils.unHideMediaGroup()
-
-                chatboxInput.classList.remove('hidden')
-                voiceChatRecordInput.classList.add('hidden') 
-                sendTextButton.classList.remove('hidden')
-                sendVoiceButton.classList.add('hidden')
-                record.stopRecording()
-            }
-
-            Utils.hideMediaGroup()
-            await record.startRecording() 
         }  
     }
 
@@ -377,6 +385,9 @@ export default class extends Controller {
                     else if (messageData.type == MessageType.AUDIO) {  
                         Utils.setUserLastMessageContent(messageData.receiver, 'You sent an audio') 
                     }
+                    else if (messageData.type == MessageType.IMAGE) {
+                        Utils.setUserLastMessageContent(messageData.receiver, 'You sent an image') 
+                    }
 
                     Utils.setUserLastMessageTimestamp(messageData.receiver, messageData.timestamp)
                     Utils.setUserLastMessageTimeAgo(messageData.receiver, messageData.timestamp, this.timeAgo)
@@ -389,6 +400,10 @@ export default class extends Controller {
                         const firstname = this.usersMap.get(messageData.sender).userDetails.firstname
                         Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent an audio') 
                     }
+                    else if (messageData.type == MessageType.IMAGE) {
+                        const firstname = this.usersMap.get(messageData.sender).userDetails.firstname
+                        Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent an image') 
+                    }
 
                     Utils.setUserLastMessageTimestamp(messageData.sender, messageData.timestamp)
                     Utils.setUserLastMessageTimeAgo(messageData.sender, messageData.timestamp, this.timeAgo)
@@ -400,7 +415,7 @@ export default class extends Controller {
     }
 
     setChatboxEventListener = () => {
-        const chatbox = document.getElementById('chatbox-input') 
+        const chatbox = document.getElementById('chatbox-message-input') 
 
         chatbox.onblur = () => {  
             Utils.unHideMediaGroup()
@@ -506,6 +521,9 @@ export default class extends Controller {
                     else if (messageData.type == MessageType.AUDIO) { 
                         messageElement = Utils.createOutgoingMessageVoiceElement(messageData.content, messageData.timestamp, this.timeAgo) 
                     }
+                    else if ( messageData.type == MessageType.IMAGE) {
+                        messageElement = Utils.createOutgoingMessageImageElement(messageData.content, messageData.timestamp, this.timeAgo) 
+                    }
 
                     chatbox.appendChild(messageElement)
                     const imgCheck = messageElement.querySelector('.img-check')
@@ -519,6 +537,9 @@ export default class extends Controller {
                     }
                     else if (messageData.type == MessageType.AUDIO) {
                         messageElement = Utils.createIncomingMessageVoiceElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
+                    }
+                    else if ( messageData.type == MessageType.IMAGE) {
+                        messageElement = Utils.createIncommingMessageImageElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
                     }
 
                     chatbox.appendChild(messageElement)  
@@ -656,6 +677,9 @@ export default class extends Controller {
             else if (type == MessageType.AUDIO) {
                 Utils.setUserLastMessageContent(this.userToChatId, 'You sent an audio') 
             }
+            else if (type == MessageType.IMAGE) {
+                Utils.setUserLastMessageContent(this.userToChatId, 'You sent an image') 
+            }
             Utils.setUserLastMessageTimestamp(this.userToChatId, timestamp)
             Utils.setUserLastMessageTimeAgo(this.userToChatId, timestamp, this.timeAgo)
             Utils.reOrderUsersListIfNewMessageIsBeingSentOrReceived(this.userToChatId)
@@ -667,9 +691,9 @@ export default class extends Controller {
     }
 
     sendTextMessage = async (message) => {
-        const chatboxInput = document.getElementById('chatbox-input')
+        const chatboxMessageInput = document.getElementById('chatbox-message-input')
         
-        chatboxInput.textContent = ''
+        chatboxMessageInput.textContent = ''
         const type = MessageType.TEXT
         const timestamp = Date.now()
 
@@ -730,34 +754,148 @@ export default class extends Controller {
         }
     }
 
+    sendImageMessage = async (blob, input, width, height, mimeType, extension, output) => {
+        let file = null 
+        if (extension == 'png') {
+            await this.ffmpeg.writeFile(input, new Uint8Array(await blob.arrayBuffer()))
+            await this.ffmpeg.exec(['-i', input, '-vf', `scale=${width}:${height}`, output]);
+            file = new File([await this.ffmpeg.readFile(output)], output, { type: mimeType })  
+        }
+        else if (extension == 'GIF') {
+            file = new File([new Uint8Array(await blob.arrayBuffer())], output, { type: mimeType }) 
+        }
+        else {
+            await this.ffmpeg.writeFile(input, new Uint8Array(await blob.arrayBuffer()))
+            await this.ffmpeg.exec(['-i', input, '-pix_fmt', 'yuv420p', '-vf', `scale=${width}:${height}`, output]);
+            file = new File([await this.ffmpeg.readFile(output)], output, { type: mimeType }) 
+        }
+
+        const response = await this.service.createImageMessage(this.uidValue, file, extension)
+        if (response.status == 200) {
+            const type = MessageType.IMAGE
+            const timestamp = Date.now()
+
+            const data = JSON.stringify({
+                sender: this.currentUserValue.id,
+                receiver: this.userToChatId,
+                type: type,
+                content: response.data,
+                timestamp: timestamp
+            })
+
+            const encryptedSenderTextMessage = await Utils.encryptMessage(this.currentUserPublickey, data)
+            const encryptedReceiverTextMessage = await Utils.encryptMessage(this.userTochatPublickey, data) 
+            const content = btoa(JSON.stringify({
+                sender: encryptedSenderTextMessage,
+                receiver: encryptedReceiverTextMessage
+            }))
+
+            const messageElement = Utils.createOutgoingMessageImageElement(URL.createObjectURL(blob), timestamp, this.timeAgo)
+            await this.setSentMessage(content, messageElement, null, type, timestamp)
+        }
+    }
+
     setOnChangeImageFileInput = () => {
         const imageFileInput = document.getElementById('image-file-input')
-        imageFileInput.onchange = async (e) => {
+        imageFileInput.onchange = async (e) => { 
             const files = e.target.files
-            const chatboxInput = document.getElementById('chatbox-input')
-             
-            // Ensure that there's at least one file selected
-            if (files.length > 0) {
-                const file = files[0];
-                
-                // Create an img element
-                const img = document.createElement('img');
+            const chatboxMessageInput = document.getElementById('chatbox-message-input') 
+            const chatboxVoiceInput = document.getElementById('chatbox-voice-input')
+            const chatboxImageInput = document.getElementById('chatbox-image-input')
+            const sendTextButton = document.getElementById('send-text-button')
+            const sendVoiceButton = document.getElementById('send-voice-button')
+            const sendImageButton = document.getElementById('send-image-button')
 
-                // Read the file as a Data URL
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    // Set the image src to the Data URL
-                    img.src = event.target.result;
-                    img.style.width = '50px'; // Set the image size to fit in the div
+            if (files.length) { 
+                Utils.hideMediaGroup()
+                chatboxMessageInput.classList.add('hidden')
+                chatboxVoiceInput.classList.add('hidden')
+                chatboxImageInput.classList.remove('hidden')
+                sendTextButton.classList.add('hidden')
+                sendVoiceButton.classList.add('hidden')
+                sendImageButton.classList.remove('hidden')
+
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i]  
+                    this.toSendImagesMap.set(i, {
+                        'file': file,
+                        'width': null,
+                        'height': null
+                    })
+                    // Create a container div for image and close button
+                    const imageContainer = document.createElement('div');
+                    imageContainer.style.position = 'relative';
+                    imageContainer.style.display = 'inline-block';
+                    imageContainer.style.margin = '5px';
+
+                    // Create the img element
+                    const img = document.createElement('img');
+                    img.setAttribute('mimeType', file.type)
+                    img.setAttribute('key', i)
+                    img.classList.add('image')
+                    img.style.width = '50px';
                     img.style.height = '50px';
+                    img.style.objectFit = 'fill'
 
-                    // Append the img element to the chatboxInput div
-                    chatboxInput.appendChild(img);
-                };
+                    // Read the file as a Data URL
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const fakeImg = document.createElement('img')
+                        fakeImg.src = event.target.result
+                        fakeImg.onload = () => { 
+                            this.toSendImagesMap.set(i, {
+                                'file': file,
+                                'width': fakeImg.width,
+                                'height': fakeImg.height
+                            })
+                        }
 
-                // Read the image file
-                reader.readAsDataURL(file);
-            }
+                        img.src = event.target.result;
+                    };
+
+                    // Read the image file
+                    reader.readAsDataURL(file);
+
+                    // Create a close button
+                    const closeButton = document.createElement('button');
+                    closeButton.innerHTML = '&times;';
+                    closeButton.style.position = 'absolute';
+                    closeButton.style.top = '0';
+                    closeButton.style.right = '0';
+                    closeButton.style.backgroundColor = 'rgb(234 63 63)';
+                    closeButton.style.color = 'white';
+                    closeButton.style.border = 'none';
+                    closeButton.style.borderRadius = '50%';
+                    closeButton.style.cursor = 'pointer';
+                    closeButton.style.width = '25px';
+                    closeButton.style.height = '25px';
+                    closeButton.style.fontSize = '14px';
+                    closeButton.style.lineHeight = '25px';  // Set line-height to match the button height for vertical centering
+                    closeButton.style.textAlign = 'center';
+
+                    // Add event listener to remove the imageContainer on click
+                    closeButton.onclick = () => {
+                        this.toSendImagesMap.delete(i)
+                        chatboxImageInput.removeChild(imageContainer); 
+
+                        if (!this.toSendImagesMap.size) {
+                            chatboxMessageInput.classList.remove('hidden')
+                            chatboxVoiceInput.classList.add('hidden')
+                            chatboxImageInput.classList.add('hidden')
+                            sendTextButton.classList.remove('hidden')
+                            sendVoiceButton.classList.add('hidden')
+                            sendImageButton.classList.add('hidden')
+                        }
+                    };
+
+                    // Append the img and close button to the container
+                    imageContainer.appendChild(img);
+                    imageContainer.appendChild(closeButton);
+
+                    // Append the container to the chatboxInput div
+                    chatboxImageInput.appendChild(imageContainer);
+                }   
+            } 
         }
     }
 
@@ -765,17 +903,19 @@ export default class extends Controller {
         const imageInputButton = document.getElementById('image-input-button')
 
         imageInputButton.onclick = () => {
-            const imageFileInput = document.getElementById('image-file-input')
-            imageFileInput.click()
+            if (!this.isVoiceRecording && this.isCloseVoiceRecording) { 
+                const imageFileInput = document.getElementById('image-file-input')
+                imageFileInput.click()
+            }
         }
     }
 
     setSendTextButtonClick = () => { 
-        const chatboxInput = document.getElementById('chatbox-input')
+        const chatboxMessageInput = document.getElementById('chatbox-message-input')
         const sendTextButton = document.getElementById('send-text-button')
 
         sendTextButton.onclick = async () => {
-            const message = chatboxInput.innerText.trim()  
+            const message = chatboxMessageInput.innerText.trim()  
             if (!this.isEmptyOrSpaces(message)) { 
                 await this.sendTextMessage(message)
             }  
@@ -791,9 +931,43 @@ export default class extends Controller {
         }
     }
 
+    setSendImageButtonClick = () => {
+        const chatboxMessageInput = document.getElementById('chatbox-message-input') 
+        const chatboxVoiceInput = document.getElementById('chatbox-voice-input')
+        const chatboxImageInput = document.getElementById('chatbox-image-input')
+        const sendTextButton = document.getElementById('send-text-button') 
+        const sendVoiceButton = document.getElementById('send-voice-button') 
+        const sendImageButton = document.getElementById('send-image-button') 
+
+        sendImageButton.onclick = () => {  
+            this.toSendImagesMap.forEach(async (value, key) => { 
+                const blob = value['file']
+                const input = value['file'].name
+                const width = Math.floor(value['width'] * .75)
+                const height = Math.floor(value['height'] * .75)
+                const mimeType = value['file'].type
+                const extension = mimeType.split("/")[1] 
+                const output = CryptoJS.MD5(Utils.generateRandomString(16)).toString() + "." + extension
+                
+                await this.sendImageMessage(blob, input, width, height, mimeType, extension, output)
+            })
+
+            Utils.unHideMediaGroup()
+            this.toSendImagesMap = new Map()
+            chatboxImageInput.innerHTML = ''
+
+            chatboxMessageInput.classList.remove('hidden')
+            chatboxVoiceInput.classList.add('hidden')
+            chatboxImageInput.classList.add('hidden')
+            sendTextButton.classList.remove('button')
+            sendVoiceButton.classList.add('hidden')
+            sendImageButton.classList.add('hidden')
+        }
+    }
+
     setSendMessageChatboxInputKeyDown = () => { 
-        const chatboxInput = document.getElementById('chatbox-input')
-        chatboxInput.onkeydown = async (e) => {
+        const chatboxMessageInput = document.getElementById('chatbox-message-input')
+        chatboxMessageInput.onkeydown = async (e) => {
             const message = e.target.innerText.trim()
             if (Utils.getUserAgentPlatformType() == 'desktop') {
                 if (e.key === 'Enter' && !e.shiftKey) {  

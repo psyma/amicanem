@@ -104,6 +104,17 @@ export default class Utils {
         return { publicKey, privateKey };
     }
 
+    static generateRandomString = (length) => {
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const charactersLength = characters.length;
+    
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
+
     static arrayBufferToBase64 = (buffer) => {
         const uint8Array = new Uint8Array(buffer);
         let binary = '';
@@ -379,7 +390,7 @@ export default class Utils {
         startBtn.appendChild(stopSvg)
 
         const waveformDiv = document.createElement('div') 
-        waveformDiv.classList.add("w-40") 
+        waveformDiv.classList.add("w-36") 
         const wavesurfer = WaveSurfer.create({
             container: waveformDiv,
             waveColor: 'rgb(200, 0, 200)', 
@@ -435,6 +446,29 @@ export default class Utils {
         recordInput.appendChild(flexContainer);
 
         return recordInput
+    }
+
+    static createImageMessageElement = (url) => {
+        // Create button element
+        const button = document.createElement('button')
+        button.className = 'outline-none';
+
+        // Create div for background image
+        const imageDiv = document.createElement('div')
+        imageDiv.className = 'rounded bg-cover bg-center w-40 h-40'
+        imageDiv.style.backgroundImage = `url("${url}")`
+
+        // Create inner div for overlay
+        const overlayDiv = document.createElement('div')
+        overlayDiv.className = 'w-full h-full flex justify-center items-center rounded bg-black bg-opacity-20 hover:bg-opacity-10 transition duration-200'
+
+        // Append the overlay div to the image div
+        imageDiv.appendChild(overlayDiv)
+
+        // Append the image div to the button
+        button.appendChild(imageDiv)
+
+        return button
     }
 
     static createOutgoingMessageTextElement = (content, timestamp, timeAgo) => {  
@@ -532,6 +566,59 @@ export default class Utils {
         img.src = '/gray_checks.svg'
         img.classList.add('w-[.875rem]', 'h-[.875rem]', 'img-check')
  
+        flexItemsDiv.appendChild(chatMessageContainer)
+        flexItemsDiv.appendChild(timeDiv)
+        flexItemsDiv.appendChild(img)
+ 
+        flexDiv.appendChild(mr4Div)
+        flexDiv.appendChild(flexItemsDiv)
+
+        selectNoneDiv.appendChild(flexDiv)
+ 
+        mainDiv.appendChild(selectNoneDiv)
+        mainDiv.onclick = () => {
+            timeText.classList.remove('hidden')
+        }
+
+        return mainDiv 
+    }
+
+    static createOutgoingMessageImageElement = (url, timestamp, timeAgo) => {
+        const mainDiv = document.createElement('div')
+ 
+        const selectNoneDiv = document.createElement('div')
+        selectNoneDiv.classList.add('select-none')
+ 
+        const flexDiv = document.createElement('div')
+        flexDiv.classList.add('flex', 'justify-end')
+ 
+        const mr4Div = document.createElement('div')
+        mr4Div.classList.add('mr-4');
+ 
+        const flexItemsDiv = document.createElement('div')
+        flexItemsDiv.classList.add('flex', 'relative', 'items-end')
+ 
+        const chatMessageContainer = document.createElement('div')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'ml-2', 'order-2', 'bg-indigo-50', 'dark:bg-slate-600')
+ 
+        const imageContent = this.createImageMessageElement(url)
+ 
+        chatMessageContainer.appendChild(imageContent);
+ 
+        const timeDiv = document.createElement('div')
+        timeDiv.classList.add('ml-1.5', 'order-1')
+ 
+        const timeText = document.createElement('p')
+        timeText.classList.add('hidden', 'flex', 'justify-end', 'outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
+        timeText.textContent = timestamp
+
+        this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
+        mainDiv.appendChild(timeText) 
+ 
+        const img = document.createElement('img')
+        img.src = '/gray_checks.svg'
+        img.classList.add('w-[.875rem]', 'h-[.875rem]', 'img-check')
+          
         flexItemsDiv.appendChild(chatMessageContainer)
         flexItemsDiv.appendChild(timeDiv)
         flexItemsDiv.appendChild(img)
@@ -655,6 +742,64 @@ export default class Utils {
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
         mainDiv.append(timeText) 
  
+        chatContainer.appendChild(chatMessageContainer)
+        chatContainer.appendChild(timeContainer)
+ 
+        flexDiv.appendChild(avatarDivContainer)
+        flexDiv.appendChild(chatContainer)
+ 
+        innerDiv1.appendChild(flexDiv)
+ 
+        mainDiv.appendChild(innerDiv1)
+        mainDiv.onclick = () => {
+            timeText.classList.remove('hidden')
+        }
+
+        return mainDiv 
+    }
+
+    static createIncommingMessageImageElement = (url, avatar, timestamp, timeAgo) => {
+        const mainDiv = document.createElement('div')
+ 
+        const innerDiv1 = document.createElement('div')
+        innerDiv1.classList.add('select-none')
+ 
+        const flexDiv = document.createElement('div')
+        flexDiv.classList.add( 'flex')
+ 
+        const avatarDivContainer = document.createElement('div')
+        avatarDivContainer.classList.add('mr-4', 'flex', 'items-end')
+ 
+        const avatarDiv = document.createElement('div')
+        avatarDiv.classList.add('outline-none')
+ 
+        const avatarImageDiv = document.createElement('div')
+        avatarImageDiv.classList.add('avatar', 'w-[2.25rem]', 'h-[2.25rem]', 'bg-cover', 'bg-center', 'rounded-full')
+        avatarImageDiv.style.backgroundImage = `url("${avatar}")`
+ 
+        avatarDiv.appendChild(avatarImageDiv)
+ 
+        avatarDivContainer.appendChild(avatarDiv)
+ 
+        const chatContainer = document.createElement('div')
+        chatContainer.classList.add('flex', 'items-end')
+ 
+        const chatMessageContainer = document.createElement('div')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
+ 
+        const imageElement = this.createImageMessageElement(url)
+ 
+        chatMessageContainer.appendChild(imageElement)
+ 
+        const timeContainer = document.createElement('div')
+        timeContainer.classList.add('mr-4')
+ 
+        const timeText = document.createElement('p')
+        timeText.classList.add('hidden', 'pl-12', 'outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
+        timeText.textContent = timestamp
+        this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
+        mainDiv.append(timeText)  
+        
         chatContainer.appendChild(chatMessageContainer)
         chatContainer.appendChild(timeContainer)
  
