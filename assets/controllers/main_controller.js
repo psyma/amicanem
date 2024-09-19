@@ -141,6 +141,7 @@ export default class extends Controller {
                 this.chatboxScrollToBottom()
                 chatbox.appendChild(messageElement)
 
+                Utils.reOrderLastFourChatboxElements()
                 Utils.setChatboxMessageAvatarHidden()
                 Utils.setChatboxMessageBorderAndMargin()
             }
@@ -680,6 +681,7 @@ export default class extends Controller {
         this.chatboxScrollToBottom(true)
         chatbox.appendChild(messageElement) 
 
+        Utils.reOrderLastFourChatboxElements()
         Utils.setChatboxMessageAvatarHidden()
         Utils.setChatboxMessageBorderAndMargin()  
 

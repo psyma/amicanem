@@ -418,6 +418,21 @@ export default class Utils {
         } 
     }
 
+    static reOrderLastFourChatboxElements = () => {
+        const chatbox = document.getElementById('chatbox') 
+        const chatboxArray = Array.from(chatbox.children)
+        const chatboxElements = chatboxArray.slice(-4)
+            
+        chatboxElements.sort((a, b) => { 
+            const timestampA = a.getAttribute('timestamp')
+            const timestampB = b.getAttribute('timestamp')
+            return timestampA - timestampB
+        }).forEach((element) => {
+            chatbox.removeChild(element)
+            chatbox.appendChild(element)
+        })
+    }
+
     static createProgressSvgElemet = () => {
         const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -604,6 +619,7 @@ export default class Utils {
 
     static createOutgoingMessageTextElement = (content, timestamp, timeAgo) => {  
         const mainDiv = document.createElement('div')
+        mainDiv.setAttribute('timestamp', timestamp)
  
         const selectNoneDiv = document.createElement('div')
         selectNoneDiv.classList.add('select-none')
@@ -660,6 +676,7 @@ export default class Utils {
 
     static createOutgoingMessageVoiceElement = (url, timestamp, timeAgo) => {
         const mainDiv = document.createElement('div')
+        mainDiv.setAttribute('timestamp', timestamp)
  
         const selectNoneDiv = document.createElement('div')
         selectNoneDiv.classList.add('select-none')
@@ -716,6 +733,7 @@ export default class Utils {
 
     static createOutgoingMessageImageElement = (url, timestamp, timeAgo) => {
         const mainDiv = document.createElement('div')
+        mainDiv.setAttribute('timestamp', timestamp)
  
         const selectNoneDiv = document.createElement('div')
         selectNoneDiv.classList.add('select-none')
@@ -769,6 +787,7 @@ export default class Utils {
 
     static createIncomingMessageTextElement = (content, avatar, timestamp, timeAgo) => {  
         const mainDiv = document.createElement('div')
+        mainDiv.setAttribute('timestamp', timestamp)
  
         const innerDiv1 = document.createElement('div')
         innerDiv1.classList.add('select-none')
@@ -830,6 +849,7 @@ export default class Utils {
 
     static createIncomingMessageVoiceElement = (url, avatar, timestamp, timeAgo) => {
         const mainDiv = document.createElement('div')
+        mainDiv.setAttribute('timestamp', timestamp)
  
         const innerDiv1 = document.createElement('div')
         innerDiv1.classList.add('select-none')
@@ -891,6 +911,7 @@ export default class Utils {
 
     static createIncommingMessageImageElement = (url, avatar, timestamp, timeAgo) => {
         const mainDiv = document.createElement('div')
+        mainDiv.setAttribute('timestamp', timestamp)
  
         const innerDiv1 = document.createElement('div')
         innerDiv1.classList.add('select-none')
