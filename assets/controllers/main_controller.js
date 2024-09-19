@@ -462,15 +462,39 @@ export default class extends Controller {
                             const { sender, receiver } = JSON.parse(atob(content)) 
             
                             try {
+                                let messageElement = null
                                 const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender)) 
-                                const messageElement = Utils.createOutgoingMessageTextElement(messageData.content, messageData.timestamp, this.timeAgo)
+                                
+                                if (messageData.type == MessageType.TEXT) {
+                                    messageElement = Utils.createOutgoingMessageTextElement(messageData.content, messageData.timestamp, this.timeAgo)
+                                }
+                                else if (messageData.type == MessageType.AUDIO) {
+                                    messageElement = Utils.createOutgoingMessageVoiceElement(messageData.content, messageData.timestamp, this.timeAgo) 
+                                }
+                                else if (messageData.type == MessageType.IMAGE) {
+                                    messageElement = Utils.createOutgoingMessageImageElement(messageData.content, messageData.timestamp, this.timeAgo) 
+                                    Utils.setViewerJsImageElement(messageElement, this.viewer)
+                                }      
+
                                 chatbox.prepend(messageElement)
-            
                                 const imgCheck = messageElement.querySelector('.img-check')
-                                imgCheck.src = '/green_checks.svg' 
+                                imgCheck.src = '/green_checks.svg'  
+
                             } catch(e) { 
+                                let messageElement = null
                                 const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver)) 
-                                const messageElement = Utils.createIncomingMessageTextElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
+                                
+                                if (messageData.type == MessageType.TEXT) {
+                                    messageElement = Utils.createIncomingMessageTextElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
+                                }
+                                else if (messageData.type == MessageType.AUDIO) {
+                                    messageElement = Utils.createIncomingMessageVoiceElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
+                                }
+                                else if (messageData.type == MessageType.IMAGE) {
+                                    messageElement = Utils.createIncommingMessageImageElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
+                                    Utils.setViewerJsImageElement(messageElement, this.viewer)
+                                }
+                                
                                 chatbox.prepend(messageElement) 
                             }
                         } 
@@ -543,7 +567,7 @@ export default class extends Controller {
                     chatbox.appendChild(messageElement)
                     const imgCheck = messageElement.querySelector('.img-check')
                     imgCheck.src = '/green_checks.svg'  
-                    
+                     
                 } catch(e) { 
                     let messageElement = null
                     const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver)) 
