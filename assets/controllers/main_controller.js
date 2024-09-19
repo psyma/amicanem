@@ -360,6 +360,7 @@ export default class extends Controller {
                 }
 
                 voiceChatRecordClose.onclick = () => {  
+                    this.isVoiceRecording = false
                     this.isCloseVoiceRecording = true
 
                     wavesurfer.empty()
@@ -763,7 +764,7 @@ export default class extends Controller {
                 receiver: encryptedReceiverTextMessage
             }))
  
-            const messageElement = Utils.createOutgoingMessageVoiceElement(URL.createObjectURL(blob) , timestamp, this.timeAgo)
+            const messageElement = Utils.createOutgoingMessageVoiceElement(URL.createObjectURL(blob), timestamp, this.timeAgo)
             await this.setSentMessage(content, messageElement, null, type, timestamp)
         }
     }
@@ -784,8 +785,16 @@ export default class extends Controller {
             file = new File([await this.ffmpeg.readFile(output)], output, { type: mimeType }) 
         }
 
-        const response = await this.service.createImageMessage(this.uidValue, file, extension)
+        const url = URL.createObjectURL(blob)
+        const chatbox = document.getElementById('chatbox') 
+        const messageTempElement = Utils.createOutgoingMessageImageElement(url, Date.now(), this.timeAgo)  
+        this.chatboxScrollToBottom(true)
+        chatbox.appendChild(messageTempElement) 
+
+        const response = await this.service.createImageMessage(this.uidValue, file, extension, messageTempElement, Utils.progressSvgElementCallback)
         if (response.status == 200) {
+            chatbox.removeChild(messageTempElement) 
+
             const type = MessageType.IMAGE
             const timestamp = Date.now()
 
@@ -802,11 +811,11 @@ export default class extends Controller {
             const content = btoa(JSON.stringify({
                 sender: encryptedSenderTextMessage,
                 receiver: encryptedReceiverTextMessage
-            }))
+            })) 
 
-            const messageElement = Utils.createOutgoingMessageImageElement(URL.createObjectURL(blob), timestamp, this.timeAgo)
+            const messageElement = Utils.createOutgoingMessageImageElement(url, timestamp, this.timeAgo) 
             Utils.setViewerJsImageElement(messageElement, this.viewer)
-            await this.setSentMessage(content, messageElement, null, type, timestamp)
+            await this.setSentMessage(content, messageElement, null, type, timestamp) 
         }
     }
 
@@ -918,7 +927,7 @@ export default class extends Controller {
     setImageButtonClick = () => {
         const imageInputButton = document.getElementById('image-input-button')
 
-        imageInputButton.onclick = () => {
+        imageInputButton.onclick = () => { 
             if (!this.isVoiceRecording && this.isCloseVoiceRecording) { 
                 const imageFileInput = document.getElementById('image-file-input')
                 imageFileInput.click()
@@ -941,7 +950,7 @@ export default class extends Controller {
     setSendVoiceButtonClick = () => { 
         const sendVoiceButton = document.getElementById('send-voice-button')
         sendVoiceButton.onclick = async () => {  
-            if(this.audioBlob != null && !this.isVoiceRecording) {   
+            if(this.audioBlob != null && !this.isVoiceRecording) {  
                 await this.sendVoiceMessage()
             }
         }

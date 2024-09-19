@@ -55,20 +55,23 @@ export default class Service {
         }
     } 
 
-    createImageMessage = async (uid, file, extension) => {
+    createImageMessage = async (uid, file, extension, messageTempElement, progressCallback) => {
         const data = new FormData()
         data.append('uid', uid) 
         data.append('file', file)
         data.append('extension', extension)
 
         try {  
+            //progressCircleElement.classList.remove('hidden')
             const response = await axios.post('/create_image_message', data, {
-                onUploadProgress: function (progressEvent) {
-                    console.log(progressEvent)
-                    //const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);  
-                    //progressCircle.setAttribute("stroke-dashoffset", `calc(251.2px - (251.2px * ${percentCompleted - 1}) / 100)`);
+                onUploadProgress: function (progressEvent) {  
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total) 
+                    progressCallback(messageTempElement, percentCompleted)
+                    //progressCircleElement.setAttribute("stroke-dashoffset", `calc(251.2px - (251.2px * ${percentCompleted - 1}) / 100)`);
                 }
             })  
+            progressCallback(messageTempElement, 100)
+            //progressCircleElement.classList.add('hidden')
             return response
         } catch(e) {  
             return { status: 500 }

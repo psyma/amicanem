@@ -348,6 +348,58 @@ export default class Utils {
         chatbox.appendChild(container) 
     }
 
+    static progressSvgElementCallback = (messageTempElement, percentCompleted) => { 
+        const svgCircleElement = messageTempElement.querySelector(".svgCircle")  
+        const progressCircleElement = messageTempElement.querySelector(".progressCircle")  
+        const imgCheck = messageTempElement.querySelector('.img-check')
+        imgCheck.classList.add('hidden')  
+        
+        if (percentCompleted == 100) {
+            svgCircleElement.classList.add('hidden')
+        }
+        else {
+            svgCircleElement.classList.remove('hidden')
+            progressCircleElement.setAttribute("stroke-dashoffset", `calc(251.2px - (251.2px * ${percentCompleted - 1} / 100))`);
+        } 
+    }
+
+    static createProgressSvgElemet = () => {
+        const SVG_NS = "http://www.w3.org/2000/svg";
+
+        // Create the SVG element
+        const svg = document.createElementNS(SVG_NS, "svg");
+        svg.setAttribute("viewBox", "0 0 100 100")
+        // fixed top-0 right-0 left-0 z-50 justify-center items-center
+        svg.classList.add("svgCircle", "w-12", "h-12", "hidden", "absolute", "inset-0", "justify-center", "self-center", "m-auto");
+        
+        // Create the background circle
+        const bgCircle = document.createElementNS(SVG_NS, "circle");
+        bgCircle.setAttribute("cx", "50");
+        bgCircle.setAttribute("cy", "50");
+        bgCircle.setAttribute("r", "40");
+        bgCircle.setAttribute("fill", "transparent");
+        bgCircle.setAttribute("stroke-width", "5");
+        bgCircle.classList.add("text-gray-200", "stroke-current");
+        
+        // Create the progress circle
+        const progressCircle = document.createElementNS(SVG_NS, "circle"); 
+        progressCircle.setAttribute("cx", "50");
+        progressCircle.setAttribute("cy", "50");
+        progressCircle.setAttribute("r", "40");
+        progressCircle.setAttribute("fill", "transparent");
+        progressCircle.setAttribute("stroke-width", "5");
+        progressCircle.setAttribute("stroke-linecap", "round");
+        progressCircle.setAttribute("stroke-dasharray", "251.2");
+        progressCircle.setAttribute("stroke-dashoffset", `calc(251.2px - (251.2px * 1) / 100)`);
+        progressCircle.classList.add("progressCircle", "text-indigo-500", "progress-ring__circle", "stroke-current");
+        
+        // Append elements to the SVG
+        svg.appendChild(bgCircle);
+        svg.appendChild(progressCircle);
+
+        return svg
+    }
+
     static createLoaderElement = () => {
         const colorTheme = localStorage.getItem('color-theme') 
         const loader = document.createElement("div")
@@ -476,14 +528,17 @@ export default class Utils {
         // Create div for background image
         const imageDiv = document.createElement('div')
         imageDiv.setAttribute('url', url)
-        imageDiv.className = 'image rounded bg-cover bg-center w-40 h-40'
+        imageDiv.className = 'image relative rounded bg-cover bg-center w-40 h-40'
         imageDiv.style.backgroundImage = `url("${url}")`
+
+        const progressSvg = this.createProgressSvgElemet()
 
         // Create inner div for overlay
         const overlayDiv = document.createElement('div')
         overlayDiv.className = 'w-full h-full flex justify-center items-center rounded bg-black bg-opacity-20 hover:bg-opacity-10 transition duration-200'
 
         // Append the overlay div to the image div
+        imageDiv.appendChild(progressSvg)
         imageDiv.appendChild(overlayDiv)
 
         // Append the image div to the button
@@ -621,9 +676,9 @@ export default class Utils {
  
         const chatMessageContainer = document.createElement('div')
         chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'ml-2', 'order-2', 'bg-indigo-50', 'dark:bg-slate-600')
- 
+        
         const imageContent = this.createImageMessageElement(url)
- 
+   
         chatMessageContainer.appendChild(imageContent);
  
         const timeDiv = document.createElement('div')
