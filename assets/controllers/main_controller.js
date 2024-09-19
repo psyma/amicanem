@@ -6,12 +6,15 @@ import Service from "../service/service"
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { toBlobURL } from '@ffmpeg/util'
 
+import Viewer from 'viewerjs'   
 import Pusher from 'pusher-js'  
 import CryptoJS from 'crypto-js';
 import WaveSurfer from 'wavesurfer.js'
 import RecordPlugin from 'wavesurfer.js/dist/plugins/record.esm.js'
 import TimeAgo from 'javascript-time-ago';
+
 import en from 'javascript-time-ago/locale/en'
+import 'viewerjs/dist/viewer.css'
 
 class MessageType {
     static TEXT = 0
@@ -61,6 +64,7 @@ export default class extends Controller {
         this.usersMap = new Map() 
         this.toSendImagesMap = new Map()
         this.ffmpeg = new FFmpeg()
+        this.viewer = new Viewer(document.getElementById("viewerjs-images-container")) 
 
         await this.ffmpeg.load({
             coreURL: await toBlobURL('/ffmpeg-core.js', 'text/javascript'),
@@ -132,7 +136,7 @@ export default class extends Controller {
                 }
                 else if (messageData.type == MessageType.IMAGE) {
                     messageElement = Utils.createIncommingMessageImageElement(messageData.content, user.userDetails.avatar, messageData.timestamp, this.timeAgo)
-
+                    Utils.setViewerJsImageElement(messageElement, this.viewer)
                 }
                 this.chatboxScrollToBottom()
                 chatbox.appendChild(messageElement)
@@ -529,8 +533,9 @@ export default class extends Controller {
                     else if (messageData.type == MessageType.AUDIO) { 
                         messageElement = Utils.createOutgoingMessageVoiceElement(messageData.content, messageData.timestamp, this.timeAgo) 
                     }
-                    else if ( messageData.type == MessageType.IMAGE) {
+                    else if (messageData.type == MessageType.IMAGE) {
                         messageElement = Utils.createOutgoingMessageImageElement(messageData.content, messageData.timestamp, this.timeAgo) 
+                        Utils.setViewerJsImageElement(messageElement, this.viewer)
                     }
 
                     chatbox.appendChild(messageElement)
@@ -548,6 +553,7 @@ export default class extends Controller {
                     }
                     else if ( messageData.type == MessageType.IMAGE) {
                         messageElement = Utils.createIncommingMessageImageElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
+                        Utils.setViewerJsImageElement(messageElement, this.viewer)
                     }
 
                     chatbox.appendChild(messageElement)  
@@ -799,6 +805,7 @@ export default class extends Controller {
             }))
 
             const messageElement = Utils.createOutgoingMessageImageElement(URL.createObjectURL(blob), timestamp, this.timeAgo)
+            Utils.setViewerJsImageElement(messageElement, this.viewer)
             await this.setSentMessage(content, messageElement, null, type, timestamp)
         }
     }

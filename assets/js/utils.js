@@ -233,6 +233,26 @@ export default class Utils {
         group.classList.remove('hidden') 
     }
 
+    static setViewerJsImageElement = (messageElement, viewer) => {
+        const viewerjsContainer = document.getElementById("viewerjs-images-container")
+        const imageDiv = messageElement.querySelector('.image')
+        const url = imageDiv.getAttribute('url')
+        const img = document.createElement('img')
+        img.src = url
+
+        const li = document.createElement('li')
+        li.appendChild(img)
+
+        viewerjsContainer.appendChild(li)
+        const index = viewerjsContainer.childNodes.length - 2
+        viewer.update()
+
+        messageElement.onclick = () => {
+            viewer.show()
+            viewer.view(index)    
+        }
+    }
+
     static setUserLastMessageContent = (id, content) => {
         const userLastMessage = document.getElementById(`user${id}-last-message`)
         userLastMessage.textContent = content
@@ -455,7 +475,8 @@ export default class Utils {
 
         // Create div for background image
         const imageDiv = document.createElement('div')
-        imageDiv.className = 'rounded bg-cover bg-center w-40 h-40'
+        imageDiv.setAttribute('url', url)
+        imageDiv.className = 'image rounded bg-cover bg-center w-40 h-40'
         imageDiv.style.backgroundImage = `url("${url}")`
 
         // Create inner div for overlay
