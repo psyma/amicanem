@@ -238,7 +238,7 @@ export default class extends Controller {
     setVoiceChatRecording = () => { 
         const voiceChatRecordButton = document.getElementById('voicechat-record-button')
         voiceChatRecordButton.onclick = async () => { 
-            if (!this.toSendImagesMap) { 
+            if (!this.toSendImagesMap.size) { 
                 const waveFormContainer = document.getElementById('waveform-input')
                 waveFormContainer.textContent = ''
 
@@ -968,7 +968,7 @@ export default class extends Controller {
             chatboxMessageInput.classList.remove('hidden')
             chatboxVoiceInput.classList.add('hidden')
             chatboxImageInput.classList.add('hidden')
-            sendTextButton.classList.remove('button')
+            sendTextButton.classList.remove('hidden')
             sendVoiceButton.classList.add('hidden')
             sendImageButton.classList.add('hidden')
         }
