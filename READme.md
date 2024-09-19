@@ -1,4 +1,4 @@
-# Symfony 7
+# Amicanem (Your another chat application 😀) 
 
 # Features
 ```
@@ -8,6 +8,8 @@ End-to-End Encryption ✅
 Two-Factor Authentication (2FA) ❌
 Optional Message Saving ❌
 ```
+
+# Symfony 7
 
 # Environment variable
 ```
