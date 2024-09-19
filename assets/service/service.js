@@ -36,7 +36,7 @@ export default class Service {
         } 
     }
 
-    createAudioMessage = async (uid, file, progressCircle) => {
+    createAudioMessage = async (uid, file, messageTempElement, progressCallback) => {
         const data = new FormData()
         data.append('uid', uid) 
         data.append('file', file)
@@ -44,11 +44,11 @@ export default class Service {
         try {  
             const response = await axios.post('/create_audio_message', data, {
                 onUploadProgress: function (progressEvent) {
-                    console.log(progressEvent)
-                    //const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);  
-                    //progressCircle.setAttribute("stroke-dashoffset", `calc(251.2px - (251.2px * ${percentCompleted - 1}) / 100)`);
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total) 
+                    progressCallback(messageTempElement, percentCompleted) 
                 }
             })  
+            progressCallback(messageTempElement, 100) 
             return response
         } catch(e) {  
             return { status: 500 }
@@ -61,17 +61,14 @@ export default class Service {
         data.append('file', file)
         data.append('extension', extension)
 
-        try {  
-            //progressCircleElement.classList.remove('hidden')
+        try {   
             const response = await axios.post('/create_image_message', data, {
                 onUploadProgress: function (progressEvent) {  
                     const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total) 
-                    progressCallback(messageTempElement, percentCompleted)
-                    //progressCircleElement.setAttribute("stroke-dashoffset", `calc(251.2px - (251.2px * ${percentCompleted - 1}) / 100)`);
+                    progressCallback(messageTempElement, percentCompleted) 
                 }
             })  
-            progressCallback(messageTempElement, 100)
-            //progressCircleElement.classList.add('hidden')
+            progressCallback(messageTempElement, 100) 
             return response
         } catch(e) {  
             return { status: 500 }

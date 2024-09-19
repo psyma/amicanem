@@ -741,13 +741,21 @@ export default class extends Controller {
         const voiceChatRecordClose = document.getElementById('voicechat-record-close')
         voiceChatRecordDelete.click()
         voiceChatRecordClose.click()
+
+        const url = URL.createObjectURL(blob)
+        const chatbox = document.getElementById('chatbox') 
+        const messageTempElement = Utils.createOutgoingMessageVoiceElement(url, Date.now(), this.timeAgo)
+        this.chatboxScrollToBottom(true)
+        chatbox.appendChild(messageTempElement) 
  
         await this.ffmpeg.writeFile('input.webm', new Uint8Array(await blob.arrayBuffer()))
         await this.ffmpeg.exec(['-i', 'input.webm', '-c:a', 'libopus', '-b:a', '0', 'output.webm']);
         const file = new File([await this.ffmpeg.readFile('output.webm')], 'audio.webm', { type: 'audio/webm' }) 
-        const response = await this.service.createAudioMessage(this.uidValue, file, null)
-        
+        const response = await this.service.createAudioMessage(this.uidValue, file, messageTempElement, Utils.progressSvgElementCallback) 
+
         if (response.status == 200) {  
+            chatbox.removeChild(messageTempElement) 
+
             const type = MessageType.AUDIO
             const timestamp = Date.now()
 
@@ -766,7 +774,7 @@ export default class extends Controller {
                 receiver: encryptedReceiverTextMessage
             }))
  
-            const messageElement = Utils.createOutgoingMessageVoiceElement(URL.createObjectURL(blob), timestamp, this.timeAgo)
+            const messageElement = Utils.createOutgoingMessageVoiceElement(url, timestamp, this.timeAgo)
             await this.setSentMessage(content, messageElement, null, type, timestamp)
         }
     }

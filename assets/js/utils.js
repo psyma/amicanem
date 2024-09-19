@@ -485,7 +485,7 @@ export default class Utils {
         recordInput.classList.add("group", "w-full", "self-center", "rounded", "transition", "duration-500", "bg-indigo-50", "dark:bg-gray-600")
 
         const flexContainer = document.createElement('div')
-        flexContainer.classList.add("flex", "items-center", "outline-none", "gap-2")
+        flexContainer.classList.add("flex", "relative", "items-center", "outline-none", "gap-2")
         flexContainer.setAttribute("tabindex", "0")
         flexContainer.setAttribute("aria-label", "audio message")
 
@@ -581,6 +581,8 @@ export default class Utils {
             timer.textContent = formattedTime
         })
 
+        const progressSvg = this.createProgressSvgElemet()
+        flexContainer.appendChild(progressSvg)
         flexContainer.appendChild(startBtn)
         flexContainer.appendChild(waveformDiv)
         flexContainer.appendChild(timer)
