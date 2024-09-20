@@ -15,6 +15,8 @@ import TimeAgo from 'javascript-time-ago';
 import heic2any from 'heic2any';
 
 import en from 'javascript-time-ago/locale/en'
+import 'emoji-picker-element'
+import 'viewerjs/dist/viewer.css'
 import 'viewerjs/dist/viewer.css'
 
 class MessageType {
@@ -77,6 +79,7 @@ export default class extends Controller {
             const users = await response.json() 
 
             this.setDarkModeToggle() 
+            this.setEmojiPickerElement()
             this.setImageButtonClick()
             this.setOnChangeImageFileInput()
             this.setSendTextButtonClick()
@@ -98,6 +101,8 @@ export default class extends Controller {
             await this.setUserLastMessage()
             await this.setChatboxInfiniteScrolling()
         }     
+
+        
     } 
 
     setEncryptionDetails = async () => {   
@@ -647,16 +652,23 @@ export default class extends Controller {
     setDarkModeToggle = () => { 
         let themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
         let themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+        let emojiPicker = document.querySelector('.emoji-picker')
 
         // Change the icons inside the button based on previous settings
         if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             themeToggleLightIcon.classList.remove('hidden');
             document.documentElement.classList.add('dark');
+
+            emojiPicker.classList.remove('light')
+            emojiPicker.classList.add('dark')
         } else {
             themeToggleDarkIcon.classList.remove('hidden');
             document.documentElement.classList.remove('dark');
-        } 
 
+            emojiPicker.classList.add('light')
+            emojiPicker.classList.remove('dark')
+        } 
+ 
         var themeToggleBtn = document.getElementById('theme-toggle');
 
         themeToggleBtn.onclick = () => {
@@ -669,9 +681,15 @@ export default class extends Controller {
                 if (localStorage.getItem('color-theme') === 'light') {
                     document.documentElement.classList.add('dark');
                     localStorage.setItem('color-theme', 'dark');
+
+                    emojiPicker.classList.remove('light')
+                    emojiPicker.classList.add('dark')
                 } else {
                     document.documentElement.classList.remove('dark');
                     localStorage.setItem('color-theme', 'light');
+
+                    emojiPicker.classList.add('light')
+                    emojiPicker.classList.remove('dark')
                 }
 
             // if NOT set via local storage previously
@@ -685,6 +703,16 @@ export default class extends Controller {
                 }
             } 
         } 
+    }
+
+    setEmojiPickerElement = () => {
+        document.querySelector('emoji-picker').addEventListener('emoji-click', (e) => {   
+            console.log(e)
+            //const str1 = chat_message.textContent.slice(0, this.chatMessageCaretPosition) + e.detail.unicode
+            //const str2 = chat_message.textContent.slice(this.chatMessageCaretPosition)
+            //chat_message.textContent = str1 + str2 
+            //this.chatMessageCaretPosition = str1.length
+        })
     }
 
     setSidebarUserToggleForMobile = () => { 
