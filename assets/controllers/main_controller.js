@@ -699,11 +699,16 @@ export default class extends Controller {
         mainChatboxIntro.classList.add('hidden') 
     } 
 
-    setSentMessage = async (content, messageElement, message, type, timestamp) => {
+    setSentMessage = async (content, messageElement, message, type, timestamp, oldMessageElement=null) => {
         const chatbox = document.getElementById('chatbox') 
         
         this.chatboxScrollToBottom(true)
-        chatbox.appendChild(messageElement) 
+        if (oldMessageElement) {
+            chatbox.replaceChild(messageElement, oldMessageElement)
+        }
+        else {
+            chatbox.appendChild(messageElement) 
+        }
 
         Utils.reOrderLastFourChatboxElements()
         Utils.setChatboxMessageAvatarHidden()
@@ -777,9 +782,7 @@ export default class extends Controller {
         const file = new File([await this.ffmpeg.readFile('output.webm')], 'audio.webm', { type: 'audio/webm' }) 
         const response = await this.service.createAudioMessage(this.uidValue, file, messageTempElement, Utils.progressSvgElementCallback) 
 
-        if (response.status == 200) {  
-            chatbox.removeChild(messageTempElement) 
-
+        if (response.status == 200) {   
             const type = MessageType.AUDIO
             const timestamp = Date.now()
 
@@ -799,7 +802,7 @@ export default class extends Controller {
             }))
  
             const messageElement = Utils.createOutgoingMessageVoiceElement(url, timestamp, this.timeAgo)
-            await this.setSentMessage(content, messageElement, null, type, timestamp)
+            await this.setSentMessage(content, messageElement, null, type, timestamp, messageTempElement)
         }
     }
 
@@ -826,9 +829,7 @@ export default class extends Controller {
         chatbox.appendChild(messageTempElement) 
 
         const response = await this.service.createImageMessage(this.uidValue, file, extension, messageTempElement, Utils.progressSvgElementCallback)
-        if (response.status == 200) {
-            chatbox.removeChild(messageTempElement) 
-
+        if (response.status == 200) { 
             const type = MessageType.IMAGE
             const timestamp = Date.now()
 
@@ -849,7 +850,7 @@ export default class extends Controller {
 
             const messageElement = Utils.createOutgoingMessageImageElement(url, timestamp, this.timeAgo) 
             Utils.setViewerJsImageElement(messageElement, this.viewer)
-            await this.setSentMessage(content, messageElement, null, type, timestamp) 
+            await this.setSentMessage(content, messageElement, null, type, timestamp, messageTempElement) 
         }
     }
 
