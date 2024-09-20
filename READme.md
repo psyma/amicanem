@@ -1,5 +1,6 @@
 # Amicanem (Your another chat application 😀) 
 # Live (https://amicanem.com)
+# App status: under construction 🚧
 
 # Features
 ```

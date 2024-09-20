@@ -247,7 +247,7 @@ export default class Utils {
         const index = viewerjsContainer.childNodes.length - 2
         viewer.update()
 
-        messageElement.onclick = () => {
+        imageDiv.onclick = () => {
             viewer.show()
             viewer.view(index)    
         }
@@ -594,13 +594,13 @@ export default class Utils {
 
     static createImageMessageElement = (url) => {
         // Create button element
-        const button = document.createElement('button')
-        button.className = 'outline-none';
+        const divContainer = document.createElement('div')
+        divContainer.className = 'outline-none cursor-pointer';
 
         // Create div for background image
         const imageDiv = document.createElement('div')
         imageDiv.setAttribute('url', url)
-        imageDiv.className = 'image relative rounded bg-cover bg-center w-40 h-40'
+        imageDiv.className = 'image relative rounded bg-cover bg-center w-56 h-56'
         imageDiv.style.backgroundImage = `url("${url}")`
 
         const progressSvg = this.createProgressSvgElemet()
@@ -614,9 +614,9 @@ export default class Utils {
         imageDiv.appendChild(overlayDiv)
 
         // Append the image div to the button
-        button.appendChild(imageDiv)
+        divContainer.appendChild(imageDiv)
 
-        return button
+        return divContainer
     }
 
     static createOutgoingMessageTextElement = (content, timestamp, timeAgo) => {  
@@ -636,7 +636,7 @@ export default class Utils {
         flexItemsDiv.classList.add('flex', 'relative', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
-        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'ml-2', 'order-2', 'bg-indigo-50', 'dark:bg-slate-600')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'order-2', 'bg-indigo-50', 'dark:bg-slate-600')
  
         const chatContent = document.createElement('p')
         chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
@@ -693,7 +693,7 @@ export default class Utils {
         flexItemsDiv.classList.add('flex', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
-        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'ml-2', 'order-2', 'bg-indigo-50', 'dark:bg-slate-600')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'order-2', 'bg-indigo-50', 'dark:bg-slate-600')
  
         const chatContent = document.createElement('p')
         chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
@@ -750,7 +750,7 @@ export default class Utils {
         flexItemsDiv.classList.add('flex', 'relative', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
-        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'ml-2', 'order-2', 'bg-indigo-50', 'dark:bg-slate-600')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'order-2', 'bg-indigo-50', 'dark:bg-slate-600')
         
         const imageContent = this.createImageMessageElement(url)
    
@@ -815,7 +815,7 @@ export default class Utils {
         chatContainer.classList.add('flex', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
-        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
  
         const chatContent = document.createElement('p')
         chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
@@ -877,7 +877,7 @@ export default class Utils {
         chatContainer.classList.add('flex', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
-        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
  
         const chatContent = document.createElement('p')
         chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
@@ -939,7 +939,7 @@ export default class Utils {
         chatContainer.classList.add('flex', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
-        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-5', 'transition', 'duration-500', 'rounded', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'transition', 'duration-500', 'rounded', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
  
         const imageElement = this.createImageMessageElement(url)
  
