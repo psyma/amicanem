@@ -136,6 +136,46 @@ export default class Utils {
         return bytes.buffer;
     }  
 
+    static formatTimestampIntoDaysOfWeek = (timestamp) => {
+        const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    
+        // Convert epoch to milliseconds and create a Date object
+        const date = new Date(parseInt(timestamp))
+        
+        // Get today's date
+        const today = new Date()
+        
+        // Strip time from today's date and just keep year, month, day
+        const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime()
+        
+        // Strip time from yesterday
+        const startOfYesterday = startOfToday - 86400000 // 24 hours earlier
+        
+        // Get date 7 days ago at midnight
+        const oneWeekAgo = startOfToday - (7 * 86400000)
+        
+        // Strip time from the timestamp date
+        const dateWithoutTime = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()
+        
+        // If the timestamp is within today's range
+        if (dateWithoutTime >= startOfToday) {
+            return "Today"
+        }
+    
+        // If the timestamp is within yesterday's range
+        if (dateWithoutTime >= startOfYesterday && dateWithoutTime < startOfToday) {
+            return "Yesterday"
+        }
+    
+        // If the timestamp is within the last 7 days
+        if (dateWithoutTime >= oneWeekAgo && dateWithoutTime < startOfYesterday) {
+            return daysOfWeek[date.getDay()]
+        }
+    
+        // If the timestamp is older than a week, return the original timestamp
+        return timestamp
+    }
+    
     static setChatboxMessageAvatarHidden = () => {
         // if the user has successive messages then only show 1 avatar
         const chatbox = document.getElementById('chatbox')
@@ -186,14 +226,12 @@ export default class Utils {
                 }
             }
         } 
-    }
+    } 
     
-    static setChatboxMessageGroupDate = () => {
+    static setChatboxDividerTimestamp = () => {
         const chatbox = document.getElementById('chatbox')
         const elements = Array.from(chatbox.children)
-        const options = { year: 'numeric', month: 'long', day: 'numeric' } 
-        const todayDate = new Date()
-        const todayLocaleDateString = todayDate.toLocaleDateString('en-US', options)
+        const options = { year: 'numeric', month: 'long', day: 'numeric' }  
        
         const dividerElements = chatbox.querySelectorAll('.divider-timestamp')
         dividerElements.forEach((element) => {
@@ -209,13 +247,14 @@ export default class Utils {
                 const currentDate = new Date(parseInt(timestamp))
                 const currentLocaleDateString = currentDate.toLocaleDateString('en-US', options)  
 
-                if (prevDate != currentLocaleDateString) {
-                    let dividerTimestampElement = null
-                    if (currentLocaleDateString == todayLocaleDateString) {
-                        dividerTimestampElement = this.createDividerTimestampElement('Today')
-                    }
-                    else {
+                if (prevDate != currentLocaleDateString) { 
+                    let dividerTimestampElement = null 
+                    const formattedTimestamp = Utils.formatTimestampIntoDaysOfWeek(timestamp)
+                    if (formattedTimestamp == timestamp) { 
                         dividerTimestampElement = this.createDividerTimestampElement(currentLocaleDateString)
+                    }
+                    else { 
+                        dividerTimestampElement = this.createDividerTimestampElement(formattedTimestamp)
                     }
                     chatbox.insertBefore(dividerTimestampElement, element)
                 } 
