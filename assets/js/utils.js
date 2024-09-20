@@ -188,6 +188,43 @@ export default class Utils {
         } 
     }
     
+    static setChatboxMessageGroupDate = () => {
+        const chatbox = document.getElementById('chatbox')
+        const elements = Array.from(chatbox.children)
+        const options = { year: 'numeric', month: 'long', day: 'numeric' } 
+        const todayDate = new Date()
+        const todayLocaleDateString = todayDate.toLocaleDateString('en-US', options)
+       
+        const dividerElements = chatbox.querySelectorAll('.divider-timestamp')
+        dividerElements.forEach((element) => {
+            chatbox.removeChild(element)
+        })
+
+        let prevDate = null
+        for (let i = 0; i < elements.length; i++) {
+            const element = elements[i]
+            const timestamp = element.getAttribute('timestamp')
+              
+            if (timestamp != null) {
+                const currentDate = new Date(parseInt(timestamp))
+                const currentLocaleDateString = currentDate.toLocaleDateString('en-US', options)  
+
+                if (prevDate != currentLocaleDateString) {
+                    let dividerTimestampElement = null
+                    if (currentLocaleDateString == todayLocaleDateString) {
+                        dividerTimestampElement = this.createDividerTimestampElement('Today')
+                    }
+                    else {
+                        dividerTimestampElement = this.createDividerTimestampElement(currentLocaleDateString)
+                    }
+                    chatbox.insertBefore(dividerTimestampElement, element)
+                } 
+
+                prevDate = currentLocaleDateString 
+            } 
+        } 
+    }
+    
     static sortUsersListBaseOnLastMessageTimestamp = () => {
         const usersList = document.getElementById('users-list')
         const usersElements = Array.from(usersList.children)  
@@ -431,6 +468,33 @@ export default class Utils {
             chatbox.removeChild(element)
             chatbox.appendChild(element)
         })
+    }
+
+    static createDividerTimestampElement = (date) => {
+        // Create the main container div
+        const container = document.createElement('div')
+        container.className = 'divider-timestamp w-full my-7 flex items-center justify-center'
+
+        // Create the left border div
+        const leftBorder = document.createElement('div')
+        leftBorder.className = 'w-full h-0 border-t border-dashed dark:border-gray-600 dark:bg-opacity-0'
+
+        // Create the text element
+        const dateElement = document.createElement('p')
+        dateElement.className = 'outline-none text-xs font-light text-black opacity-60 dark:text-white dark:opacity-70 leading-4 tracking-[.01rem] mx-2 whitespace-nowrap'
+        dateElement.textContent = date
+
+        // Create the right border div
+        const rightBorder = document.createElement('div')
+        rightBorder.className = 'w-full h-0 border-t border-dashed dark:border-gray-600 dark:bg-opacity-0'
+
+        // Append the elements to the container
+        container.appendChild(leftBorder)
+        container.appendChild(dateElement)
+        container.appendChild(rightBorder)
+
+        // Return the complete container
+        return container;
     }
 
     static createProgressSvgElemet = () => {
