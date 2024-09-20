@@ -344,7 +344,7 @@ export default class Utils {
         nameParagraph.textContent = name
 
         const encryptedContainer = document.createElement('div')
-        encryptedContainer.className = 'bg-indigo-50 dark:bg-slate-600 rounded p-3 mt-8 mx-5 sm:mx-0'
+        encryptedContainer.className = 'bg-indigo-50 dark:bg-gray-600 rounded p-3 mt-8 mx-5 sm:mx-0'
 
         const flexInnerContainer = document.createElement('div')
         flexInnerContainer.className = 'flex justify-center items-center gap-1'
@@ -700,7 +700,7 @@ export default class Utils {
         flexItemsDiv.classList.add('flex', 'relative', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
-        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'order-2', 'bg-indigo-50', 'dark:bg-slate-600')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'order-2', 'bg-indigo-50', 'dark:bg-gray-600')
  
         const chatContent = document.createElement('p')
         chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
@@ -757,7 +757,7 @@ export default class Utils {
         flexItemsDiv.classList.add('flex', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
-        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'order-2', 'bg-indigo-50', 'dark:bg-slate-600')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'order-2', 'bg-indigo-50', 'dark:bg-gray-600')
  
         const chatContent = document.createElement('p')
         chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
@@ -814,7 +814,7 @@ export default class Utils {
         flexItemsDiv.classList.add('flex', 'relative', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
-        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'order-2', 'bg-indigo-50', 'dark:bg-slate-600')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'order-2', 'bg-indigo-50', 'dark:bg-gray-600')
         
         const imageContent = this.createImageMessageElement(url)
    

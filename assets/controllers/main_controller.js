@@ -654,7 +654,7 @@ export default class extends Controller {
         } else {
             themeToggleDarkIcon.classList.remove('hidden');
             document.documentElement.classList.remove('dark');
-        }
+        } 
 
         var themeToggleBtn = document.getElementById('theme-toggle');
 
