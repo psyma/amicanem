@@ -75,7 +75,7 @@ class MessageController extends AbstractController
         $directoryPath = (string) $epochTimestamp; 
 
         $filepath = $uploadPath . $file->getClientOriginalName() . $extension;
-        $filename = $directoryPath . '/' . md5(uniqid()) . md5(uniqid()) . $extension;
+        $filename = $directoryPath . '/images/' . md5(uniqid()) . md5(uniqid()) . $extension;
 
         $filesystem = new Filesystem(); 
         $filesystem->copy($filepath, $uploadPath . $filename); 
@@ -102,7 +102,7 @@ class MessageController extends AbstractController
         $directoryPath = (string) $epochTimestamp; 
 
         $filepath = $uploadPath . $file->getClientOriginalName() . $extension;
-        $filename = $directoryPath . '/' . md5(uniqid()) . md5(uniqid()) . $extension;
+        $filename = $directoryPath . '/audios/' . md5(uniqid()) . md5(uniqid()) . $extension;
 
         $filesystem = new Filesystem(); 
         $filesystem->copy($filepath, $uploadPath . $filename); 
