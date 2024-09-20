@@ -31,6 +31,7 @@
         "bowser": "^2.11.0",
         "crypto-js": "^4.2.0",
         "flowbite": "^2.5.1",
+        "heic2any": "^0.0.4",
         "javascript-time-ago": "^2.5.11",
         "pusher-js": "^8.4.0-rc2",
         "viewerjs": "^1.11.6",

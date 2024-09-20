@@ -12,6 +12,7 @@ import CryptoJS from 'crypto-js';
 import WaveSurfer from 'wavesurfer.js'
 import RecordPlugin from 'wavesurfer.js/dist/plugins/record.esm.js'
 import TimeAgo from 'javascript-time-ago';
+import heic2any from 'heic2any';
 
 import en from 'javascript-time-ago/locale/en'
 import 'viewerjs/dist/viewer.css'
@@ -812,6 +813,8 @@ export default class extends Controller {
 
     sendImageMessage = async (blob, input, width, height, mimeType, extension, output) => {
         let file = null 
+        let url = URL.createObjectURL(blob)
+
         if (extension == 'png') {
             await this.ffmpeg.writeFile(input, new Uint8Array(await blob.arrayBuffer()))
             await this.ffmpeg.exec(['-i', input, '-vf', `scale=${width}:${height}`, output]);
@@ -820,19 +823,26 @@ export default class extends Controller {
         else if (extension == 'GIF') {
             file = new File([new Uint8Array(await blob.arrayBuffer())], output, { type: mimeType }) 
         }
+        else if (extension == "heic") {
+            const heicBlob = await heic2any({ blob, toType: 'image/jpeg'}) 
+            url = URL.createObjectURL(heicBlob)
+            
+            await this.ffmpeg.writeFile('input.jpeg', new Uint8Array(await heicBlob.arrayBuffer()))
+            await this.ffmpeg.exec(['-i', 'input.jpeg', '-pix_fmt', 'yuv420p', '-vf', `scale=${width}:${height}`, 'output.jpeg']);
+            file = new File([await this.ffmpeg.readFile('output.jpeg')], 'output.jpeg', { type: 'image/jpeg' })  
+        }
         else {
             await this.ffmpeg.writeFile(input, new Uint8Array(await blob.arrayBuffer()))
             await this.ffmpeg.exec(['-i', input, '-pix_fmt', 'yuv420p', '-vf', `scale=${width}:${height}`, output]);
             file = new File([await this.ffmpeg.readFile(output)], output, { type: mimeType }) 
-        }
-
-        const url = URL.createObjectURL(blob)
+        } 
+        
         const chatbox = document.getElementById('chatbox') 
         const messageTempElement = Utils.createOutgoingMessageImageElement(url, Date.now(), this.timeAgo)  
         this.chatboxScrollToBottom(true)
         chatbox.appendChild(messageTempElement) 
 
-        const response = await this.service.createImageMessage(this.uidValue, file, extension, messageTempElement, Utils.progressSvgElementCallback)
+        const response = await this.service.createImageMessage(this.uidValue, file, extension == 'heic' ? 'jpeg' : extension, messageTempElement, Utils.progressSvgElementCallback)
         if (response.status == 200) { 
             const type = MessageType.IMAGE
             const timestamp = Date.now()
@@ -880,7 +890,7 @@ export default class extends Controller {
                 sendImageButton.classList.remove('hidden')
 
                 for (let i = 0; i < files.length; i++) {
-                    const file = files[i]  
+                    const file = files[i]
                     this.toSendImagesMap.set(i, {
                         'file': file,
                         'width': null,
