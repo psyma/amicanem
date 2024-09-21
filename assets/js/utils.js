@@ -2,6 +2,17 @@ import Bowser from 'bowser';
 import WaveSurfer from 'wavesurfer.js'
 import { Dropdown } from 'flowbite';
 
+class MessageType {
+    static TEXT = 0
+    static IMAGE = 1
+    static GIF = 2
+    static AUDIO = 3
+    
+    static get TEXT() { return TEXT }
+    static get IMAGE() { return IMAGE }
+    static get GIF() { return GIF }
+} 
+
 export default class Utils {
     static encryptMessage = async (publicKey, message, chunkSize=190) => {
         const importedPublicKey = await window.crypto.subtle.importKey(
@@ -756,7 +767,7 @@ export default class Utils {
         return divContainer
     }
 
-    static createVerticalThreeDotsOptionsElement = (placement, isIncoming=false) => {
+    static createVerticalThreeDotsOptionsElement = (placement, type, isIncomingMessage=false) => {
         function createDropdownElement() {
             // Create the dropdown container
             const dropdown = document.createElement('div');
@@ -773,7 +784,11 @@ export default class Utils {
                 { label: 'Forward', iconPath: 'M4.248 19C3.22 15.77 5.275 8.232 12.466 8.232V6.079a1.025 1.025 0 0 1 1.644-.862l5.479 4.307a1.108 1.108 0 0 1 0 1.723l-5.48 4.307a1.026 1.026 0 0 1-1.643-.861v-2.154C5.275 13.616 4.248 19 4.248 19Z' },                     
             ]
 
-            if (!isIncoming) {
+            if (type == MessageType.AUDIO || type == MessageType.IMAGE) {
+                buttons.splice(1, 1)
+            } 
+
+            if (!isIncomingMessage) {
                 buttons.push({ label: 'Delete Message', iconPath: 'M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0'})
             } 
 
@@ -881,7 +896,7 @@ export default class Utils {
         mainDiv.appendChild(timeText) 
         
         const divOptions = document.createElement('div')  
-        const options = this.createVerticalThreeDotsOptionsElement('top-end')
+        const options = this.createVerticalThreeDotsOptionsElement('top-end', MessageType.TEXT)
 
         divOptions.style.height = '100%'
         divOptions.classList.add('flex', 'flex-col', 'justify-between', 'items-center')
@@ -948,7 +963,7 @@ export default class Utils {
         mainDiv.appendChild(timeText) 
 
         const divOptions = document.createElement('div')  
-        const options = this.createVerticalThreeDotsOptionsElement('top-end')
+        const options = this.createVerticalThreeDotsOptionsElement('top-end', MessageType.AUDIO)
 
         divOptions.style.height = '100%'
         divOptions.classList.add('flex', 'flex-col', 'justify-between', 'items-center')
@@ -1012,7 +1027,7 @@ export default class Utils {
         mainDiv.appendChild(timeText) 
 
         const divOptions = document.createElement('div')  
-        const options = this.createVerticalThreeDotsOptionsElement('top-end')
+        const options = this.createVerticalThreeDotsOptionsElement('top-end', MessageType.IMAGE)
 
         divOptions.style.height = '100%'
         divOptions.classList.add('flex', 'flex-col', 'justify-between', 'items-center')
@@ -1079,8 +1094,7 @@ export default class Utils {
  
         chatMessageContainer.appendChild(chatContent)
  
-        const timeContainer = document.createElement('div')
-        //timeContainer.classList.add('mr-4')
+        const timeContainer = document.createElement('div') 
  
         const timeText = document.createElement('p')
         timeText.classList.add('hidden', 'pl-12', 'outline-none', 'text-xs', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
@@ -1088,7 +1102,7 @@ export default class Utils {
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
         mainDiv.append(timeText)  
         
-        const options = this.createVerticalThreeDotsOptionsElement('top-start', true)
+        const options = this.createVerticalThreeDotsOptionsElement('top-start', MessageType.TEXT, true)
 
         chatContainer.appendChild(chatMessageContainer)
         chatContainer.appendChild(timeContainer)
@@ -1145,8 +1159,7 @@ export default class Utils {
         const voiceElement = this.createVoiceMessageElement(url) 
         chatMessageContainer.appendChild(voiceElement)
  
-        const timeContainer = document.createElement('div')
-        //timeContainer.classList.add('mr-4')
+        const timeContainer = document.createElement('div') 
  
         const timeText = document.createElement('p')
         timeText.classList.add('hidden', 'pl-12', 'outline-none', 'text-xs', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
@@ -1154,7 +1167,7 @@ export default class Utils {
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
         mainDiv.append(timeText) 
  
-        const options = this.createVerticalThreeDotsOptionsElement('top-start', true)
+        const options = this.createVerticalThreeDotsOptionsElement('top-start', MessageType.AUDIO, true)
 
         chatContainer.appendChild(chatMessageContainer)
         chatContainer.appendChild(timeContainer)
@@ -1168,6 +1181,7 @@ export default class Utils {
         mainDiv.appendChild(innerDiv1)
         mainDiv.onclick = () => {
             timeText.classList.remove('hidden')
+            options.classList.remove('invisible')
         }
 
         return mainDiv 
@@ -1207,8 +1221,7 @@ export default class Utils {
  
         chatMessageContainer.appendChild(imageElement)
  
-        const timeContainer = document.createElement('div')
-        //timeContainer.classList.add('mr-4')
+        const timeContainer = document.createElement('div') 
  
         const timeText = document.createElement('p')
         timeText.classList.add('hidden', 'pl-12', 'outline-none', 'text-xs', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
@@ -1216,7 +1229,7 @@ export default class Utils {
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
         mainDiv.append(timeText)  
         
-        const options = this.createVerticalThreeDotsOptionsElement('top-start', true)
+        const options = this.createVerticalThreeDotsOptionsElement('top-start', MessageType.IMAGE, true)
 
         chatContainer.appendChild(chatMessageContainer)
         chatContainer.appendChild(timeContainer)
