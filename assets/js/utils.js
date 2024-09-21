@@ -755,6 +755,29 @@ export default class Utils {
         return divContainer
     }
 
+    static createVerticalThreeDotsOptionsElement = () => {
+        const options = document.createElement('div')
+
+        // Create the SVG element
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+        svg.classList.add('w-5', 'h-5', 'text-neutral-400')
+        svg.setAttribute('aria-hidden', 'true')
+        svg.setAttribute('fill', 'currentColor')
+        svg.setAttribute('viewBox', '0 0 24 24')
+
+        // Create the path element
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+        path.setAttribute('d', 'M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z')
+
+        // Append the path to the SVG
+        svg.appendChild(path)
+
+        options.classList.add('ml-3', 'mt-2', 'invisible', 'cursor-pointer')
+        options.appendChild(svg) 
+
+        return options
+    }
+
     static createOutgoingMessageTextElement = (content, timestamp, timeAgo) => {  
         const mainDiv = document.createElement('div')
         mainDiv.setAttribute('timestamp', timestamp)
@@ -790,14 +813,22 @@ export default class Utils {
 
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
         mainDiv.appendChild(timeText) 
- 
+        
+        const divOptions = document.createElement('div')  
+        const options = this.createVerticalThreeDotsOptionsElement()
+        divOptions.style.height = '100%'
+        divOptions.classList.add('flex', 'flex-col', 'justify-between', 'items-center')
+
         const img = document.createElement('img')
         img.src = '/gray_checks.svg'
         img.classList.add('w-[.875rem]', 'h-[.875rem]', 'img-check')
+        
+        divOptions.appendChild(options)
+        divOptions.appendChild(img)
           
         flexItemsDiv.appendChild(chatMessageContainer)
         flexItemsDiv.appendChild(timeDiv)
-        flexItemsDiv.appendChild(img)
+        flexItemsDiv.appendChild(divOptions)
  
         flexDiv.appendChild(mr4Div)
         flexDiv.appendChild(flexItemsDiv)
@@ -807,6 +838,7 @@ export default class Utils {
         mainDiv.appendChild(selectNoneDiv)
         mainDiv.onclick = () => {
             timeText.classList.remove('hidden')
+            options.classList.remove('invisible')
         }
 
         return mainDiv 
@@ -847,14 +879,22 @@ export default class Utils {
 
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
         mainDiv.appendChild(timeText) 
+
+        const divOptions = document.createElement('div')  
+        const options = this.createVerticalThreeDotsOptionsElement()
+        divOptions.style.height = '100%'
+        divOptions.classList.add('flex', 'flex-col', 'justify-between', 'items-center')
  
         const img = document.createElement('img')
         img.src = '/gray_checks.svg'
         img.classList.add('w-[.875rem]', 'h-[.875rem]', 'img-check')
+
+        divOptions.appendChild(options)
+        divOptions.appendChild(img)
  
         flexItemsDiv.appendChild(chatMessageContainer)
         flexItemsDiv.appendChild(timeDiv)
-        flexItemsDiv.appendChild(img)
+        flexItemsDiv.appendChild(divOptions)
  
         flexDiv.appendChild(mr4Div)
         flexDiv.appendChild(flexItemsDiv)
@@ -864,6 +904,7 @@ export default class Utils {
         mainDiv.appendChild(selectNoneDiv)
         mainDiv.onclick = () => {
             timeText.classList.remove('hidden')
+            options.classList.remove('invisible')
         }
 
         return mainDiv 
@@ -901,14 +942,22 @@ export default class Utils {
 
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
         mainDiv.appendChild(timeText) 
+
+        const divOptions = document.createElement('div')  
+        const options = this.createVerticalThreeDotsOptionsElement()
+        divOptions.style.height = '100%'
+        divOptions.classList.add('flex', 'flex-col', 'justify-between', 'items-center')
  
         const img = document.createElement('img')
         img.src = '/gray_checks.svg'
         img.classList.add('w-[.875rem]', 'h-[.875rem]', 'img-check')
+
+        divOptions.appendChild(options)
+        divOptions.appendChild(img)
           
         flexItemsDiv.appendChild(chatMessageContainer)
         flexItemsDiv.appendChild(timeDiv)
-        flexItemsDiv.appendChild(img)
+        flexItemsDiv.appendChild(divOptions)
  
         flexDiv.appendChild(mr4Div)
         flexDiv.appendChild(flexItemsDiv)
@@ -918,6 +967,7 @@ export default class Utils {
         mainDiv.appendChild(selectNoneDiv)
         mainDiv.onclick = () => {
             timeText.classList.remove('hidden')
+            options.classList.remove('invisible')
         }
 
         return mainDiv 

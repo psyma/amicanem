@@ -21,7 +21,7 @@
     transition: stroke-dashoffset 0.35s;
     transform: rotate(-90deg);
     transform-origin: 50% 50%;
-} 
+}  
 
 #play-pause.play::after {
     font-size: 1.5rem;
