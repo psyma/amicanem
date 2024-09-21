@@ -320,7 +320,7 @@ export default class Utils {
         li.appendChild(img)
 
         viewerjsContainer.appendChild(li)
-        const index = viewerjsContainer.childNodes.length - 2
+        const index = viewerjsContainer.childNodes.length - 1
         viewer.update()
 
         imageDiv.onclick = () => {

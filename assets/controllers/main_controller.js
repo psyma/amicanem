@@ -534,6 +534,8 @@ export default class extends Controller {
         this.page = 1 
         this.isReceivedFirstMessage = false
         this.isLockInfiniteScrolling = true 
+        
+        document.getElementById("viewerjs-images-container").innerHTML = '' 
     } 
 
     setConversations = async () => {  
