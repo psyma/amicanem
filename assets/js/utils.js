@@ -682,7 +682,7 @@ export default class Utils {
         }) 
 
         const timer = document.createElement('p')
-        timer.classList.add("outline-none", "text-xs", "font-light", "leading-4", "tracking-[.01rem]", "text-black", "dark:text-white", "opacity-40", "dark:opacity-90")
+        timer.classList.add("outline-none", "text-xs", "font-light", "leading-4", "tracking-[.01rem]", "text-black", "dark:text-white", "opacity-80", "dark:opacity-90")
         timer.setAttribute("tabindex", "0")
         timer.setAttribute("aria-label", "00:00")
         startBtn.onclick = () => wavesurfer.playPause()  

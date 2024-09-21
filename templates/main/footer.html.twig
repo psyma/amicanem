@@ -24,7 +24,7 @@
             </div>
         </div> 
  
-        <div contenteditable="true" placeholder="Your message..." title="Message input" aria-label="Message input" id="chatbox-message-input" class="whitespace-pre-wrap w-full mx-2 relative max-h-44 overflow-y-auto px-5 py-4 text-sm rounded-sm content-center outline-none text-sm placeholder:text-black placeholder:opacity-40 text-opacity-70 dark:placeholder:text-white dark:placeholder:opacity-70 focus:outline-none transition duration-200 ease-out text-black bg-gray-100 dark:text-white border-opacity-0 dark:bg-gray-700 dark:bg-opacity-70 dark:border-opacity-70 dark:border-gray-700"></div> 
+        <div contenteditable="true" placeholder="Your message..." title="Message input" aria-label="Message input" id="chatbox-message-input" class="whitespace-pre-wrap w-full mx-2 relative max-h-44 overflow-y-auto px-5 py-4 text-sm rounded-sm content-center outline-none text-sm placeholder:text-black placeholder:opacity-70 text-opacity-90 dark:placeholder:text-white dark:placeholder:opacity-90 focus:outline-none transition duration-200 ease-out text-black bg-gray-100 dark:text-white border-opacity-0 dark:bg-gray-700 dark:bg-opacity-90 dark:border-opacity-90 dark:border-gray-700"></div> 
      
         <div id="chatbox-voice-input" class="hidden group w-full mx-2 p-3 mt-5 self-center rounded transition duration-500 bg-indigo-50 dark:bg-gray-600">  
             <div class="flex items-center outline-none" tabindex="0" aria-label="audio message">
@@ -49,7 +49,7 @@
                 <div class="w-full mr-1 flex items-center">
                     <div id="waveform-input" class="w-full"></div>
                 </div>
-                <p id="voicechat-record-time" class="outline-none text-xs font-light leading-4 tracking-[.01rem] text-black dark:text-white opacity-40 dark:opacity-70" tabindex="0" aria-label="11 seconds"> 00:00 </p>
+                <p id="voicechat-record-time" class="outline-none text-xs font-light leading-4 tracking-[.01rem] text-black dark:text-white opacity-70 dark:opacity-90" tabindex="0" aria-label="11 seconds"> 00:00 </p>
             </div> 
         </div>   
 
@@ -57,7 +57,7 @@
             <input type="file" accept="image/*" id="image-file-input" multiple class="hidden"/>
         </div>
 
-        <div onkeydown="(function(e){ e.preventDefault(); })(event)" contenteditable="true" placeholder="Your message..." title="Message input" aria-label="Message input" id="chatbox-image-input" class="hidden whitespace-pre-wrap w-full mx-2 relative max-h-44 overflow-y-auto px-5 py-4 text-sm rounded-sm content-center outline-none text-sm placeholder:text-black placeholder:opacity-40 text-opacity-70 dark:placeholder:text-white dark:placeholder:opacity-70 focus:outline-none transition duration-200 ease-out text-black bg-gray-100 dark:text-white border-opacity-0 dark:bg-gray-700 dark:bg-opacity-70 dark:border-opacity-70 dark:border-gray-700"></div>
+        <div onkeydown="(function(e){ e.preventDefault(); })(event)" contenteditable="true" placeholder="Your message..." title="Message input" aria-label="Message input" id="chatbox-image-input" class="hidden whitespace-pre-wrap w-full mx-2 relative max-h-44 overflow-y-auto px-5 py-4 text-sm rounded-sm content-center outline-none text-sm placeholder:text-black placeholder:opacity-70 text-opacity-90 dark:placeholder:text-white dark:placeholder:opacity-90 focus:outline-none transition duration-200 ease-out text-black bg-gray-100 dark:text-white border-opacity-0 dark:bg-gray-700 dark:bg-opacity-90 dark:border-opacity-90 dark:border-gray-700"></div>
 
         <div class="min-h-[2.75rem] mr-2"> 
             <button id="send-text-button" class="group flex justify-center items-center outline-none rounded-full focus:outline-none transition-all duration-200 group w-10 h-10 bg-indigo-300 hover:bg-indigo-400 focus:bg-indigo-400 dark:focus:bg-indigo-300 dark:bg-indigo-400 dark:hover:bg-indigo-400 active:scale-110" title="Send message" aria-label="Send message">
