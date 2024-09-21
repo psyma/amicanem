@@ -756,7 +756,7 @@ export default class Utils {
         return divContainer
     }
 
-    static createVerticalThreeDotsOptionsElement = () => {
+    static createVerticalThreeDotsOptionsElement = (placement, isIncoming=false) => {
         function createDropdownElement() {
             // Create the dropdown container
             const dropdown = document.createElement('div');
@@ -770,9 +770,12 @@ export default class Utils {
             const buttons = [
                 { label: 'Reply', iconPath: 'M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3' },
                 { label: 'Copy', iconPath: 'M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5A3.375 3.375 0 006.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0015 2.25h-1.5a2.251 2.251 0 00-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 00-9-9z' },
-                { label: 'Pin', iconPath: 'M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75m9 0H18A2.25 2.25 0 0120.25 6v12A2.25 2.25 0 0118 20.25H6A2.25 2.25 0 013.75 18V6A2.25 2.25 0 016 3.75h1.5m9 0h-9' }, 
-                { label: 'Delete Message', iconPath: 'M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0'}, 
-            ];
+                { label: 'Forward', iconPath: 'M4.248 19C3.22 15.77 5.275 8.232 12.466 8.232V6.079a1.025 1.025 0 0 1 1.644-.862l5.479 4.307a1.108 1.108 0 0 1 0 1.723l-5.48 4.307a1.026 1.026 0 0 1-1.643-.861v-2.154C5.275 13.616 4.248 19 4.248 19Z' },                     
+            ]
+
+            if (!isIncoming) {
+                buttons.push({ label: 'Delete Message', iconPath: 'M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0'})
+            } 
 
             // Create buttons
             buttons.forEach(button => { 
@@ -828,9 +831,9 @@ export default class Utils {
         svg.appendChild(path)
 
         const dropdownElement = createDropdownElement()
-        const dropdown = new Dropdown(dropdownElement, options, { placement: 'top-end' })
+        const dropdown = new Dropdown(dropdownElement, options, { placement: placement })
 
-        options.classList.add('ml-3', 'mt-2', 'invisible', 'cursor-pointer')
+        options.classList.add('invisible', 'cursor-pointer') 
         options.appendChild(svg) 
         options.appendChild(dropdownElement)
 
@@ -878,7 +881,8 @@ export default class Utils {
         mainDiv.appendChild(timeText) 
         
         const divOptions = document.createElement('div')  
-        const options = this.createVerticalThreeDotsOptionsElement()
+        const options = this.createVerticalThreeDotsOptionsElement('top-end')
+
         divOptions.style.height = '100%'
         divOptions.classList.add('flex', 'flex-col', 'justify-between', 'items-center')
 
@@ -944,7 +948,8 @@ export default class Utils {
         mainDiv.appendChild(timeText) 
 
         const divOptions = document.createElement('div')  
-        const options = this.createVerticalThreeDotsOptionsElement()
+        const options = this.createVerticalThreeDotsOptionsElement('top-end')
+
         divOptions.style.height = '100%'
         divOptions.classList.add('flex', 'flex-col', 'justify-between', 'items-center')
  
@@ -1007,7 +1012,8 @@ export default class Utils {
         mainDiv.appendChild(timeText) 
 
         const divOptions = document.createElement('div')  
-        const options = this.createVerticalThreeDotsOptionsElement()
+        const options = this.createVerticalThreeDotsOptionsElement('top-end')
+
         divOptions.style.height = '100%'
         divOptions.classList.add('flex', 'flex-col', 'justify-between', 'items-center')
  
@@ -1074,7 +1080,7 @@ export default class Utils {
         chatMessageContainer.appendChild(chatContent)
  
         const timeContainer = document.createElement('div')
-        timeContainer.classList.add('mr-4')
+        //timeContainer.classList.add('mr-4')
  
         const timeText = document.createElement('p')
         timeText.classList.add('hidden', 'pl-12', 'outline-none', 'text-xs', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
@@ -1082,17 +1088,21 @@ export default class Utils {
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
         mainDiv.append(timeText)  
         
+        const options = this.createVerticalThreeDotsOptionsElement('top-start', true)
+
         chatContainer.appendChild(chatMessageContainer)
         chatContainer.appendChild(timeContainer)
  
         flexDiv.appendChild(avatarDivContainer)
         flexDiv.appendChild(chatContainer)
+        flexDiv.appendChild(options)
  
         innerDiv1.appendChild(flexDiv)
  
         mainDiv.appendChild(innerDiv1)
         mainDiv.onclick = () => {
             timeText.classList.remove('hidden')
+            options.classList.remove('invisible')
         }
 
         return mainDiv 
@@ -1136,7 +1146,7 @@ export default class Utils {
         chatMessageContainer.appendChild(voiceElement)
  
         const timeContainer = document.createElement('div')
-        timeContainer.classList.add('mr-4')
+        //timeContainer.classList.add('mr-4')
  
         const timeText = document.createElement('p')
         timeText.classList.add('hidden', 'pl-12', 'outline-none', 'text-xs', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
@@ -1144,11 +1154,14 @@ export default class Utils {
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
         mainDiv.append(timeText) 
  
+        const options = this.createVerticalThreeDotsOptionsElement('top-start', true)
+
         chatContainer.appendChild(chatMessageContainer)
         chatContainer.appendChild(timeContainer)
  
         flexDiv.appendChild(avatarDivContainer)
         flexDiv.appendChild(chatContainer)
+        flexDiv.appendChild(options)
  
         innerDiv1.appendChild(flexDiv)
  
@@ -1195,7 +1208,7 @@ export default class Utils {
         chatMessageContainer.appendChild(imageElement)
  
         const timeContainer = document.createElement('div')
-        timeContainer.classList.add('mr-4')
+        //timeContainer.classList.add('mr-4')
  
         const timeText = document.createElement('p')
         timeText.classList.add('hidden', 'pl-12', 'outline-none', 'text-xs', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
@@ -1203,17 +1216,21 @@ export default class Utils {
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
         mainDiv.append(timeText)  
         
+        const options = this.createVerticalThreeDotsOptionsElement('top-start', true)
+
         chatContainer.appendChild(chatMessageContainer)
         chatContainer.appendChild(timeContainer)
  
         flexDiv.appendChild(avatarDivContainer)
         flexDiv.appendChild(chatContainer)
+        flexDiv.appendChild(options)
  
         innerDiv1.appendChild(flexDiv)
  
         mainDiv.appendChild(innerDiv1)
         mainDiv.onclick = () => {
             timeText.classList.remove('hidden')
+            options.classList.remove('invisible')
         }
 
         return mainDiv 
