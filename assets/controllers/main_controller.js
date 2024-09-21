@@ -144,7 +144,9 @@ export default class extends Controller {
                     messageElement = Utils.createIncommingMessageImageElement(messageData.content, user.userDetails.avatar, messageData.timestamp, this.timeAgo)
                     Utils.setViewerJsImageElement(messageElement, this.viewer)
                 }
+
                 this.chatboxScrollToBottom()
+                messageElement.setAttribute('messageData', JSON.stringify(messageData))
                 chatbox.appendChild(messageElement)
 
                 Utils.reOrderLastFourChatboxElements()
@@ -493,6 +495,7 @@ export default class extends Controller {
                                     Utils.setViewerJsImageElement(messageElement, this.viewer)
                                 }      
 
+                                messageElement.setAttribute('messageData', JSON.stringify(messageData))
                                 chatbox.prepend(messageElement)
                                 const imgCheck = messageElement.querySelector('.img-check')
                                 imgCheck.src = '/green_checks.svg'  
@@ -512,6 +515,7 @@ export default class extends Controller {
                                     Utils.setViewerJsImageElement(messageElement, this.viewer)
                                 }
                                 
+                                messageElement.setAttribute('messageData', JSON.stringify(messageData))
                                 chatbox.prepend(messageElement) 
                             }
                         } 
@@ -572,7 +576,7 @@ export default class extends Controller {
 
                 try {
                     let messageElement = null
-                    const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender))  
+                    const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender))   
                     if (messageData.type == MessageType.TEXT) {
                         messageElement = Utils.createOutgoingMessageTextElement(messageData.content, messageData.timestamp, this.timeAgo) 
                     }
@@ -583,7 +587,8 @@ export default class extends Controller {
                         messageElement = Utils.createOutgoingMessageImageElement(messageData.content, messageData.timestamp, this.timeAgo) 
                         Utils.setViewerJsImageElement(messageElement, this.viewer)
                     }
-
+                    
+                    messageElement.setAttribute('messageData', JSON.stringify(messageData))
                     chatbox.appendChild(messageElement)
                     const imgCheck = messageElement.querySelector('.img-check')
                     imgCheck.src = '/green_checks.svg'  
@@ -601,7 +606,8 @@ export default class extends Controller {
                         messageElement = Utils.createIncommingMessageImageElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
                         Utils.setViewerJsImageElement(messageElement, this.viewer)
                     }
-
+ 
+                    messageElement.setAttribute('messageData', JSON.stringify(messageData))
                     chatbox.appendChild(messageElement)  
                 }
             } 
@@ -803,6 +809,7 @@ export default class extends Controller {
         }))
 
         const messageElement = Utils.createOutgoingMessageTextElement(message, timestamp, this.timeAgo)
+        messageElement.setAttribute('messageData', data)
         await this.setSentMessage(content, messageElement, message, type, timestamp)
     } 
 
