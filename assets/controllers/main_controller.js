@@ -454,8 +454,18 @@ export default class extends Controller {
             if (scrollTop == 0 && !this.isReceivedFirstMessage && !this.isLockInfiniteScrolling) {
                 this.page += 1   
                 this.isLockInfiniteScrolling = true
-                const flexGrowChild = chatbox.removeChild(chatbox.children[0]) 
-                const firstChild = chatbox.children[0]
+                const flexGrowChild = chatbox.removeChild(chatbox.children[0])  
+
+                let index = 0
+                let firstChild = null
+                while (index < chatbox.children.length) {
+                    firstChild = chatbox.children[index] 
+                    if (!firstChild.classList.contains('divider-timestamp')) {
+                        break
+                    }
+                    index++
+                }
+                 
                 const loader = Utils.createLoaderElement()
                 chatbox.prepend(loader)
  
