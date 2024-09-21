@@ -298,7 +298,7 @@ export default class Utils {
         let preCaretRange = range.cloneRange()
         preCaretRange.selectNodeContents(div)
         preCaretRange.setEnd(range.endContainer, range.endOffset)
-        
+
         return preCaretRange.toString().length // Return caret's offset within the div
     }
     
@@ -411,7 +411,7 @@ export default class Utils {
         profileImage.style.backgroundImage = `url('${avatar}')`
 
         const nameParagraph = document.createElement('p')
-        nameParagraph.className = 'outline-none text-sm text-black opacity-60 dark:text-white dark:opacity-70 font-semibold leading-4 tracking-[.01rem] default-outline'
+        nameParagraph.className = 'outline-none text-sm text-black opacity-80 dark:text-white dark:opacity-90 font-semibold leading-4 tracking-[.01rem] default-outline'
         nameParagraph.tabIndex = 0
         nameParagraph.textContent = name
 
@@ -433,7 +433,7 @@ export default class Utils {
         svgIcon.appendChild(path)
 
         const encryptedText = document.createElement('span')
-        encryptedText.className = 'flex align-middle outline-none text-xs text-black opacity-60 dark:text-white dark:opacity-70 font-bold leading-4 tracking-[.01rem] default-outline'
+        encryptedText.className = 'flex align-middle outline-none text-xs text-black opacity-80 dark:text-white dark:opacity-90 font-bold leading-4 tracking-[.01rem] default-outline'
         encryptedText.tabIndex = 0
         encryptedText.textContent = 'End-to-end encrypted'
 
@@ -441,7 +441,7 @@ export default class Utils {
         flexInnerContainer.appendChild(encryptedText)
 
         const messageText = document.createElement('div')
-        messageText.className = 'text-center mx-auto outline-none text-xs text-black opacity-60 dark:text-white dark:opacity-70 leading-4 tracking-[.01rem] default-outline'
+        messageText.className = 'text-center mx-auto outline-none text-xs text-black opacity-80 dark:text-white dark:opacity-90 leading-4 tracking-[.01rem] default-outline'
         messageText.tabIndex = 0
         messageText.innerHTML = 'Messages and calls are secured with end-to-end encryption. <span class="text-blue-500">Learn more</span>'
 
@@ -553,7 +553,7 @@ export default class Utils {
 
         // Create the text element
         const dateElement = document.createElement('p')
-        dateElement.className = 'outline-none text-xs font-light text-black opacity-60 dark:text-white dark:opacity-70 leading-4 tracking-[.01rem] mx-2 whitespace-nowrap'
+        dateElement.className = 'outline-none text-xs font-light text-black opacity-80 dark:text-white dark:opacity-90 leading-4 tracking-[.01rem] mx-2 whitespace-nowrap'
         dateElement.textContent = date
 
         // Create the right border div
@@ -682,7 +682,7 @@ export default class Utils {
         }) 
 
         const timer = document.createElement('p')
-        timer.classList.add("outline-none", "text-xs", "font-light", "leading-4", "tracking-[.01rem]", "text-black", "dark:text-white", "opacity-40", "dark:opacity-70")
+        timer.classList.add("outline-none", "text-xs", "font-light", "leading-4", "tracking-[.01rem]", "text-black", "dark:text-white", "opacity-40", "dark:opacity-90")
         timer.setAttribute("tabindex", "0")
         timer.setAttribute("aria-label", "00:00")
         startBtn.onclick = () => wavesurfer.playPause()  
@@ -775,7 +775,7 @@ export default class Utils {
         chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'order-2', 'bg-indigo-50', 'dark:bg-gray-600')
  
         const chatContent = document.createElement('p')
-        chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
+        chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90')
         chatContent.setAttribute('tabindex', '0')
         chatContent.textContent = content
  
@@ -785,7 +785,7 @@ export default class Utils {
         timeDiv.classList.add('ml-1.5', 'order-1')
  
         const timeText = document.createElement('p')
-        timeText.classList.add('hidden', 'flex', 'justify-end', 'outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
+        timeText.classList.add('hidden', 'flex', 'justify-end', 'outline-none', 'text-xs', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
         timeText.textContent = timestamp
 
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
@@ -832,7 +832,7 @@ export default class Utils {
         chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'order-2', 'bg-indigo-50', 'dark:bg-gray-600')
  
         const chatContent = document.createElement('p')
-        chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
+        chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90')
         chatContent.setAttribute('tabindex', '0') 
 
         const voiceElement = this.createVoiceMessageElement(url) 
@@ -842,7 +842,7 @@ export default class Utils {
         timeDiv.classList.add('ml-1.5', 'order-1')
  
         const timeText = document.createElement('p')
-        timeText.classList.add('hidden', 'flex', 'justify-end', 'outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
+        timeText.classList.add('hidden', 'flex', 'justify-end', 'outline-none', 'text-xs', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
         timeText.textContent = timestamp
 
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
@@ -896,7 +896,7 @@ export default class Utils {
         timeDiv.classList.add('ml-1.5', 'order-1')
  
         const timeText = document.createElement('p')
-        timeText.classList.add('hidden', 'flex', 'justify-end', 'outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
+        timeText.classList.add('hidden', 'flex', 'justify-end', 'outline-none', 'text-xs', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
         timeText.textContent = timestamp
 
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
@@ -954,7 +954,7 @@ export default class Utils {
         chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
  
         const chatContent = document.createElement('p')
-        chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
+        chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90')
         chatContent.setAttribute('tabindex', '0')
         chatContent.textContent = content
  
@@ -964,7 +964,7 @@ export default class Utils {
         timeContainer.classList.add('mr-4')
  
         const timeText = document.createElement('p')
-        timeText.classList.add('hidden', 'pl-12', 'outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
+        timeText.classList.add('hidden', 'pl-12', 'outline-none', 'text-xs', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
         timeText.textContent = timestamp
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
         mainDiv.append(timeText)  
@@ -1016,7 +1016,7 @@ export default class Utils {
         chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
  
         const chatContent = document.createElement('p')
-        chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70')
+        chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90')
         chatContent.setAttribute('tabindex', '0')
 
         const voiceElement = this.createVoiceMessageElement(url) 
@@ -1026,7 +1026,7 @@ export default class Utils {
         timeContainer.classList.add('mr-4')
  
         const timeText = document.createElement('p')
-        timeText.classList.add('hidden', 'pl-12', 'outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
+        timeText.classList.add('hidden', 'pl-12', 'outline-none', 'text-xs', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
         timeText.textContent = timestamp
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
         mainDiv.append(timeText) 
@@ -1085,7 +1085,7 @@ export default class Utils {
         timeContainer.classList.add('mr-4')
  
         const timeText = document.createElement('p')
-        timeText.classList.add('hidden', 'pl-12', 'outline-none', 'text-xs', 'text-black', 'opacity-60', 'dark:text-white', 'dark:opacity-70', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
+        timeText.classList.add('hidden', 'pl-12', 'outline-none', 'text-xs', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90', 'font-light', 'leading-4', 'tracking-[.01rem]', 'whitespace-pre')
         timeText.textContent = timestamp
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
         mainDiv.append(timeText)  
