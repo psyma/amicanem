@@ -707,13 +707,12 @@ export default class extends Controller {
         } 
     }
 
-    setEmojiPickerElement = () => {
+    setEmojiPickerElement = () => {   
+        const chatbox = document.getElementById('chatbox-message-input')
         document.querySelector('emoji-picker').addEventListener('emoji-click', (e) => {   
-            console.log(e)
-            //const str1 = chat_message.textContent.slice(0, this.chatMessageCaretPosition) + e.detail.unicode
-            //const str2 = chat_message.textContent.slice(this.chatMessageCaretPosition)
-            //chat_message.textContent = str1 + str2 
-            //this.chatMessageCaretPosition = str1.length
+            const caretPosition = Utils.saveCaretPosition(chatbox)
+            chatbox.innerHTML = chatbox.innerHTML.substring(0, caretPosition) + e.detail.unicode + chatbox.innerHTML.substring(caretPosition)
+            Utils.restoreCaretPosition(chatbox, caretPosition + e.detail.unicode.length)
         })
     }
 

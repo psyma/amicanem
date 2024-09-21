@@ -292,6 +292,39 @@ export default class Utils {
         return t >= (currentTime - milliseconds)
     }
 
+    static saveCaretPosition = (div) => {
+        let selection = window.getSelection()
+        let range = selection.getRangeAt(0)
+        let preCaretRange = range.cloneRange()
+        preCaretRange.selectNodeContents(div)
+        preCaretRange.setEnd(range.endContainer, range.endOffset)
+        
+        return preCaretRange.toString().length // Return caret's offset within the div
+    }
+    
+    static restoreCaretPosition = (div, offset) => {
+        let selection = window.getSelection()
+        let range = document.createRange()
+        let walker = document.createTreeWalker(div, NodeFilter.SHOW_TEXT, null, false)
+        let currentNode = walker.nextNode()
+        let currentOffset = 0
+    
+        while (currentNode) {
+            let nodeLength = currentNode.length
+            if (currentOffset + nodeLength >= offset) {
+                // We found the node where caret should be restored
+                range.setStart(currentNode, offset - currentOffset)
+                range.setEnd(currentNode, offset - currentOffset)
+                break
+            }
+            currentOffset += nodeLength
+            currentNode = walker.nextNode()
+        }
+    
+        selection.removeAllRanges()
+        selection.addRange(range)
+    }
+
     static getUserAgentPlatformType = () => {
         const browser = Bowser.getParser(window.navigator.userAgent); 
         return browser.parsedResult.platform.type  
