@@ -149,8 +149,8 @@ export default class extends Controller {
 
                 Utils.reOrderLastFourChatboxElements()
                 Utils.setChatboxMessageAvatarHidden()
-                Utils.setChatboxMessageBorderAndMargin()
                 Utils.setChatboxDividerTimestamp()
+                Utils.setChatboxMessageBorderAndMargin()
             }
 
             if (messageData.type == MessageType.TEXT) {
@@ -507,8 +507,8 @@ export default class extends Controller {
                         } 
 
                         Utils.setChatboxMessageAvatarHidden()
-                        Utils.setChatboxMessageBorderAndMargin()
                         Utils.setChatboxDividerTimestamp()
+                        Utils.setChatboxMessageBorderAndMargin()
 
                         setTimeout(() => {
                             firstChild.scrollIntoView({ behavior: "smooth", block: "end" })
@@ -603,8 +603,8 @@ export default class extends Controller {
         this.isLockInfiniteScrolling = false
         chatbox.removeChild(loader) 
         Utils.setChatboxMessageAvatarHidden()
-        Utils.setChatboxMessageBorderAndMargin() 
         Utils.setChatboxDividerTimestamp()
+        Utils.setChatboxMessageBorderAndMargin() 
         
         if (!hasMessages) {
             const user = this.usersMap.get(this.userToChatId)
@@ -745,8 +745,8 @@ export default class extends Controller {
 
         Utils.reOrderLastFourChatboxElements()
         Utils.setChatboxMessageAvatarHidden()
-        Utils.setChatboxMessageBorderAndMargin()  
         Utils.setChatboxDividerTimestamp()
+        Utils.setChatboxMessageBorderAndMargin()  
 
         const response = await this.service.createTextMessage(this.uidValue, `messages/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, this.currentUserValue.id, this.userToChatId, MessageType.TEXT, content, timestamp, true)
         const imgCheck = messageElement.querySelector('.img-check')

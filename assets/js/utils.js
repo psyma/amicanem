@@ -224,7 +224,7 @@ export default class Utils {
                 if (i != elements.length - 2) {
                     next.classList.add('mb-5') 
                 }
-            }
+            } 
         } 
     } 
     
@@ -235,7 +235,7 @@ export default class Utils {
        
         const dividerElements = chatbox.querySelectorAll('.divider-timestamp')
         dividerElements.forEach((element) => {
-            chatbox.removeChild(element)
+            chatbox.removeChild(element) 
         })
 
         let prevDate = null
