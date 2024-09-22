@@ -1,4 +1,5 @@
 import Bowser from 'bowser';
+import CryptoJS from 'crypto-js';
 import WaveSurfer from 'wavesurfer.js'
 import { Dropdown } from 'flowbite';
 
@@ -767,7 +768,24 @@ export default class Utils {
         return divContainer
     }
 
+    static setForwardUserUiDefaults = (usersMap) => {
+        usersMap.forEach((value, key) => {
+            const userId = key
+            const forwardUserSvgSent = document.getElementById(`forward-user-svg-sent-${userId}`)
+            const forwardUserSvgDefault = document.getElementById(`forward-user-svg-default-${userId}`)
+            const forwardUserSpanText = document.getElementById(`forward-user-span-text-${userId}`)
+            const forwadUserButton = document.getElementById(`forward-user-button-${userId}`)
+
+            forwadUserButton.removeAttribute('disabled')
+            forwadUserButton.classList.remove("cursor-not-allowed")
+            forwardUserSvgSent.classList.add('hidden')
+            forwardUserSvgDefault.classList.remove('hidden')
+            forwardUserSpanText.textContent = 'Send'
+        })
+    }
+
     static createVerticalThreeDotsOptionsElement = (placement, type, isIncomingMessage=false) => { 
+        const myThis = this
         function getRootParent(node) {
             let current = node
     
@@ -808,6 +826,7 @@ export default class Utils {
                 buttons.push({ label: 'Delete Message', iconPath: 'M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0'})
             } 
 
+            
             // Create buttons 
             buttons.forEach(button => { 
                 const btn = document.createElement('button');  
@@ -838,19 +857,49 @@ export default class Utils {
                 btn.appendChild(icon);
                 btn.appendChild(document.createTextNode(button.label))
 
-                btn.onclick = async () => {   
+                
+                btn.onclick = async () => {    
+                    dropdown.hide()     
+
                     if (button.label == 'Reply') {
 
                     }
                     else if (button.label == 'Copy') { 
                         const messageElement = getRootParent(btn)
                         const messageData = JSON.parse(messageElement.getAttribute('messageData')) 
-                        await messageElement.copyTextMessageCallback(messageData.content) 
-                        
-                        dropdown.hide()       
+                        await messageElement.copyTextMessageCallback(messageData.content)   
                     }
                     else if (button.label == 'Forward') {
+                        const forwardButtonTrigger = document.getElementById('static-modal-forward-users-list-button')
+                        const messageElement = getRootParent(btn)
+                        const messageData = JSON.parse(messageElement.getAttribute('messageData'))  
+                        
+                        forwardButtonTrigger.click()
+                        if (type == MessageType.TEXT) {
+                            messageElement.forwardMessageCallback(type, messageData.content, null, null, null, null, null, null, null)
+                        }
+                        else if (type == MessageType.AUDIO) {
+                            const response = await fetch(messageData.content)
+                            const blob = await response.blob() 
+                            messageElement.forwardMessageCallback(type, null, blob, null, null, null, null, null, null)
+                        }
+                        else if (type == MessageType.IMAGE) { 
+                            const response = await fetch(messageData.content)
+                            const blob = await response.blob() 
 
+                            const img = document.createElement('img')
+                            img.src = URL.createObjectURL(blob) 
+                            
+                            img.onload = () => {
+                                const width = img.width
+                                const height = img.height
+                                const mimeType = blob.type
+                                const extension = mimeType.split("/")[1]
+                                const input = CryptoJS.MD5(myThis.generateRandomString(16)).toString() + "." + extension
+                                const output = CryptoJS.MD5(myThis.generateRandomString(16)).toString() + "." + extension
+                                messageElement.forwardMessageCallback(type, null, blob, input, width, height, mimeType, extension, output)
+                            }
+                        } 
                     }
                     else if (button.label == 'Delete Message') {
 

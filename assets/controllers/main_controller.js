@@ -16,8 +16,7 @@ import heic2any from 'heic2any';
 
 import en from 'javascript-time-ago/locale/en'
 import 'emoji-picker-element'
-import 'viewerjs/dist/viewer.css'
-import 'viewerjs/dist/viewer.css'
+import 'viewerjs/dist/viewer.css' 
 
 class MessageType {
     static TEXT = 0
@@ -67,7 +66,16 @@ export default class extends Controller {
         this.usersMap = new Map() 
         this.toSendImagesMap = new Map()
         this.ffmpeg = new FFmpeg()
-        this.viewer = new Viewer(document.getElementById("viewerjs-images-container")) 
+        this.viewer = new Viewer(document.getElementById("viewerjs-images-container"))  
+        this.forwardUserMessageType = null
+        this.forwardUserMessageContent = null
+        this.forwardUserMessageBlob = null
+        this.forwardUserMessageInput = null
+        this.forwardUserMessageWidth = null
+        this.forwardUserMessageHeight = null
+        this.forwardUserMessageMimeType = null
+        this.forwardUserMessageExtension = null
+        this.forwardUserMessageOutput = null
 
         await this.ffmpeg.load({
             coreURL: await toBlobURL('/ffmpeg-core.js', 'text/javascript'),
@@ -90,9 +98,10 @@ export default class extends Controller {
             this.setVoiceChatRecording()
             this.setChatboxEventListener() 
 
-            users.forEach(async(user) => {
+            users.forEach(async(user) => { 
                 this.usersMap.set(user.id, user)
 
+                this.setForwardUserId(user)
                 await this.setSidebarUserClickEvent(user)
                 await this.setUserPusherMessagesChannel(user) 
             }) 
@@ -101,8 +110,6 @@ export default class extends Controller {
             await this.setUserLastMessage()
             await this.setChatboxInfiniteScrolling()
         }     
-
-        
     } 
 
     setEncryptionDetails = async () => {   
@@ -148,6 +155,7 @@ export default class extends Controller {
                 messageElement.setAttribute('messageId', id)
                 messageElement.setAttribute('messageData', JSON.stringify(messageData))
                 messageElement.copyTextMessageCallback = this.copyTextMessageCallback
+                messageElement.forwardMessageCallback = this.forwardMessageCallback
 
                 this.chatboxScrollToBottom()
                 chatbox.appendChild(messageElement)
@@ -417,22 +425,26 @@ export default class extends Controller {
 
                     Utils.setUserLastMessageTimestamp(messageData.receiver, messageData.timestamp)
                     Utils.setUserLastMessageTimeAgo(messageData.receiver, messageData.timestamp, this.timeAgo)
-                } catch(e) { 
-                    const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver))
-                    if (messageData.type == MessageType.TEXT) {
-                        Utils.setUserLastMessageContent(messageData.sender, messageData.content) 
-                    } 
-                    else if (messageData.type == MessageType.AUDIO) {
-                        const firstname = this.usersMap.get(messageData.sender).userDetails.firstname
-                        Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent an audio') 
-                    }
-                    else if (messageData.type == MessageType.IMAGE) {
-                        const firstname = this.usersMap.get(messageData.sender).userDetails.firstname
-                        Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent an image') 
-                    }
+                } catch(e) {  
+                    try{
 
-                    Utils.setUserLastMessageTimestamp(messageData.sender, messageData.timestamp)
-                    Utils.setUserLastMessageTimeAgo(messageData.sender, messageData.timestamp, this.timeAgo)
+                        const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver)) 
+                        if (messageData.type == MessageType.TEXT) {
+                            Utils.setUserLastMessageContent(messageData.sender, messageData.content) 
+                        } 
+                        else if (messageData.type == MessageType.AUDIO) {
+                            const firstname = this.usersMap.get(messageData.sender).userDetails.firstname
+                            Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent an audio') 
+                        }
+                        else if (messageData.type == MessageType.IMAGE) {
+                            const firstname = this.usersMap.get(messageData.sender).userDetails.firstname
+                            Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent an image') 
+                        }
+                        
+                        Utils.setUserLastMessageTimestamp(messageData.sender, messageData.timestamp)
+                        Utils.setUserLastMessageTimeAgo(messageData.sender, messageData.timestamp, this.timeAgo) 
+                    }catch(ee) { 
+                    }
                 }
             } 
         }
@@ -501,6 +513,7 @@ export default class extends Controller {
                                 messageElement.setAttribute('messageId', id)
                                 messageElement.setAttribute('messageData', JSON.stringify(messageData))
                                 messageElement.copyTextMessageCallback = this.copyTextMessageCallback
+                                messageElement.forwardMessageCallback = this.forwardMessageCallback
 
                                 chatbox.prepend(messageElement)
                                 const imgCheck = messageElement.querySelector('.img-check')
@@ -524,6 +537,7 @@ export default class extends Controller {
                                 messageElement.setAttribute('messageId', id)
                                 messageElement.setAttribute('messageData', JSON.stringify(messageData))
                                 messageElement.copyTextMessageCallback = this.copyTextMessageCallback
+                                messageElement.forwardMessageCallback = this.forwardMessageCallback
 
                                 chatbox.prepend(messageElement) 
                             }
@@ -553,6 +567,31 @@ export default class extends Controller {
         await this.sleep(1)
     }
 
+    setForwardUserId = (user) => {
+        const forwardUserSvgSent = document.getElementById(`forward-user-svg-sent-${user.id}`)
+        const forwardUserSvgDefault = document.getElementById(`forward-user-svg-default-${user.id}`)
+        const forwardUserSpanText = document.getElementById(`forward-user-span-text-${user.id}`)
+        const forwadUserButton = document.getElementById(`forward-user-button-${user.id}`)
+
+        forwadUserButton.onclick = async () => {   
+            forwadUserButton.setAttribute('disabled', '')
+            forwadUserButton.classList.add("cursor-not-allowed")
+            forwardUserSvgSent.classList.remove('hidden')
+            forwardUserSvgDefault.classList.add('hidden')
+            forwardUserSpanText.textContent = 'Sent'
+
+            if (this.forwardUserMessageType == MessageType.TEXT) {
+                await this.sendTextMessage(user.id, this.forwardUserMessageContent)
+            }
+            else if (this.forwardUserMessageType == MessageType.AUDIO) {
+                await this.sendVoiceMessage(user.id, this.forwardUserMessageBlob)
+            }
+            else if (this.forwardUserMessageType == MessageType.IMAGE) {
+                await this.sendImageMessage(user.id, this.forwardUserMessageBlob, this.forwardUserMessageInput, this.forwardUserMessageWidth, this.forwardUserMessageHeight, this.forwardUserMessageMimeType, this.forwardUserMessageExtension, this.forwardUserMessageOutput)
+            } 
+        }
+    }
+
     setDefaultValues = () => {
         this.page = 1 
         this.isReceivedFirstMessage = false
@@ -565,16 +604,18 @@ export default class extends Controller {
         await navigator.clipboard.writeText(content)
     }
 
-    forwardMessageCallback = async (sender, receiver, content, type) => {
-        if (type == MessageType.TEXT) {
+    forwardMessageCallback = (type, message, blob, input, width, height, mimeType, extension, output) => {
+        this.forwardUserMessageType = type
+        this.forwardUserMessageContent = message
+        this.forwardUserMessageBlob = blob
+        this.forwardUserMessageInput = input
+        this.forwardUserMessageWidth = width
+        this.forwardUserMessageHeight = height
+        this.forwardUserMessageMimeType = mimeType
+        this.forwardUserMessageExtension = extension
+        this.forwardUserMessageOutput = output 
 
-        }
-        else if (type == MessageType.AUDIO) {
-
-        }
-        else if (type == MessageType.IMAGE) {
-            
-        }
+        Utils.setForwardUserUiDefaults(this.usersMap)
     }
     
     setConversations = async () => {   
@@ -616,6 +657,7 @@ export default class extends Controller {
                     messageElement.setAttribute('messageId', id)
                     messageElement.setAttribute('messageData', JSON.stringify(messageData))
                     messageElement.copyTextMessageCallback = this.copyTextMessageCallback
+                    messageElement.forwardMessageCallback = this.forwardMessageCallback
 
                     chatbox.appendChild(messageElement)
                     const imgCheck = messageElement.querySelector('.img-check')
@@ -638,6 +680,7 @@ export default class extends Controller {
                     messageElement.setAttribute('messageId', id)
                     messageElement.setAttribute('messageData', JSON.stringify(messageData))
                     messageElement.copyTextMessageCallback = this.copyTextMessageCallback
+                    messageElement.forwardMessageCallback = this.forwardMessageCallback
 
                     chatbox.appendChild(messageElement)  
                 }
@@ -779,15 +822,17 @@ export default class extends Controller {
         mainChatboxIntro.classList.add('hidden') 
     } 
 
-    setSentMessage = async (content, messageElement, message, type, timestamp, oldMessageElement=null) => {
+    setSentMessage = async (receiver, content, messageElement, message, type, timestamp, oldMessageElement=null) => {
         const chatbox = document.getElementById('chatbox') 
         
-        this.chatboxScrollToBottom(true)
-        if (oldMessageElement) {
-            chatbox.replaceChild(messageElement, oldMessageElement)
-        }
-        else {
-            chatbox.appendChild(messageElement) 
+        this.chatboxScrollToBottom(true) 
+        if (parseInt(this.userToChatId) == parseInt(receiver)) {
+            if (oldMessageElement) {
+                chatbox.replaceChild(messageElement, oldMessageElement)
+            }
+            else {
+                chatbox.appendChild(messageElement) 
+            }
         }
 
         Utils.reOrderLastFourChatboxElements()
@@ -795,7 +840,7 @@ export default class extends Controller {
         Utils.setChatboxDividerTimestamp()
         Utils.setChatboxMessageBorderAndMargin()  
 
-        const response = await this.service.createTextMessage(this.uidValue, `messages/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, this.currentUserValue.id, this.userToChatId, MessageType.TEXT, content, timestamp, true)
+        const response = await this.service.createTextMessage(this.uidValue, `messages/${this.currentUserValue.id}/${receiver}`, `${this.currentUserValue.id}-${receiver}`, this.currentUserValue.id, receiver, MessageType.TEXT, content, timestamp, true)
         const imgCheck = messageElement.querySelector('.img-check')
         if (response.ok) { 
             const messageData = await response.json()
@@ -803,17 +848,17 @@ export default class extends Controller {
             messageElement.setAttribute('messageId', id)
          
             if (type == MessageType.TEXT) {
-                Utils.setUserLastMessageContent(this.userToChatId, message) 
+                Utils.setUserLastMessageContent(receiver, message) 
             }
             else if (type == MessageType.AUDIO) {
-                Utils.setUserLastMessageContent(this.userToChatId, 'You sent an audio') 
+                Utils.setUserLastMessageContent(receiver, 'You sent an audio') 
             }
             else if (type == MessageType.IMAGE) {
-                Utils.setUserLastMessageContent(this.userToChatId, 'You sent an image') 
+                Utils.setUserLastMessageContent(receiver, 'You sent an image') 
             }
-            Utils.setUserLastMessageTimestamp(this.userToChatId, timestamp)
-            Utils.setUserLastMessageTimeAgo(this.userToChatId, timestamp, this.timeAgo)
-            Utils.reOrderUsersListIfNewMessageIsBeingSentOrReceived(this.userToChatId)
+            Utils.setUserLastMessageTimestamp(receiver, timestamp)
+            Utils.setUserLastMessageTimeAgo(receiver, timestamp, this.timeAgo)
+            Utils.reOrderUsersListIfNewMessageIsBeingSentOrReceived(receiver)
             imgCheck.src = '/green_checks.svg'
         }
         else {
@@ -821,7 +866,7 @@ export default class extends Controller {
         }
     }
 
-    sendTextMessage = async (message) => {
+    sendTextMessage = async (receiver, message) => {
         const chatboxMessageInput = document.getElementById('chatbox-message-input')
         
         chatboxMessageInput.textContent = ''
@@ -830,14 +875,15 @@ export default class extends Controller {
 
         const data = JSON.stringify({
             sender: this.currentUserValue.id,
-            receiver: this.userToChatId,
+            receiver: receiver,
             type: type,
             content: message,
             timestamp: timestamp
         })
 
+        const userTochatPublickey = Utils.base64ToArrayBuffer(this.usersMap.get(receiver).userDetails.publickey.publickey)
         const encryptedSenderTextMessage = await Utils.encryptMessage(this.currentUserPublickey, data)
-        const encryptedReceiverTextMessage = await Utils.encryptMessage(this.userTochatPublickey, data) 
+        const encryptedReceiverTextMessage = await Utils.encryptMessage(userTochatPublickey, data) 
         const content = btoa(JSON.stringify({
             sender: encryptedSenderTextMessage,
             receiver: encryptedReceiverTextMessage
@@ -846,10 +892,11 @@ export default class extends Controller {
         const messageElement = Utils.createOutgoingMessageTextElement(message, timestamp, this.timeAgo)
         messageElement.setAttribute('messageData', data)
         messageElement.copyTextMessageCallback = this.copyTextMessageCallback
-        await this.setSentMessage(content, messageElement, message, type, timestamp)
+        messageElement.forwardMessageCallback = this.forwardMessageCallback
+        await this.setSentMessage(receiver, content, messageElement, message, type, timestamp)
     } 
 
-    sendVoiceMessage = async (blob) => { 
+    sendVoiceMessage = async (receiver, blob) => { 
         this.audioBlob = null
   
         const voiceChatRecordDelete = document.getElementById('voicechat-record-delete')
@@ -861,7 +908,9 @@ export default class extends Controller {
         const chatbox = document.getElementById('chatbox') 
         const messageTempElement = Utils.createOutgoingMessageVoiceElement(url, Date.now(), this.timeAgo)
         this.chatboxScrollToBottom(true)
-        chatbox.appendChild(messageTempElement) 
+        if (parseInt(this.userToChatId) == parseInt(receiver)) { 
+            chatbox.appendChild(messageTempElement) 
+        }
  
         await this.ffmpeg.writeFile('input.webm', new Uint8Array(await blob.arrayBuffer()))
         await this.ffmpeg.exec(['-i', 'input.webm', '-c:a', 'libopus', '-b:a', '0', 'output.webm']);
@@ -874,25 +923,29 @@ export default class extends Controller {
 
             const data = JSON.stringify({
                 sender: this.currentUserValue.id,
-                receiver: this.userToChatId,
+                receiver: receiver,
                 type: type,
                 content: response.data,
                 timestamp: timestamp
-            })
+            }) 
 
+            const userTochatPublickey = Utils.base64ToArrayBuffer(this.usersMap.get(receiver).userDetails.publickey.publickey)
             const encryptedSenderTextMessage = await Utils.encryptMessage(this.currentUserPublickey, data)
-            const encryptedReceiverTextMessage = await Utils.encryptMessage(this.userTochatPublickey, data) 
+            const encryptedReceiverTextMessage = await Utils.encryptMessage(userTochatPublickey, data) 
             const content = btoa(JSON.stringify({
                 sender: encryptedSenderTextMessage,
                 receiver: encryptedReceiverTextMessage
             }))
  
             const messageElement = Utils.createOutgoingMessageVoiceElement(url, timestamp, this.timeAgo)
-            await this.setSentMessage(content, messageElement, null, type, timestamp, messageTempElement)
+            messageElement.setAttribute('messageData', data)
+            messageElement.copyTextMessageCallback = this.copyTextMessageCallback
+            messageElement.forwardMessageCallback = this.forwardMessageCallback
+            await this.setSentMessage(receiver, content, messageElement, null, type, timestamp, messageTempElement)
         }
     }
 
-    sendImageMessage = async (blob, input, width, height, mimeType, extension, output) => {
+    sendImageMessage = async (receiver, blob, input, width, height, mimeType, extension, output) => {
         let file = null 
         let url = URL.createObjectURL(blob)
 
@@ -921,7 +974,9 @@ export default class extends Controller {
         const chatbox = document.getElementById('chatbox') 
         const messageTempElement = Utils.createOutgoingMessageImageElement(url, Date.now(), this.timeAgo)  
         this.chatboxScrollToBottom(true)
-        chatbox.appendChild(messageTempElement) 
+        if (parseInt(this.userToChatId) == parseInt(receiver)) {
+            chatbox.appendChild(messageTempElement) 
+        }
 
         const response = await this.service.createImageMessage(this.uidValue, file, extension == 'heic' ? 'jpeg' : extension, messageTempElement, Utils.progressSvgElementCallback)
         if (response.status == 200) { 
@@ -930,22 +985,26 @@ export default class extends Controller {
 
             const data = JSON.stringify({
                 sender: this.currentUserValue.id,
-                receiver: this.userToChatId,
+                receiver: receiver,
                 type: type,
                 content: response.data,
                 timestamp: timestamp
             })
 
+            const userTochatPublickey = Utils.base64ToArrayBuffer(this.usersMap.get(receiver).userDetails.publickey.publickey)
             const encryptedSenderTextMessage = await Utils.encryptMessage(this.currentUserPublickey, data)
-            const encryptedReceiverTextMessage = await Utils.encryptMessage(this.userTochatPublickey, data) 
+            const encryptedReceiverTextMessage = await Utils.encryptMessage(userTochatPublickey, data) 
             const content = btoa(JSON.stringify({
                 sender: encryptedSenderTextMessage,
                 receiver: encryptedReceiverTextMessage
             })) 
 
             const messageElement = Utils.createOutgoingMessageImageElement(url, timestamp, this.timeAgo) 
+            messageElement.setAttribute('messageData', data)
+            messageElement.copyTextMessageCallback = this.copyTextMessageCallback
+            messageElement.forwardMessageCallback = this.forwardMessageCallback
             Utils.setViewerJsImageElement(messageElement, this.viewer)
-            await this.setSentMessage(content, messageElement, null, type, timestamp, messageTempElement) 
+            await this.setSentMessage(receiver, content, messageElement, null, type, timestamp, messageTempElement) 
         }
     }
 
@@ -1072,7 +1131,7 @@ export default class extends Controller {
         sendTextButton.onclick = async () => {
             const message = chatboxMessageInput.innerText.trim()  
             if (!this.isEmptyOrSpaces(message)) { 
-                await this.sendTextMessage(message)
+                await this.sendTextMessage(this.userToChatId, message)
             }  
         }
     }
@@ -1081,7 +1140,7 @@ export default class extends Controller {
         const sendVoiceButton = document.getElementById('send-voice-button')
         sendVoiceButton.onclick = async () => {  
             if(this.audioBlob != null && !this.isVoiceRecording) {  
-                await this.sendVoiceMessage(this.audioBlob)
+                await this.sendVoiceMessage(this.userToChatId, this.audioBlob)
             }
         }
     }
@@ -1107,7 +1166,7 @@ export default class extends Controller {
                 const extension = mimeType.split("/")[1] 
                 const output = CryptoJS.MD5(Utils.generateRandomString(16)).toString() + "." + extension
                 
-                await this.sendImageMessage(blob, input, width, height, mimeType, extension, output)
+                await this.sendImageMessage(this.userToChatId, blob, input, width, height, mimeType, extension, output)
             })
 
             Utils.unHideMediaGroup()
@@ -1132,7 +1191,7 @@ export default class extends Controller {
                     e.preventDefault()
                     
                     if (!this.isEmptyOrSpaces(message)) {
-                        await this.sendTextMessage(message)
+                        await this.sendTextMessage(this.userToChatId, message)
                     } 
                 }
             }
