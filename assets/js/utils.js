@@ -843,9 +843,9 @@ export default class Utils {
 
                     }
                     else if (button.label == 'Copy') {
-                        const rootNode = getRootParent(btn)
-                        const messageData = JSON.parse(rootNode.getAttribute('messageData'))
-                        await navigator.clipboard.writeText(messageData.content)
+                        const messageElement = getRootParent(btn)
+                        const messageData = JSON.parse(messageElement.getAttribute('messageData')) 
+                        await messageElement.copyTextContentCallback(messageData.content)
 
                         dropdown.hide() 
                     }

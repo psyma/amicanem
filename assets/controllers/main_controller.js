@@ -145,9 +145,11 @@ export default class extends Controller {
                     Utils.setViewerJsImageElement(messageElement, this.viewer)
                 }
 
-                this.chatboxScrollToBottom()
                 messageElement.setAttribute('messageId', id)
                 messageElement.setAttribute('messageData', JSON.stringify(messageData))
+                messageElement.copyTextContentCallback = this.copyTextContentCallback
+
+                this.chatboxScrollToBottom()
                 chatbox.appendChild(messageElement)
 
                 Utils.reOrderLastFourChatboxElements()
@@ -498,6 +500,8 @@ export default class extends Controller {
 
                                 messageElement.setAttribute('messageId', id)
                                 messageElement.setAttribute('messageData', JSON.stringify(messageData))
+                                messageElement.copyTextContentCallback = this.copyTextContentCallback
+
                                 chatbox.prepend(messageElement)
                                 const imgCheck = messageElement.querySelector('.img-check')
                                 imgCheck.src = '/green_checks.svg'  
@@ -519,6 +523,8 @@ export default class extends Controller {
                                 
                                 messageElement.setAttribute('messageId', id)
                                 messageElement.setAttribute('messageData', JSON.stringify(messageData))
+                                messageElement.copyTextContentCallback = this.copyTextContentCallback
+
                                 chatbox.prepend(messageElement) 
                             }
                         } 
@@ -555,7 +561,13 @@ export default class extends Controller {
         document.getElementById("viewerjs-images-container").innerHTML = '' 
     } 
 
+    copyTextContentCallback = async (text) => {
+        await navigator.clipboard.writeText(text)
+    }
+    
     setConversations = async () => {  
+       
+
         function clearChatboxElement() { 
             const chatbox = document.getElementById('chatbox') 
             const element = document.createElement('div')
@@ -593,6 +605,8 @@ export default class extends Controller {
                     
                     messageElement.setAttribute('messageId', id)
                     messageElement.setAttribute('messageData', JSON.stringify(messageData))
+                    messageElement.copyTextContentCallback = this.copyTextContentCallback
+
                     chatbox.appendChild(messageElement)
                     const imgCheck = messageElement.querySelector('.img-check')
                     imgCheck.src = '/green_checks.svg'  
@@ -613,6 +627,8 @@ export default class extends Controller {
                     
                     messageElement.setAttribute('messageId', id)
                     messageElement.setAttribute('messageData', JSON.stringify(messageData))
+                    messageElement.copyTextContentCallback = this.copyTextContentCallback
+
                     chatbox.appendChild(messageElement)  
                 }
             } 
@@ -819,6 +835,7 @@ export default class extends Controller {
 
         const messageElement = Utils.createOutgoingMessageTextElement(message, timestamp, this.timeAgo)
         messageElement.setAttribute('messageData', data)
+        messageElement.copyTextContentCallback = this.copyTextContentCallback
         await this.setSentMessage(content, messageElement, message, type, timestamp)
     } 
 
