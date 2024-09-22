@@ -767,9 +767,9 @@ export default class Utils {
         return divContainer
     }
 
-    static createVerticalThreeDotsOptionsElement = (placement, type, isIncomingMessage=false) => {
+    static createVerticalThreeDotsOptionsElement = (placement, type, isIncomingMessage=false) => { 
         function getRootParent(node) {
-            let current = node;
+            let current = node
     
             while (current.parentNode) {
                 if (current.getAttribute('messageId')) {
@@ -779,16 +779,19 @@ export default class Utils {
                 current = current.parentNode;
             }
         
-            return current;
-        }
-        function createDropdownElement() {
+            return current
+        } 
+
+        function createDropdownElement(options, placement) { 
             // Create the dropdown container
-            const dropdownDiv = document.createElement('div');
-            dropdownDiv.classList.add('hidden', 'top-0', 'absolute', 'z-[100]', 'w-[12.5rem]', 'mt-2', 'rounded-sm', 'bg-white', 'dark:bg-gray-800', 'shadow-lg', 'border', 'border-gray-100', 'dark:border-gray-600', 'focus:outline-none');
-            dropdownDiv.setAttribute('role', 'menu');
-            dropdownDiv.setAttribute('aria-orientation', 'vertical');
-            dropdownDiv.setAttribute('aria-labelledby', 'menu-button');
-            dropdownDiv.setAttribute('tabindex', '-1'); 
+            const dropdownDiv = document.createElement('div')
+            const dropdown = new Dropdown(dropdownDiv, options, { placement: placement }) 
+
+            dropdownDiv.classList.add('hidden', 'top-0', 'absolute', 'z-[100]', 'w-[12.5rem]', 'mt-2', 'rounded-sm', 'bg-white', 'dark:bg-gray-800', 'shadow-lg', 'border', 'border-gray-100', 'dark:border-gray-600', 'focus:outline-none')
+            dropdownDiv.setAttribute('role', 'menu')
+            dropdownDiv.setAttribute('aria-orientation', 'vertical')
+            dropdownDiv.setAttribute('aria-labelledby', 'menu-button')
+            dropdownDiv.setAttribute('tabindex', '-1')
 
             // List of button items
             const buttons = [
@@ -805,49 +808,46 @@ export default class Utils {
                 buttons.push({ label: 'Delete Message', iconPath: 'M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0'})
             } 
 
-            // Create buttons
+            // Create buttons 
             buttons.forEach(button => { 
-                const btn = document.createElement('button');
-                btn.classList.add('w-full', 'px-4', 'py-3', 'flex', 'items-center', 'border-b', 'opacity-60', 'dark:opacity-70', 'outline-none', 'text-sm', 'border-gray-200', 'dark:border-gray-600', 'transition-all', 'duration-200', 'text-black',   'hover:bg-gray-50', 'dark:hover:bg-gray-600', 'active:bg-gray-100', 'dark:focus:bg-gray-600');
+                const btn = document.createElement('button');  
+                btn.classList.add('w-full', 'px-4', 'py-3', 'flex', 'items-center', 'border-b', 'opacity-60', 'dark:opacity-70', 'outline-none', 'text-sm', 'border-gray-200', 'dark:border-gray-600', 'transition-all', 'duration-200', 'text-black',   'hover:bg-gray-50', 'dark:hover:bg-gray-600', 'active:bg-gray-100', 'dark:focus:bg-gray-600')
 
                 if (button.label === 'Delete Message') {
-                    btn.classList.add('text-red-500', 'hover:bg-red-50', 'dark:hover:text-red-50', 'active:bg-red-100', 'dark:hover:bg-red-900'); 
+                    btn.classList.add('text-red-500', 'hover:bg-red-50', 'dark:hover:text-red-50', 'active:bg-red-100', 'dark:hover:bg-red-900')
                 }
                 else {
                     btn.classList.add('dark:text-white')
                 }
 
-                const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                icon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-                icon.setAttribute('fill', 'none');
-                icon.setAttribute('viewBox', '0 0 24 24');
-                icon.setAttribute('stroke-width', '1.5');
-                icon.setAttribute('stroke', 'currentColor');
-                icon.setAttribute('aria-hidden', 'true');
-                icon.classList.add('h-5', 'w-5', 'mr-3'); 
+                const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+                icon.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+                icon.setAttribute('fill', 'none')
+                icon.setAttribute('viewBox', '0 0 24 24')
+                icon.setAttribute('stroke-width', '1.5')
+                icon.setAttribute('stroke', 'currentColor')
+                icon.setAttribute('aria-hidden', 'true')
+                icon.classList.add('h-5', 'w-5', 'mr-3')
                
-
-                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                path.setAttribute('stroke-linecap', 'round');
-                path.setAttribute('stroke-linejoin', 'round');
-                path.setAttribute('d', button.iconPath);
-                icon.appendChild(path);
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+                path.setAttribute('stroke-linecap', 'round')
+                path.setAttribute('stroke-linejoin', 'round')
+                path.setAttribute('d', button.iconPath)
+                icon.appendChild(path)
 
                 btn.appendChild(icon);
-                btn.appendChild(document.createTextNode(button.label));
+                btn.appendChild(document.createTextNode(button.label))
 
-                dropdownDiv.appendChild(btn);
-
-                btn.onclick = async () => {
+                btn.onclick = async () => {   
                     if (button.label == 'Reply') {
 
                     }
-                    else if (button.label == 'Copy') {
+                    else if (button.label == 'Copy') { 
                         const messageElement = getRootParent(btn)
                         const messageData = JSON.parse(messageElement.getAttribute('messageData')) 
-                        await messageElement.copyTextMessageCallback(messageData.content)
-
-                        dropdown.hide() 
+                        await messageElement.copyTextMessageCallback(messageData.content) 
+                        
+                        dropdown.hide()       
                     }
                     else if (button.label == 'Forward') {
 
@@ -856,9 +856,12 @@ export default class Utils {
 
                     }
                 }
+
+                dropdownDiv.appendChild(btn);
             });
 
-            return dropdownDiv
+            
+            return [dropdownDiv, dropdown]
         }
 
         const options = document.createElement('div')
@@ -876,19 +879,18 @@ export default class Utils {
 
         // Append the path to the SVG
         svg.appendChild(path)
-
-        const dropdownElement = createDropdownElement()
-        const dropdown = new Dropdown(dropdownElement, options, { placement: placement })
-
+        
+        const [dropdownElement, dropdown] = createDropdownElement(options, placement)
+        
         options.classList.add('invisible', 'cursor-pointer') 
         options.appendChild(svg) 
-        options.appendChild(dropdownElement)
+        //options.appendChild(dropdownElement)
 
-        options.onclick = () => {
-            dropdown.show()
-        }
+        options.onclick = () => { 
+            dropdown.show()    
+        } 
 
-        return options
+        return [options, dropdownElement]
     }
 
     static createOutgoingMessageTextElement = (content, timestamp, timeAgo) => {  
@@ -928,7 +930,7 @@ export default class Utils {
         mainDiv.appendChild(timeText) 
         
         const divOptions = document.createElement('div')  
-        const options = this.createVerticalThreeDotsOptionsElement('top-end', MessageType.TEXT)
+        const [options, dropdownElement] = this.createVerticalThreeDotsOptionsElement ('top-end', MessageType.TEXT)
 
         divOptions.style.height = '100%'
         divOptions.classList.add('flex', 'flex-col', 'justify-between', 'items-center')
@@ -939,6 +941,7 @@ export default class Utils {
         
         divOptions.appendChild(options)
         divOptions.appendChild(img)
+        divOptions.appendChild(dropdownElement)
           
         flexItemsDiv.appendChild(chatMessageContainer)
         flexItemsDiv.appendChild(timeDiv)
@@ -995,7 +998,7 @@ export default class Utils {
         mainDiv.appendChild(timeText) 
 
         const divOptions = document.createElement('div')  
-        const options = this.createVerticalThreeDotsOptionsElement('top-end', MessageType.AUDIO)
+        const [options, dropdownElement] = this.createVerticalThreeDotsOptionsElement ('top-end', MessageType.AUDIO)
 
         divOptions.style.height = '100%'
         divOptions.classList.add('flex', 'flex-col', 'justify-between', 'items-center')
@@ -1006,6 +1009,7 @@ export default class Utils {
 
         divOptions.appendChild(options)
         divOptions.appendChild(img)
+        divOptions.appendChild(dropdownElement)
  
         flexItemsDiv.appendChild(chatMessageContainer)
         flexItemsDiv.appendChild(timeDiv)
@@ -1059,7 +1063,7 @@ export default class Utils {
         mainDiv.appendChild(timeText) 
 
         const divOptions = document.createElement('div')  
-        const options = this.createVerticalThreeDotsOptionsElement('top-end', MessageType.IMAGE)
+        const [options, dropdownElement] = this.createVerticalThreeDotsOptionsElement ('top-end', MessageType.IMAGE)
 
         divOptions.style.height = '100%'
         divOptions.classList.add('flex', 'flex-col', 'justify-between', 'items-center')
@@ -1070,6 +1074,7 @@ export default class Utils {
 
         divOptions.appendChild(options)
         divOptions.appendChild(img)
+        divOptions.appendChild(dropdownElement)
           
         flexItemsDiv.appendChild(chatMessageContainer)
         flexItemsDiv.appendChild(timeDiv)
@@ -1134,7 +1139,7 @@ export default class Utils {
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
         mainDiv.append(timeText)  
         
-        const options = this.createVerticalThreeDotsOptionsElement('top-start', MessageType.TEXT, true)
+        const [options, dropdownElement] = this.createVerticalThreeDotsOptionsElement ('top-start', MessageType.TEXT, true)
 
         chatContainer.appendChild(chatMessageContainer)
         chatContainer.appendChild(timeContainer)
@@ -1142,6 +1147,7 @@ export default class Utils {
         flexDiv.appendChild(avatarDivContainer)
         flexDiv.appendChild(chatContainer)
         flexDiv.appendChild(options)
+        flexDiv.appendChild(dropdownElement)
  
         innerDiv1.appendChild(flexDiv)
  
@@ -1199,7 +1205,7 @@ export default class Utils {
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
         mainDiv.append(timeText) 
  
-        const options = this.createVerticalThreeDotsOptionsElement('top-start', MessageType.AUDIO, true)
+        const [options, dropdownElement] = this.createVerticalThreeDotsOptionsElement ('top-start', MessageType.AUDIO, true)
 
         chatContainer.appendChild(chatMessageContainer)
         chatContainer.appendChild(timeContainer)
@@ -1207,6 +1213,7 @@ export default class Utils {
         flexDiv.appendChild(avatarDivContainer)
         flexDiv.appendChild(chatContainer)
         flexDiv.appendChild(options)
+        flexDiv.appendChild(dropdownElement)
  
         innerDiv1.appendChild(flexDiv)
  
@@ -1261,7 +1268,7 @@ export default class Utils {
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
         mainDiv.append(timeText)  
         
-        const options = this.createVerticalThreeDotsOptionsElement('top-start', MessageType.IMAGE, true)
+        const [options, dropdownElement] = this.createVerticalThreeDotsOptionsElement ('top-start', MessageType.IMAGE, true)
 
         chatContainer.appendChild(chatMessageContainer)
         chatContainer.appendChild(timeContainer)
@@ -1269,6 +1276,7 @@ export default class Utils {
         flexDiv.appendChild(avatarDivContainer)
         flexDiv.appendChild(chatContainer)
         flexDiv.appendChild(options)
+        flexDiv.appendChild(dropdownElement)
  
         innerDiv1.appendChild(flexDiv)
  
