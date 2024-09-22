@@ -768,14 +768,27 @@ export default class Utils {
     }
 
     static createVerticalThreeDotsOptionsElement = (placement, type, isIncomingMessage=false) => {
+        function getRootParent(node) {
+            let current = node;
+    
+            while (current.parentNode) {
+                if (current.getAttribute('messageId')) {
+                    break
+                }
+
+                current = current.parentNode;
+            }
+        
+            return current;
+        }
         function createDropdownElement() {
             // Create the dropdown container
-            const dropdown = document.createElement('div');
-            dropdown.classList.add('hidden', 'top-0', 'absolute', 'z-[100]', 'w-[12.5rem]', 'mt-2', 'rounded-sm', 'bg-white', 'dark:bg-gray-800', 'shadow-lg', 'border', 'border-gray-100', 'dark:border-gray-600', 'focus:outline-none');
-            dropdown.setAttribute('role', 'menu');
-            dropdown.setAttribute('aria-orientation', 'vertical');
-            dropdown.setAttribute('aria-labelledby', 'menu-button');
-            dropdown.setAttribute('tabindex', '-1'); 
+            const dropdownDiv = document.createElement('div');
+            dropdownDiv.classList.add('hidden', 'top-0', 'absolute', 'z-[100]', 'w-[12.5rem]', 'mt-2', 'rounded-sm', 'bg-white', 'dark:bg-gray-800', 'shadow-lg', 'border', 'border-gray-100', 'dark:border-gray-600', 'focus:outline-none');
+            dropdownDiv.setAttribute('role', 'menu');
+            dropdownDiv.setAttribute('aria-orientation', 'vertical');
+            dropdownDiv.setAttribute('aria-labelledby', 'menu-button');
+            dropdownDiv.setAttribute('tabindex', '-1'); 
 
             // List of button items
             const buttons = [
@@ -823,10 +836,29 @@ export default class Utils {
                 btn.appendChild(icon);
                 btn.appendChild(document.createTextNode(button.label));
 
-                dropdown.appendChild(btn);
+                dropdownDiv.appendChild(btn);
+
+                btn.onclick = async () => {
+                    if (button.label == 'Reply') {
+
+                    }
+                    else if (button.label == 'Copy') {
+                        const rootNode = getRootParent(btn)
+                        const messageData = JSON.parse(rootNode.getAttribute('messageData'))
+                        await navigator.clipboard.writeText(messageData.content)
+
+                        dropdown.hide() 
+                    }
+                    else if (button.label == 'Forward') {
+
+                    }
+                    else if (button.label == 'Delete Message') {
+
+                    }
+                }
             });
 
-            return dropdown
+            return dropdownDiv
         }
 
         const options = document.createElement('div')
