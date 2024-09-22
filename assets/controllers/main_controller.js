@@ -147,7 +147,7 @@ export default class extends Controller {
 
                 messageElement.setAttribute('messageId', id)
                 messageElement.setAttribute('messageData', JSON.stringify(messageData))
-                messageElement.copyTextContentCallback = this.copyTextContentCallback
+                messageElement.copyTextMessageCallback = this.copyTextMessageCallback
 
                 this.chatboxScrollToBottom()
                 chatbox.appendChild(messageElement)
@@ -500,7 +500,7 @@ export default class extends Controller {
 
                                 messageElement.setAttribute('messageId', id)
                                 messageElement.setAttribute('messageData', JSON.stringify(messageData))
-                                messageElement.copyTextContentCallback = this.copyTextContentCallback
+                                messageElement.copyTextMessageCallback = this.copyTextMessageCallback
 
                                 chatbox.prepend(messageElement)
                                 const imgCheck = messageElement.querySelector('.img-check')
@@ -523,7 +523,7 @@ export default class extends Controller {
                                 
                                 messageElement.setAttribute('messageId', id)
                                 messageElement.setAttribute('messageData', JSON.stringify(messageData))
-                                messageElement.copyTextContentCallback = this.copyTextContentCallback
+                                messageElement.copyTextMessageCallback = this.copyTextMessageCallback
 
                                 chatbox.prepend(messageElement) 
                             }
@@ -561,13 +561,23 @@ export default class extends Controller {
         document.getElementById("viewerjs-images-container").innerHTML = '' 
     } 
 
-    copyTextContentCallback = async (text) => {
-        await navigator.clipboard.writeText(text)
+    copyTextMessageCallback = async (content) => {
+        await navigator.clipboard.writeText(content)
+    }
+
+    forwardMessageCallback = async (sender, receiver, content, type) => {
+        if (type == MessageType.TEXT) {
+
+        }
+        else if (type == MessageType.AUDIO) {
+
+        }
+        else if (type == MessageType.IMAGE) {
+            
+        }
     }
     
-    setConversations = async () => {  
-       
-
+    setConversations = async () => {   
         function clearChatboxElement() { 
             const chatbox = document.getElementById('chatbox') 
             const element = document.createElement('div')
@@ -605,7 +615,7 @@ export default class extends Controller {
                     
                     messageElement.setAttribute('messageId', id)
                     messageElement.setAttribute('messageData', JSON.stringify(messageData))
-                    messageElement.copyTextContentCallback = this.copyTextContentCallback
+                    messageElement.copyTextMessageCallback = this.copyTextMessageCallback
 
                     chatbox.appendChild(messageElement)
                     const imgCheck = messageElement.querySelector('.img-check')
@@ -627,7 +637,7 @@ export default class extends Controller {
                     
                     messageElement.setAttribute('messageId', id)
                     messageElement.setAttribute('messageData', JSON.stringify(messageData))
-                    messageElement.copyTextContentCallback = this.copyTextContentCallback
+                    messageElement.copyTextMessageCallback = this.copyTextMessageCallback
 
                     chatbox.appendChild(messageElement)  
                 }
@@ -835,14 +845,13 @@ export default class extends Controller {
 
         const messageElement = Utils.createOutgoingMessageTextElement(message, timestamp, this.timeAgo)
         messageElement.setAttribute('messageData', data)
-        messageElement.copyTextContentCallback = this.copyTextContentCallback
+        messageElement.copyTextMessageCallback = this.copyTextMessageCallback
         await this.setSentMessage(content, messageElement, message, type, timestamp)
     } 
 
-    sendVoiceMessage = async () => {
-        const blob = this.audioBlob
+    sendVoiceMessage = async (blob) => { 
         this.audioBlob = null
-
+  
         const voiceChatRecordDelete = document.getElementById('voicechat-record-delete')
         const voiceChatRecordClose = document.getElementById('voicechat-record-close')
         voiceChatRecordDelete.click()
@@ -1072,7 +1081,7 @@ export default class extends Controller {
         const sendVoiceButton = document.getElementById('send-voice-button')
         sendVoiceButton.onclick = async () => {  
             if(this.audioBlob != null && !this.isVoiceRecording) {  
-                await this.sendVoiceMessage()
+                await this.sendVoiceMessage(this.audioBlob)
             }
         }
     }

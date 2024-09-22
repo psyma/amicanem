@@ -845,7 +845,7 @@ export default class Utils {
                     else if (button.label == 'Copy') {
                         const messageElement = getRootParent(btn)
                         const messageData = JSON.parse(messageElement.getAttribute('messageData')) 
-                        await messageElement.copyTextContentCallback(messageData.content)
+                        await messageElement.copyTextMessageCallback(messageData.content)
 
                         dropdown.hide() 
                     }
