@@ -146,6 +146,7 @@ export default class extends Controller {
                 }
 
                 this.chatboxScrollToBottom()
+                messageElement.setAttribute('messageId', id)
                 messageElement.setAttribute('messageData', JSON.stringify(messageData))
                 chatbox.appendChild(messageElement)
 
@@ -495,6 +496,7 @@ export default class extends Controller {
                                     Utils.setViewerJsImageElement(messageElement, this.viewer)
                                 }      
 
+                                messageElement.setAttribute('messageId', id)
                                 messageElement.setAttribute('messageData', JSON.stringify(messageData))
                                 chatbox.prepend(messageElement)
                                 const imgCheck = messageElement.querySelector('.img-check')
@@ -515,6 +517,7 @@ export default class extends Controller {
                                     Utils.setViewerJsImageElement(messageElement, this.viewer)
                                 }
                                 
+                                messageElement.setAttribute('messageId', id)
                                 messageElement.setAttribute('messageData', JSON.stringify(messageData))
                                 chatbox.prepend(messageElement) 
                             }
@@ -588,6 +591,7 @@ export default class extends Controller {
                         Utils.setViewerJsImageElement(messageElement, this.viewer)
                     }
                     
+                    messageElement.setAttribute('messageId', id)
                     messageElement.setAttribute('messageData', JSON.stringify(messageData))
                     chatbox.appendChild(messageElement)
                     const imgCheck = messageElement.querySelector('.img-check')
@@ -606,7 +610,8 @@ export default class extends Controller {
                         messageElement = Utils.createIncommingMessageImageElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
                         Utils.setViewerJsImageElement(messageElement, this.viewer)
                     }
- 
+                    
+                    messageElement.setAttribute('messageId', id)
                     messageElement.setAttribute('messageData', JSON.stringify(messageData))
                     chatbox.appendChild(messageElement)  
                 }
@@ -767,6 +772,10 @@ export default class extends Controller {
         const response = await this.service.createTextMessage(this.uidValue, `messages/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, this.currentUserValue.id, this.userToChatId, MessageType.TEXT, content, timestamp, true)
         const imgCheck = messageElement.querySelector('.img-check')
         if (response.ok) { 
+            const messageData = await response.json()
+            const id = messageData.id
+            messageElement.setAttribute('messageId', id)
+         
             if (type == MessageType.TEXT) {
                 Utils.setUserLastMessageContent(this.userToChatId, message) 
             }
