@@ -188,6 +188,185 @@ export default class Utils {
         // If the timestamp is older than a week, return the original timestamp
         return timestamp
     }
+
+    static reOrderUsersListIfNewMessageIsBeingSentOrReceived = (id) => { 
+        const usersList = document.getElementById('users-list')
+        const element = document.getElementById(`user${id}`)
+        usersList.removeChild(element)
+        usersList.prepend(element)
+    }
+
+    static isTimestampIsGreaterThanNminutes = (timestamp, N) => {
+        const t = parseInt(timestamp)
+        const milliseconds = N * 60 * 1000
+        const currentTime = Date.now()
+
+        return t >= (currentTime - milliseconds)
+    }
+
+    static saveCaretPosition = (div) => {
+        let selection = window.getSelection()
+        let range = selection.getRangeAt(0)
+        let preCaretRange = range.cloneRange()
+        preCaretRange.selectNodeContents(div)
+        preCaretRange.setEnd(range.endContainer, range.endOffset)
+
+        return preCaretRange.toString().length // Return caret's offset within the div
+    }
+    
+    static restoreCaretPosition = (div, offset) => {
+        let selection = window.getSelection()
+        let range = document.createRange()
+        let walker = document.createTreeWalker(div, NodeFilter.SHOW_TEXT, null, false)
+        let currentNode = walker.nextNode()
+        let currentOffset = 0
+    
+        while (currentNode) {
+            let nodeLength = currentNode.length
+            if (currentOffset + nodeLength >= offset) {
+                // We found the node where caret should be restored
+                range.setStart(currentNode, offset - currentOffset)
+                range.setEnd(currentNode, offset - currentOffset)
+                break
+            }
+            currentOffset += nodeLength
+            currentNode = walker.nextNode()
+        }
+    
+        selection.removeAllRanges()
+        selection.addRange(range)
+    }
+
+    static getUserAgentPlatformType = () => {
+        const browser = Bowser.getParser(window.navigator.userAgent); 
+        return browser.parsedResult.platform.type  
+    }
+
+    static hideMediaGroup = () => {
+        const group = document.getElementById('media-group')
+        if (this.getUserAgentPlatformType() == 'mobile') {
+            group.classList.add('hidden') 
+        }
+    }
+
+    static unHideMediaGroup = () => {
+        const group = document.getElementById('media-group')
+        group.classList.remove('hidden') 
+    }
+
+    static sortUsersListBaseOnLastMessageTimestamp = () => {
+        const usersList = document.getElementById('users-list')
+        const usersElements = Array.from(usersList.children)  
+        usersElements.sort((a, b) => {
+            const timestampA = parseInt(a.querySelector('.last-message').getAttribute('timestamp'))
+            const timestampB = parseInt(b.querySelector('.last-message').getAttribute('timestamp')) 
+            return timestampB - timestampA
+        }).forEach((element) => { 
+            usersList.removeChild(element)
+            usersList.appendChild(element)
+        }) 
+    } 
+
+    static isTotalImagesToSendNotExceeded = (totalFiles) => {
+        const MAX_IMAGES_UPLOAD = 5
+
+        if (totalFiles > MAX_IMAGES_UPLOAD) {
+            const title = 'Maximum files to upload exceeded'
+            const content = `You can upload a maximum of ${MAX_IMAGES_UPLOAD} files, but you have attempted to upload ${totalFiles} files.`
+            Utils.showAlertMessage(title, content) 
+
+            return false
+        }
+
+        return true
+    }
+
+    static isImageFilesizeNotExceeded = (images) => {
+        function toOrdinal(num) {
+            if (typeof num !== 'number' || !Number.isInteger(num)) {
+                throw new Error('Input must be an integer.');
+            }
+            
+            const suffixes = ["th", "st", "nd", "rd"];
+            const v = num % 100;
+            
+            return num + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
+        }
+
+        const MAX_SIZE_IN_BYTES = 10 * 1024 * 1024; // 10MB
+        for (let i = 0; i < images.length; i++) {
+            const [key, value] = images[i]
+            const filesize = value['file'].size
+            if (filesize > MAX_SIZE_IN_BYTES) {
+                const title = 'Maximum upload filesize exceeded';
+                const content = `The ${toOrdinal(i + 1)} image size (${Math.round(filesize / 1048576)} MB) exceeds the maximum allowed filesize of 10 MB.`;
+                Utils.showAlertMessage(title, content) 
+                return false
+            }
+        }
+
+        return true
+    }
+
+    static showAlertMessage = (title, content) => {
+        const alertMessageContainer = document.getElementById('alert-message-container')
+        const alertMessageTitle = alertMessageContainer.querySelector('#alert-message-title')
+        const alertMessageContent = alertMessageContainer.querySelector('#alert-message-content')
+
+        alertMessageTitle.textContent = title
+        alertMessageContent.textContent = content
+
+        alertMessageContainer.classList.remove('hidden')
+        setTimeout(() => {
+            alertMessageContainer.classList.add('hidden')
+        }, 5000)
+    }
+
+    static progressSvgElementCallback = (messageTempElement, percentCompleted) => { 
+        const svgCircleElement = messageTempElement.querySelector(".svgCircle")  
+        const progressCircleElement = messageTempElement.querySelector(".progressCircle")  
+        const imgCheck = messageTempElement.querySelector('.img-check')
+        imgCheck.classList.add('hidden')  
+
+        if (percentCompleted == 100) {
+            svgCircleElement.classList.add('hidden')
+        }
+        else {
+            svgCircleElement.classList.remove('hidden')
+            progressCircleElement.setAttribute("stroke-dashoffset", `calc(251.2px - (251.2px * ${percentCompleted - 1} / 100))`);
+        } 
+    }
+
+    static reOrderLastFourChatboxElements = () => {
+        const chatbox = document.getElementById('chatbox') 
+        const chatboxArray = Array.from(chatbox.children)
+        const chatboxElements = chatboxArray.slice(-4)
+            
+        chatboxElements.sort((a, b) => { 
+            const timestampA = a.getAttribute('timestamp')
+            const timestampB = b.getAttribute('timestamp')
+            return timestampA - timestampB
+        }).forEach((element) => {
+            chatbox.removeChild(element)
+            chatbox.appendChild(element)
+        })
+    }
+
+    static setForwardUserUiDefaults = (usersMap) => {
+        usersMap.forEach((value, key) => {
+            const userId = key
+            const forwardUserSvgSent = document.getElementById(`forward-user-svg-sent-${userId}`)
+            const forwardUserSvgDefault = document.getElementById(`forward-user-svg-default-${userId}`)
+            const forwardUserSpanText = document.getElementById(`forward-user-span-text-${userId}`)
+            const forwadUserButton = document.getElementById(`forward-user-button-${userId}`)
+
+            forwadUserButton.removeAttribute('disabled')
+            forwadUserButton.classList.remove("cursor-not-allowed")
+            forwardUserSvgSent.classList.add('hidden')
+            forwardUserSvgDefault.classList.remove('hidden')
+            forwardUserSpanText.textContent = 'Send'
+        })
+    }
     
     static setChatboxMessageAvatarHidden = () => {
         // if the user has successive messages then only show 1 avatar
@@ -275,84 +454,6 @@ export default class Utils {
                 prevDate = currentLocaleDateString 
             } 
         } 
-    }
-    
-    static sortUsersListBaseOnLastMessageTimestamp = () => {
-        const usersList = document.getElementById('users-list')
-        const usersElements = Array.from(usersList.children)  
-        usersElements.sort((a, b) => {
-            const timestampA = parseInt(a.querySelector('.last-message').getAttribute('timestamp'))
-            const timestampB = parseInt(b.querySelector('.last-message').getAttribute('timestamp')) 
-            return timestampB - timestampA
-        }).forEach((element) => { 
-            usersList.removeChild(element)
-            usersList.appendChild(element)
-        }) 
-    }
-
-    static reOrderUsersListIfNewMessageIsBeingSentOrReceived = (id) => { 
-        const usersList = document.getElementById('users-list')
-        const element = document.getElementById(`user${id}`)
-        usersList.removeChild(element)
-        usersList.prepend(element)
-    }
-
-    static isTimestampIsGreaterThanNminutes = (timestamp, N) => {
-        const t = parseInt(timestamp)
-        const milliseconds = N * 60 * 1000
-        const currentTime = Date.now()
-
-        return t >= (currentTime - milliseconds)
-    }
-
-    static saveCaretPosition = (div) => {
-        let selection = window.getSelection()
-        let range = selection.getRangeAt(0)
-        let preCaretRange = range.cloneRange()
-        preCaretRange.selectNodeContents(div)
-        preCaretRange.setEnd(range.endContainer, range.endOffset)
-
-        return preCaretRange.toString().length // Return caret's offset within the div
-    }
-    
-    static restoreCaretPosition = (div, offset) => {
-        let selection = window.getSelection()
-        let range = document.createRange()
-        let walker = document.createTreeWalker(div, NodeFilter.SHOW_TEXT, null, false)
-        let currentNode = walker.nextNode()
-        let currentOffset = 0
-    
-        while (currentNode) {
-            let nodeLength = currentNode.length
-            if (currentOffset + nodeLength >= offset) {
-                // We found the node where caret should be restored
-                range.setStart(currentNode, offset - currentOffset)
-                range.setEnd(currentNode, offset - currentOffset)
-                break
-            }
-            currentOffset += nodeLength
-            currentNode = walker.nextNode()
-        }
-    
-        selection.removeAllRanges()
-        selection.addRange(range)
-    }
-
-    static getUserAgentPlatformType = () => {
-        const browser = Bowser.getParser(window.navigator.userAgent); 
-        return browser.parsedResult.platform.type  
-    }
-
-    static hideMediaGroup = () => {
-        const group = document.getElementById('media-group')
-        if (this.getUserAgentPlatformType() == 'mobile') {
-            group.classList.add('hidden') 
-        }
-    }
-
-    static unHideMediaGroup = () => {
-        const group = document.getElementById('media-group')
-        group.classList.remove('hidden') 
     }
 
     static setViewerJsImageElement = (messageElement, viewer) => {
@@ -468,92 +569,7 @@ export default class Utils {
         container.appendChild(flexContainer)
 
         chatbox.appendChild(container) 
-    }
-
-    static isTotalImagesToSendNotExceeded = (totalFiles) => {
-        const MAX_IMAGES_UPLOAD = 5
-
-        if (totalFiles > MAX_IMAGES_UPLOAD) {
-            const title = 'Maximum files to upload exceeded'
-            const content = `You can upload a maximum of ${MAX_IMAGES_UPLOAD} files, but you have attempted to upload ${totalFiles} files.`
-            Utils.showAlertMessage(title, content) 
-
-            return false
-        }
-
-        return true
-    }
-
-    static isImageFilesizeNotExceeded = (images) => {
-        function toOrdinal(num) {
-            if (typeof num !== 'number' || !Number.isInteger(num)) {
-                throw new Error('Input must be an integer.');
-            }
-            
-            const suffixes = ["th", "st", "nd", "rd"];
-            const v = num % 100;
-            
-            return num + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
-        }
-
-        const MAX_SIZE_IN_BYTES = 10 * 1024 * 1024; // 10MB
-        for (let i = 0; i < images.length; i++) {
-            const [key, value] = images[i]
-            const filesize = value['file'].size
-            if (filesize > MAX_SIZE_IN_BYTES) {
-                const title = 'Maximum upload filesize exceeded';
-                const content = `The ${toOrdinal(i + 1)} image size (${Math.round(filesize / 1048576)} MB) exceeds the maximum allowed filesize of 10 MB.`;
-                Utils.showAlertMessage(title, content) 
-                return false
-            }
-        }
-
-        return true
-    }
-
-    static showAlertMessage = (title, content) => {
-        const alertMessageContainer = document.getElementById('alert-message-container')
-        const alertMessageTitle = alertMessageContainer.querySelector('#alert-message-title')
-        const alertMessageContent = alertMessageContainer.querySelector('#alert-message-content')
-
-        alertMessageTitle.textContent = title
-        alertMessageContent.textContent = content
-
-        alertMessageContainer.classList.remove('hidden')
-        setTimeout(() => {
-            alertMessageContainer.classList.add('hidden')
-        }, 5000)
-    }
-
-    static progressSvgElementCallback = (messageTempElement, percentCompleted) => { 
-        const svgCircleElement = messageTempElement.querySelector(".svgCircle")  
-        const progressCircleElement = messageTempElement.querySelector(".progressCircle")  
-        const imgCheck = messageTempElement.querySelector('.img-check')
-        imgCheck.classList.add('hidden')  
-
-        if (percentCompleted == 100) {
-            svgCircleElement.classList.add('hidden')
-        }
-        else {
-            svgCircleElement.classList.remove('hidden')
-            progressCircleElement.setAttribute("stroke-dashoffset", `calc(251.2px - (251.2px * ${percentCompleted - 1} / 100))`);
-        } 
-    }
-
-    static reOrderLastFourChatboxElements = () => {
-        const chatbox = document.getElementById('chatbox') 
-        const chatboxArray = Array.from(chatbox.children)
-        const chatboxElements = chatboxArray.slice(-4)
-            
-        chatboxElements.sort((a, b) => { 
-            const timestampA = a.getAttribute('timestamp')
-            const timestampB = b.getAttribute('timestamp')
-            return timestampA - timestampB
-        }).forEach((element) => {
-            chatbox.removeChild(element)
-            chatbox.appendChild(element)
-        })
-    }
+    } 
 
     static createDividerTimestampElement = (date) => {
         // Create the main container div
@@ -766,23 +782,7 @@ export default class Utils {
         divContainer.appendChild(imageDiv)
 
         return divContainer
-    }
-
-    static setForwardUserUiDefaults = (usersMap) => {
-        usersMap.forEach((value, key) => {
-            const userId = key
-            const forwardUserSvgSent = document.getElementById(`forward-user-svg-sent-${userId}`)
-            const forwardUserSvgDefault = document.getElementById(`forward-user-svg-default-${userId}`)
-            const forwardUserSpanText = document.getElementById(`forward-user-span-text-${userId}`)
-            const forwadUserButton = document.getElementById(`forward-user-button-${userId}`)
-
-            forwadUserButton.removeAttribute('disabled')
-            forwadUserButton.classList.remove("cursor-not-allowed")
-            forwardUserSvgSent.classList.add('hidden')
-            forwardUserSvgDefault.classList.remove('hidden')
-            forwardUserSpanText.textContent = 'Send'
-        })
-    }
+    } 
 
     static createVerticalThreeDotsOptionsElement = (placement, type, isIncomingMessage=false) => { 
         const myThis = this

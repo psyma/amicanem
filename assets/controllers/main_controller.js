@@ -101,7 +101,7 @@ export default class extends Controller {
             users.forEach(async(user) => { 
                 this.usersMap.set(user.id, user)
 
-                this.setForwardUserId(user)
+                this.setForwardUserMessage(user)
                 await this.setSidebarUserClickEvent(user)
                 await this.setUserPusherMessagesChannel(user) 
             }) 
@@ -567,7 +567,7 @@ export default class extends Controller {
         await this.sleep(1)
     }
 
-    setForwardUserId = (user) => {
+    setForwardUserMessage = (user) => {
         const forwardUserSvgSent = document.getElementById(`forward-user-svg-sent-${user.id}`)
         const forwardUserSvgDefault = document.getElementById(`forward-user-svg-default-${user.id}`)
         const forwardUserSpanText = document.getElementById(`forward-user-span-text-${user.id}`)
