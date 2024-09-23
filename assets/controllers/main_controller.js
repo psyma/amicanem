@@ -52,10 +52,7 @@ export default class extends Controller {
         this.voiceMessageHandler = new VoiceMessageHandler()
         this.imageMessageHandler = new ImageMessageHandler()
         this.forwardMessageHandler = new ForwardMessageHandler()
-
-        this.audioBlob = null
-        this.isVoiceRecording = false
-        this.isCloseVoiceRecording = true
+   
         this.isReceivedFirstMessage = false
         this.isLockInfiniteScrolling = false
         this.usersOnlineMap = new Map()
