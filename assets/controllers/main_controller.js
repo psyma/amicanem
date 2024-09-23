@@ -604,9 +604,9 @@ export default class extends Controller {
         await navigator.clipboard.writeText(content)
     }
 
-    forwardMessageCallback = (type, message, blob, input, width, height, mimeType, extension, output) => {
+    forwardMessageCallback = (type, content, blob, input, width, height, mimeType, extension, output) => {
         this.forwardUserMessageType = type
-        this.forwardUserMessageContent = message
+        this.forwardUserMessageContent = content
         this.forwardUserMessageBlob = blob
         this.forwardUserMessageInput = input
         this.forwardUserMessageWidth = width
@@ -948,7 +948,8 @@ export default class extends Controller {
     sendImageMessage = async (receiver, blob, input, width, height, mimeType, extension, output) => {
         let file = null 
         let url = URL.createObjectURL(blob)
-
+        file = new File([new Uint8Array(await blob.arrayBuffer())], output, { type: mimeType }) 
+        /*
         if (extension == 'png') {
             await this.ffmpeg.writeFile(input, new Uint8Array(await blob.arrayBuffer()))
             await this.ffmpeg.exec(['-i', input, '-vf', `scale=${width}:${height}`, output]);
@@ -970,6 +971,7 @@ export default class extends Controller {
             await this.ffmpeg.exec(['-i', input, '-pix_fmt', 'yuv420p', '-vf', `scale=${width}:${height}`, output]);
             file = new File([await this.ffmpeg.readFile(output)], output, { type: mimeType }) 
         } 
+            */
         
         const chatbox = document.getElementById('chatbox') 
         const messageTempElement = Utils.createOutgoingMessageImageElement(url, Date.now(), this.timeAgo)  

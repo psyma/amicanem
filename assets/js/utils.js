@@ -884,7 +884,7 @@ export default class Utils {
                         }
                         else if (type == MessageType.IMAGE) { 
                             const response = await fetch(messageData.content)
-                            const blob = await response.blob() 
+                            const blob = await response.blob()
 
                             const img = document.createElement('img')
                             img.src = URL.createObjectURL(blob) 
