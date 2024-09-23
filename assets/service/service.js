@@ -75,9 +75,11 @@ export default class Service {
         }
     }
 
-    sendTypingNotification = async (uid, isTyping) => {
+    sendTypingNotification = async (uid, event, channels, isTyping) => {
         const data = new FormData()
         data.append('uid', uid) 
+        data.append("event", event)
+        data.append("channels", channels)
         data.append('isTyping', isTyping)
 
         try {

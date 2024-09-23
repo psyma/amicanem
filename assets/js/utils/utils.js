@@ -499,8 +499,9 @@ export default class Utils {
 
     static setUserLastMessageContent = (id, content) => {
         const userLastMessage = document.getElementById(`user${id}-last-message`)
+        userLastMessage.classList.remove('is-typing-loader', 'w-10')  
         userLastMessage.textContent = content
-    }
+    } 
 
     static setUserLastMessageTimestamp = (id, timestamp) => {
         const userLastMessage = document.getElementById(`user${id}-last-message`)
@@ -930,7 +931,7 @@ export default class Utils {
             return [dropdownDiv, dropdown]
         }
 
-        const options = document.createElement('div')
+        const options = document.createElement('btn')
 
         // Create the SVG element
         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
@@ -948,7 +949,7 @@ export default class Utils {
         
         const [dropdownElement, dropdown] = createDropdownElement(options, placement)
         
-        options.classList.add('invisible', 'cursor-pointer') 
+        options.classList.add('invisible', 'cursor-pointer', 'p-2') 
         options.appendChild(svg) 
         //options.appendChild(dropdownElement)
 
@@ -1158,7 +1159,7 @@ export default class Utils {
         }
 
         return mainDiv 
-    }
+    } 
 
     static createIncomingMessageTextElement = (content, avatar, timestamp, timeAgo) => {  
         const mainDiv = document.createElement('div')
@@ -1351,6 +1352,57 @@ export default class Utils {
             timeText.classList.remove('hidden')
             options.classList.remove('invisible')
         }
+
+        return mainDiv 
+    }
+
+    static createIncomingIsTypingElement = (avatar) => {
+        const mainDiv = document.createElement('div') 
+ 
+        const innerDiv1 = document.createElement('div')
+        innerDiv1.classList.add('select-none')
+ 
+        const flexDiv = document.createElement('div')
+        flexDiv.classList.add( 'flex')
+ 
+        const avatarDivContainer = document.createElement('div')
+        avatarDivContainer.classList.add('mr-4', 'flex', 'items-end')
+ 
+        const avatarDiv = document.createElement('div')
+        avatarDiv.classList.add('outline-none')
+ 
+        const avatarImageDiv = document.createElement('div')
+        avatarImageDiv.classList.add('avatar', 'w-[2.25rem]', 'h-[2.25rem]', 'bg-cover', 'bg-center', 'rounded-full')
+        avatarImageDiv.style.backgroundImage = `url("${avatar}")`
+ 
+        avatarDiv.appendChild(avatarImageDiv)
+ 
+        avatarDivContainer.appendChild(avatarDiv)
+ 
+        const chatContainer = document.createElement('div')
+        chatContainer.classList.add('flex', 'items-end')
+ 
+        const chatMessageContainer = document.createElement('div')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
+ 
+        const chatContent = document.createElement('p')
+        chatContent.classList.add('is-typing-loader', 'w-10', 'whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90')
+        chatContent.setAttribute('tabindex', '0')
+        //chatContent.textContent = content
+ 
+        chatMessageContainer.appendChild(chatContent)
+ 
+        const timeContainer = document.createElement('div')  
+
+        chatContainer.appendChild(chatMessageContainer)
+        chatContainer.appendChild(timeContainer)
+ 
+        flexDiv.appendChild(avatarDivContainer)
+        flexDiv.appendChild(chatContainer) 
+ 
+        innerDiv1.appendChild(flexDiv)
+ 
+        mainDiv.appendChild(innerDiv1) 
 
         return mainDiv 
     }

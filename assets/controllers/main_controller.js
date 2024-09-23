@@ -60,11 +60,8 @@ export default class extends Controller {
         this.toSendImagesMap = new Map()
         this.ffmpeg = new FFmpeg()
         this.viewer = new Viewer(document.getElementById("viewerjs-images-container"))  
-        this.forwardUserMessageType = null
-        this.forwardUserMessageContent = null
-        this.forwardUserMessageBlob = null   
-        this.forwardUserMessageMimeType = null 
-        this.forwardUserMessageOutput = null
+        this.isTyping = false
+        this.typingTimeout = null
 
         await this.ffmpeg.load({
             coreURL: await toBlobURL('/ffmpeg-core.js', 'text/javascript'),
@@ -100,6 +97,24 @@ export default class extends Controller {
             await this.setUserLastMessage()
             await this.setChatboxInfiniteScrolling()
         }     
+
+        const chatboxMessageInput = document.getElementById("chatbox-message-input")  
+        chatboxMessageInput.addEventListener("keydown", async () => {
+            if (!this.isTyping) {
+                this.isTyping = true
+                await this.service.sendTypingNotification(this.uidValue, `typing/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, true)
+            }
+            clearTimeout(this.typingTimeout)
+        
+            this.typingTimeout = setTimeout(async () => {
+                this.isTyping = false
+                await this.service.sendTypingNotification(this.uidValue, `typing/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, false)
+            }, 1000)
+        });
+        chatboxMessageInput.addEventListener("blur", async () => {
+            this.isTyping = false
+            await this.service.sendTypingNotification(this.uidValue, `typing/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, false)
+        }) 
     } 
 
     setEncryptionDetails = async () => {   
@@ -122,7 +137,12 @@ export default class extends Controller {
 
     setUserPusherMessagesChannel = async (user) => {  
         const chatbox = document.getElementById('chatbox')
+        const avatar = this.usersMap.get(user.id).userDetails.avatar
         const channel = this.pusher.subscribe(`${user.id}-${this.currentUserValue.id}`)
+        const typingElement = Utils.createIncomingIsTypingElement(avatar)
+        
+        const userLastMessage = document.getElementById(`user${user.id}-last-message`)
+        let userLastMessageContent = userLastMessage.textContent
 
         channel.bind(`messages/${user.id}/${this.currentUserValue.id}`, async (data) => { 
             const { id, content, isSeen } = data
@@ -171,6 +191,31 @@ export default class extends Controller {
             Utils.setUserLastMessageTimestamp(messageData.sender, messageData.timestamp)
             Utils.setUserLastMessageTimeAgo(messageData.sender, messageData.timestamp, this.timeAgo)
             Utils.reOrderUsersListIfNewMessageIsBeingSentOrReceived(messageData.sender)
+        })
+
+        channel.bind(`typing/${user.id}/${this.currentUserValue.id}`, async (data) => {
+            if (user.id == this.userToChatId) {   
+                if (data == 'true') {
+                    chatbox.appendChild(typingElement) 
+                }
+                else {
+                    try{
+                        chatbox.removeChild(typingElement)      
+                    } catch(e) { }
+                }
+            }
+
+            if (data == 'true') { 
+                userLastMessageContent = userLastMessage.textContent
+                userLastMessage.classList.add('is-typing-loader', 'w-10') 
+                userLastMessage.textContent = ''
+            }
+            else {    
+                userLastMessage.classList.remove('is-typing-loader', 'w-10')  
+                if (!userLastMessage.textContent) {
+                    userLastMessage.textContent = userLastMessageContent
+                }
+            }
         })
 
         await Utils.sleep(1)
