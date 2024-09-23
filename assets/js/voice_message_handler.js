@@ -243,7 +243,6 @@ export default class VoiceMessageHandler {
         Utils.chatboxScrollToBottom(true) 
         chatbox.replaceChild(messageElement, oldMessageElement)
 
-
         Utils.reOrderLastFourChatboxElements()
         Utils.setChatboxMessageAvatarHidden()
         Utils.setChatboxDividerTimestamp()

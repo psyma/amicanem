@@ -5,6 +5,7 @@ import Service from "../service/service"
 import MessageType from '../js/message_type';
 import TextMessageHandler from '../js/text_message_handler';
 import VoiceMessageHandler from '../js/voice_message_handler';
+import ImageMessageHandler from '../js/image_message_handler';
  
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { toBlobURL } from '@ffmpeg/util'
@@ -51,6 +52,7 @@ export default class extends Controller {
 
         this.textMessageHandler = new TextMessageHandler()
         this.voiceMessageHandler = new VoiceMessageHandler()
+        this.imageMessageHandler = new ImageMessageHandler()
 
         this.audioBlob = null
         this.isVoiceRecording = false
@@ -79,13 +81,16 @@ export default class extends Controller {
 
             this.setDarkModeToggle() 
             this.setEmojiPickerElement()
-            this.setImageButtonClick()
-            this.setOnChangeImageFileInput()
+            //this.setImageButtonClick()
+            this.imageMessageHandler.setButtonClick()
+            //this.setOnChangeImageFileInput()
+            this.imageMessageHandler.setFileInputOnChange()
             //this.setSendTextButtonClick() 
             this.textMessageHandler.setButtonClick()
             //this.setSendVoiceButtonClick()
             this.voiceMessageHandler.setButtonClick()
-            this.setSendImageButtonClick()
+            //this.setSendImageButtonClick()
+            this.imageMessageHandler.setFileInputButtonClick()
             this.setUserPusherPresenceChannel()
             //this.setSendMessageChatboxInputKeyDown()
             this.textMessageHandler.setInputKeyDown()
@@ -253,6 +258,7 @@ export default class extends Controller {
 
             this.textMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.usersMap)
             this.voiceMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.ffmpeg, this.usersMap)
+            this.imageMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.ffmpeg, this.usersMap)
         } 
 
         await this.sleep(1)
@@ -1005,7 +1011,7 @@ export default class extends Controller {
         }
     }
 
-    setOnChangeImageFileInput = () => { 
+    xsetOnChangeImageFileInput = () => { 
         const imageFileInput = document.getElementById('image-file-input')
         imageFileInput.onchange = async (e) => { 
             const files = e.target.files
@@ -1110,7 +1116,7 @@ export default class extends Controller {
         }
     }
 
-    setImageButtonClick = () => {
+    xsetImageButtonClick = () => {
         const imageInputButton = document.getElementById('image-input-button')
 
         imageInputButton.onclick = () => { 
@@ -1142,7 +1148,7 @@ export default class extends Controller {
         }
     }
 
-    setSendImageButtonClick = () => { 
+    xsetSendImageButtonClick = () => { 
         const chatboxMessageInput = document.getElementById('chatbox-message-input') 
         const chatboxVoiceInput = document.getElementById('chatbox-voice-input')
         const chatboxImageInput = document.getElementById('chatbox-image-input')
