@@ -527,12 +527,14 @@ export default class extends Controller {
     }
 
     setUserToChatBadge = (badge, badgeColor) => {
+        const spanBadge = document.getElementById('user-to-chat-badge')
         if (badge) {
-            const spanBadge = document.getElementById('user-to-chat-badge')
             spanBadge.classList.remove('hidden')
-            spanBadge.classList.add(`text-${badgeColor}-600`)
-            console.log(`text-${badgeColor}-600`)
-
+            spanBadge.classList.add(`text-${badgeColor}-600`) 
+        }
+        else {
+            spanBadge.classList.add('hidden')
+            spanBadge.classList.remove(`text-${badgeColor}-600`) 
         }
     }
 
