@@ -59,7 +59,7 @@
                 </div>
                 <ul class="space-y-3 overflow-auto max-h-80 p-2"> 
                     {% for user in users %} 
-                        <li class="{{ user == currentUser ? 'hidden' : '' }}">
+                        <li class="{{ user == currentUser ? 'hidden' : '' }} {{ user.isVerified ? '' : 'hidden' }}">
                             <div class="flex justify-between items-center text-sm">
                                 <div class="flex items-center self-center flex-shrink-0 gap-2 w-56">
                                     <div class="w-10 h-10 rounded-full bg-contain bg-center shadow border border-gray-200 dark:border-gray-700" style="background-image: url('{{ user.userDetails.avatar }}');"></div>
