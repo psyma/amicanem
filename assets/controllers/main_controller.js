@@ -197,6 +197,7 @@ export default class extends Controller {
             if (user.id == this.userToChatId) {   
                 if (data == 'true') {
                     chatbox.appendChild(typingElement) 
+                    Utils.chatboxScrollToBottom()
                 }
                 else {
                     try{
