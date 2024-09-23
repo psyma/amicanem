@@ -46,6 +46,21 @@ class MainController extends AbstractController
             'privatekey' => $privatekey,
             'passphrase' => $passphrase,
         ]);
+    } 
+
+    #[Route('/send_typing_notification', name: 'app_send_typing_notification', methods: ["POST"])]
+    public function sendTypingNotification(Request $request): JsonResponse
+    {
+        $this->denyAccessUnlessGranted("ROLE_USER");  
+        $this->denyAccessUnlessCurrentUser($request->request->get("uid"));
+
+        $isTyping = $request->request->get("isTyping");  
+
+        $event = $request->request->get("event");
+        $channels = $request->request->get("channels");
+        $this->pusher->trigger($channels, $event, $isTyping);
+
+        return new JsonResponse($isTyping);
     }
 
     #[Route('/get_users/{uid}', name: 'app_get_users', methods: ["GET"])]

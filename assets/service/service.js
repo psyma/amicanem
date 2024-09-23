@@ -75,6 +75,19 @@ export default class Service {
         }
     }
 
+    sendTypingNotification = async (uid, isTyping) => {
+        const data = new FormData()
+        data.append('uid', uid) 
+        data.append('isTyping', isTyping)
+
+        try {
+            const response = await fetch("/send_typing_notification", { method: "POST", body: data })
+            return await response
+        } catch(e) {
+            return { ok: false }
+        } 
+    }
+
     getUserLastSeen = async (uid, id) => {
         try {
             const response = await fetch(`/get_user_last_seen/${uid}/${id}`, { method: "GET" }) 

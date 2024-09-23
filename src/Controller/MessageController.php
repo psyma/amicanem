@@ -109,7 +109,7 @@ class MessageController extends AbstractController
         $filesystem->remove($filepath);
          
         return new JsonResponse("uploads/" . $filename);
-    }
+    } 
 
     #[Route('/get_messages/{uid}/{currentUserId}/{userToChatId}/{page}/{pageSize}/{toReverse}', name: 'app_get_messages', methods: ["GET"])]
     public function get_messages(string $uid, int $currentUserId, int $userToChatId, int $page, int $pageSize, int $toReverse): JsonResponse {  
