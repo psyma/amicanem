@@ -69,12 +69,8 @@ export default class extends Controller {
         this.viewer = new Viewer(document.getElementById("viewerjs-images-container"))  
         this.forwardUserMessageType = null
         this.forwardUserMessageContent = null
-        this.forwardUserMessageBlob = null
-        this.forwardUserMessageInput = null
-        this.forwardUserMessageWidth = null
-        this.forwardUserMessageHeight = null
-        this.forwardUserMessageMimeType = null
-        this.forwardUserMessageExtension = null
+        this.forwardUserMessageBlob = null   
+        this.forwardUserMessageMimeType = null 
         this.forwardUserMessageOutput = null
 
         await this.ffmpeg.load({
@@ -587,7 +583,7 @@ export default class extends Controller {
                 await this.sendVoiceMessage(user.id, this.forwardUserMessageBlob)
             }
             else if (this.forwardUserMessageType == MessageType.IMAGE) {
-                await this.sendImageMessage(user.id, this.forwardUserMessageBlob, this.forwardUserMessageInput, this.forwardUserMessageWidth, this.forwardUserMessageHeight, this.forwardUserMessageMimeType, this.forwardUserMessageExtension, this.forwardUserMessageOutput)
+                await this.sendImageMessage(user.id, this.forwardUserMessageBlob, null, null, null, this.forwardUserMessageMimeType, null, this.forwardUserMessageOutput, true)
             } 
         }
     }
@@ -604,15 +600,11 @@ export default class extends Controller {
         await navigator.clipboard.writeText(content)
     }
 
-    forwardMessageCallback = (type, content, blob, input, width, height, mimeType, extension, output) => {
+    forwardMessageCallback = (type, content, blob, mimeType, output) => {
         this.forwardUserMessageType = type
         this.forwardUserMessageContent = content
         this.forwardUserMessageBlob = blob
-        this.forwardUserMessageInput = input
-        this.forwardUserMessageWidth = width
-        this.forwardUserMessageHeight = height
         this.forwardUserMessageMimeType = mimeType
-        this.forwardUserMessageExtension = extension
         this.forwardUserMessageOutput = output 
 
         Utils.setForwardUserUiDefaults(this.usersMap)
@@ -945,12 +937,14 @@ export default class extends Controller {
         }
     }
 
-    sendImageMessage = async (receiver, blob, input, width, height, mimeType, extension, output) => {
+    sendImageMessage = async (receiver, blob, input, width, height, mimeType, extension, output, isForward=false) => {
         let file = null 
         let url = URL.createObjectURL(blob)
-        file = new File([new Uint8Array(await blob.arrayBuffer())], output, { type: mimeType }) 
-        /*
-        if (extension == 'png') {
+
+        if (isForward) {
+            file = new File([new Uint8Array(await blob.arrayBuffer())], output, { type: mimeType }) 
+        } 
+        else if (extension == 'png') {
             await this.ffmpeg.writeFile(input, new Uint8Array(await blob.arrayBuffer()))
             await this.ffmpeg.exec(['-i', input, '-vf', `scale=${width}:${height}`, output]);
             file = new File([await this.ffmpeg.readFile(output)], output, { type: mimeType })  
@@ -970,8 +964,7 @@ export default class extends Controller {
             await this.ffmpeg.writeFile(input, new Uint8Array(await blob.arrayBuffer()))
             await this.ffmpeg.exec(['-i', input, '-pix_fmt', 'yuv420p', '-vf', `scale=${width}:${height}`, output]);
             file = new File([await this.ffmpeg.readFile(output)], output, { type: mimeType }) 
-        } 
-            */
+        }  
         
         const chatbox = document.getElementById('chatbox') 
         const messageTempElement = Utils.createOutgoingMessageImageElement(url, Date.now(), this.timeAgo)  

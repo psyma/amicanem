@@ -875,12 +875,12 @@ export default class Utils {
                         
                         forwardButtonTrigger.click()
                         if (type == MessageType.TEXT) {
-                            messageElement.forwardMessageCallback(type, messageData.content, null, null, null, null, null, null, null)
+                            messageElement.forwardMessageCallback(type, messageData.content, null, null, null)
                         }
                         else if (type == MessageType.AUDIO) {
                             const response = await fetch(messageData.content)
                             const blob = await response.blob() 
-                            messageElement.forwardMessageCallback(type, null, blob, null, null, null, null, null, null)
+                            messageElement.forwardMessageCallback(type, null, blob, null, null)
                         }
                         else if (type == MessageType.IMAGE) { 
                             const response = await fetch(messageData.content)
@@ -890,13 +890,10 @@ export default class Utils {
                             img.src = URL.createObjectURL(blob) 
                             
                             img.onload = () => {
-                                const width = img.width
-                                const height = img.height
                                 const mimeType = blob.type
                                 const extension = mimeType.split("/")[1]
-                                const input = "input" + "." + extension
                                 const output = "output" + "." + extension
-                                messageElement.forwardMessageCallback(type, null, blob, input, width, height, mimeType, extension, output)
+                                messageElement.forwardMessageCallback(type, null, blob, mimeType, output)
                             }
                         } 
                     }
