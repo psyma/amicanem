@@ -1,10 +1,10 @@
 {
-  "build/app.css": "/build/app.74fdf546.css",
-  "build/app.js": "/build/app.d312e9d4.js",
-  "build/runtime.js": "/build/runtime.0acbb72b.js",
-  "build/797.a2a25a4b.js": "/build/797.a2a25a4b.js",
-  "build/138.e52f11b6.js": "/build/138.e52f11b6.js",
-  "build/835.c61b4008.js": "/build/835.c61b4008.js",
-  "build/89.e25255bf.js": "/build/89.e25255bf.js",
+  "build/app.css": "/build/app.css",
+  "build/app.js": "/build/app.js",
+  "build/runtime.js": "/build/runtime.js",
+  "build/vendor_symfony_ux-turbo_assets_dist_turbo_controller_js.js": "/build/vendor_symfony_ux-turbo_assets_dist_turbo_controller_js.js",
+  "build/node_modules_ffmpeg_ffmpeg_dist_esm_worker_js.js": "/build/node_modules_ffmpeg_ffmpeg_dist_esm_worker_js.js",
+  "build/vendors-node_modules_ffmpeg_ffmpeg_dist_esm_index_js-node_modules_ffmpeg_util_dist_esm_index_-525ad1.js": "/build/vendors-node_modules_ffmpeg_ffmpeg_dist_esm_index_js-node_modules_ffmpeg_util_dist_esm_index_-525ad1.js",
+  "build/vendors-node_modules_hotwired_turbo_dist_turbo_es2017-esm_js.js": "/build/vendors-node_modules_hotwired_turbo_dist_turbo_es2017-esm_js.js",
   "build/fonts/HelveticaNeue.ttf": "/build/fonts/HelveticaNeue.8b0e1de6.ttf"
 }

@@ -785,7 +785,6 @@ export default class Utils {
     } 
 
     static createVerticalThreeDotsOptionsElement = (placement, type, isIncomingMessage=false) => { 
-        const myThis = this
         function getRootParent(node) {
             let current = node
     
@@ -895,8 +894,8 @@ export default class Utils {
                                 const height = img.height
                                 const mimeType = blob.type
                                 const extension = mimeType.split("/")[1]
-                                const input = CryptoJS.MD5(myThis.generateRandomString(16)).toString() + "." + extension
-                                const output = CryptoJS.MD5(myThis.generateRandomString(16)).toString() + "." + extension
+                                const input = "input" + "." + extension
+                                const output = "output" + "." + extension
                                 messageElement.forwardMessageCallback(type, null, blob, input, width, height, mimeType, extension, output)
                             }
                         } 
