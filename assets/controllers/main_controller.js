@@ -230,6 +230,8 @@ export default class extends Controller {
         const userElement = document.getElementById(`user${user.id}`) // sidebar user list element   
         userElement.onclick = async () => {
             const name = `${user.userDetails.firstname} ${user.userDetails.lastname}`
+            const badge = user.userDetails.badge
+            const badgeColor = user.userDetails.badgeColor
             const avatar = user.userDetails.avatar
             const publickey = user.userDetails.publickey.publickey 
             this.userTochatPublickey = Utils.base64ToArrayBuffer(publickey)
@@ -238,6 +240,7 @@ export default class extends Controller {
 
             this.setUserToChatName(name)
             this.setUserToChatAvatar(avatar) 
+            this.setUserToChatBadge(badge, badgeColor)
             this.setSidebarUserToggleForMobile() 
             this.setMainChatbox()
             
@@ -514,13 +517,21 @@ export default class extends Controller {
     }
 
     setUserToChatName = (name) => {
-        const userToChatName = document.getElementById('userToChatName')
+        const userToChatName = document.getElementById('user-to-chat-name')
         userToChatName.textContent = name
     }
 
     setUserToChatAvatar = (avatar) => {
         const userToChatAvatar = document.getElementById('usertochat-avatar')
         userToChatAvatar.style.backgroundImage = `url('${avatar}')`
+    }
+
+    setUserToChatBadge = (badge, badgeColor) => {
+        if (badge) {
+            const spanBadge = document.getElementById('user-to-chat-badge')
+            spanBadge.classList.remove('hidden')
+            spanBadge.classList.add(`text-${badgeColor}-600`)
+        }
     }
 
     setUserToChatOnlineStatus = () => {
