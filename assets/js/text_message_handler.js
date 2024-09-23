@@ -81,7 +81,7 @@ export default class TextMessageHandler {
             receiver: encryptedReceiverTextMessage
         }))
 
-        await this.#setSendMessage(userToChatId, message, content, timestamp)
+        await this.#setSendMessage(userToChatId, message, content, timestamp, data)
         //const messageElement = Utils.createOutgoingMessageTextElement(message, timestamp, this.timeAgo)
         //messageElement.setAttribute('messageData', data)
         //messageElement.copyTextMessageCallback = this.copyTextMessageCallback
@@ -89,10 +89,11 @@ export default class TextMessageHandler {
         //await this.setSentMessage(receiver, content, messageElement, message, type, timestamp)
     }
 
-    #setSendMessage = async (userToChatId, message, content, timestamp) => {
+    #setSendMessage = async (userToChatId, message, content, timestamp, data) => {
         const chatbox = document.getElementById('chatbox') 
         const messageElement = Utils.createOutgoingMessageTextElement(message, timestamp, this.timeAgo)
-        
+        messageElement.setAttribute('messageData', data)
+
         Utils.chatboxScrollToBottom(true) 
         chatbox.appendChild(messageElement) 
 

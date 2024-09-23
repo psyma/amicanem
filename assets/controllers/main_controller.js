@@ -4,6 +4,7 @@ import Utils from '../js/utils';
 import Service from "../service/service"   
 import MessageType from '../js/message_type';
 import TextMessageHandler from '../js/text_message_handler';
+import VoiceMessageHandler from '../js/voice_message_handler';
  
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { toBlobURL } from '@ffmpeg/util'
@@ -49,6 +50,7 @@ export default class extends Controller {
         this.timeAgo = new TimeAgo('en-US')
 
         this.textMessageHandler = new TextMessageHandler()
+        this.voiceMessageHandler = new VoiceMessageHandler()
 
         this.audioBlob = null
         this.isVoiceRecording = false
@@ -81,12 +83,14 @@ export default class extends Controller {
             this.setOnChangeImageFileInput()
             //this.setSendTextButtonClick() 
             this.textMessageHandler.setButtonClick()
-            this.setSendVoiceButtonClick()
+            //this.setSendVoiceButtonClick()
+            this.voiceMessageHandler.setButtonClick()
             this.setSendImageButtonClick()
             this.setUserPusherPresenceChannel()
             //this.setSendMessageChatboxInputKeyDown()
             this.textMessageHandler.setInputKeyDown()
-            this.setVoiceChatRecording()
+            //this.setVoiceChatRecording()
+            this.voiceMessageHandler.setVoiceRecording()
             this.setChatboxEventListener() 
 
             users.forEach(async(user) => { 
@@ -248,12 +252,13 @@ export default class extends Controller {
             this.setUserToChatOnlineStatus()
 
             this.textMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.usersMap)
+            this.voiceMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.ffmpeg, this.usersMap)
         } 
 
         await this.sleep(1)
     } 
 
-    setVoiceChatRecording = () => { 
+    xsetVoiceChatRecording = () => { 
         const voiceChatRecordButton = document.getElementById('voicechat-record-button')
         voiceChatRecordButton.onclick = async () => { 
             if (!this.toSendImagesMap.size) { 
@@ -885,7 +890,7 @@ export default class extends Controller {
         await this.setSentMessage(receiver, content, messageElement, message, type, timestamp)
     } 
 
-    sendVoiceMessage = async (receiver, blob) => { 
+    xsendVoiceMessage = async (receiver, blob) => { 
         this.audioBlob = null
   
         const voiceChatRecordDelete = document.getElementById('voicechat-record-delete')
@@ -1128,7 +1133,7 @@ export default class extends Controller {
         }
     }
 
-    setSendVoiceButtonClick = () => { 
+    xsetSendVoiceButtonClick = () => { 
         const sendVoiceButton = document.getElementById('send-voice-button')
         sendVoiceButton.onclick = async () => {  
             if(this.audioBlob != null && !this.isVoiceRecording) {  
