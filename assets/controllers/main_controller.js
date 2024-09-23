@@ -231,7 +231,7 @@ export default class extends Controller {
         userElement.onclick = async () => {
             const name = `${user.userDetails.firstname} ${user.userDetails.lastname}`
             const badge = user.userDetails.badge
-            const badgeColor = user.userDetails.badgeColor
+            const badgeColor = user.userDetails.badgecolor
             const avatar = user.userDetails.avatar
             const publickey = user.userDetails.publickey.publickey 
             this.userTochatPublickey = Utils.base64ToArrayBuffer(publickey)
@@ -531,6 +531,8 @@ export default class extends Controller {
             const spanBadge = document.getElementById('user-to-chat-badge')
             spanBadge.classList.remove('hidden')
             spanBadge.classList.add(`text-${badgeColor}-600`)
+            console.log(`text-${badgeColor}-600`)
+
         }
     }
 
