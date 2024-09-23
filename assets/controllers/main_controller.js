@@ -2,6 +2,7 @@ import { Controller } from '@hotwired/stimulus';
  
 import Utils from '../js/utils';
 import Service from "../service/service"   
+import MessageType from '../js/message_type';
  
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { toBlobURL } from '@ffmpeg/util'
@@ -16,18 +17,7 @@ import heic2any from 'heic2any';
 
 import en from 'javascript-time-ago/locale/en'
 import 'emoji-picker-element'
-import 'viewerjs/dist/viewer.css' 
-
-class MessageType {
-    static TEXT = 0
-    static IMAGE = 1
-    static GIF = 2
-    static AUDIO = 3
-    
-    static get TEXT() { return TEXT }
-    static get IMAGE() { return IMAGE }
-    static get GIF() { return GIF }
-} 
+import 'viewerjs/dist/viewer.css'  
 
 export default class extends Controller {
     static values = {

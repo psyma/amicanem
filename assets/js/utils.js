@@ -1,18 +1,8 @@
-import Bowser from 'bowser';
-import CryptoJS from 'crypto-js';
+import MessageType from '../js/message_type';
+
+import Bowser from 'bowser'; 
 import WaveSurfer from 'wavesurfer.js'
 import { Dropdown } from 'flowbite';
-
-class MessageType {
-    static TEXT = 0
-    static IMAGE = 1
-    static GIF = 2
-    static AUDIO = 3
-    
-    static get TEXT() { return TEXT }
-    static get IMAGE() { return IMAGE }
-    static get GIF() { return GIF }
-} 
 
 export default class Utils {
     static encryptMessage = async (publicKey, message, chunkSize=190) => {
