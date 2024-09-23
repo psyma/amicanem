@@ -3,6 +3,7 @@ import { Controller } from '@hotwired/stimulus';
 import Utils from '../js/utils';
 import Service from "../service/service"   
 import MessageType from '../js/message_type';
+import TextMessageHandler from '../js/text_message_handler';
  
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { toBlobURL } from '@ffmpeg/util'
@@ -47,6 +48,8 @@ export default class extends Controller {
         this.service = new Service()
         this.timeAgo = new TimeAgo('en-US')
 
+        this.textMessageHandler = new TextMessageHandler()
+
         this.audioBlob = null
         this.isVoiceRecording = false
         this.isCloseVoiceRecording = true
@@ -76,11 +79,13 @@ export default class extends Controller {
             this.setEmojiPickerElement()
             this.setImageButtonClick()
             this.setOnChangeImageFileInput()
-            this.setSendTextButtonClick()
+            //this.setSendTextButtonClick() 
+            this.textMessageHandler.setButtonClick()
             this.setSendVoiceButtonClick()
             this.setSendImageButtonClick()
             this.setUserPusherPresenceChannel()
-            this.setSendMessageChatboxInputKeyDown()
+            //this.setSendMessageChatboxInputKeyDown()
+            this.textMessageHandler.setInputKeyDown()
             this.setVoiceChatRecording()
             this.setChatboxEventListener() 
 
@@ -241,6 +246,8 @@ export default class extends Controller {
             await this.setConversations()
 
             this.setUserToChatOnlineStatus()
+
+            this.textMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.usersMap)
         } 
 
         await this.sleep(1)
@@ -1109,7 +1116,7 @@ export default class extends Controller {
         }
     }
 
-    setSendTextButtonClick = () => { 
+    xsetSendTextButtonClick = () => { 
         const chatboxMessageInput = document.getElementById('chatbox-message-input')
         const sendTextButton = document.getElementById('send-text-button')
 
@@ -1167,7 +1174,7 @@ export default class extends Controller {
         }
     }
 
-    setSendMessageChatboxInputKeyDown = () => { 
+    xsetSendMessageChatboxInputKeyDown = () => { 
         const chatboxMessageInput = document.getElementById('chatbox-message-input')
         chatboxMessageInput.onkeydown = async (e) => {
             const message = e.target.innerText.trim()

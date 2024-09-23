@@ -139,6 +139,33 @@ export default class Utils {
         return bytes.buffer;
     }  
 
+    static chatboxScrollToBottom = (force=false) => {
+        const chatbox = document.getElementById('chatbox')
+        function isScrollbarAtBottom(element){
+            const offset = Math.abs(element.scrollHeight - element.clientHeight) * .40  
+            return Math.abs(element.scrollHeight - element.clientHeight - element.scrollTop) <= offset
+        }
+
+        if (force) {
+            setTimeout(() => {
+                chatbox.style.scrollBehavior = "smooth"
+                chatbox.scrollTop = chatbox.scrollHeight
+            }, 500)
+        }
+        else {
+            if (isScrollbarAtBottom(chatbox)) {
+                setTimeout(() => {
+                    chatbox.style.scrollBehavior = "smooth"
+                    chatbox.scrollTop = chatbox.scrollHeight
+                }, 500)
+            }
+        }
+    }
+
+    static isEmptyOrSpaces = (str) => {
+        return str === null || str.match(/^ *$/) !== null
+    } 
+
     static formatTimestampIntoDaysOfWeek = (timestamp) => {
         const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
     
