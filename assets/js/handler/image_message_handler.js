@@ -216,8 +216,12 @@ export default class ImageMessageHandler {
 
         const chatbox = document.getElementById('chatbox') 
         const messageTempElement = Utils.createOutgoingMessageImageElement(url, Date.now(), this.timeAgo)  
-        Utils.chatboxScrollToBottom(true)
-        chatbox.appendChild(messageTempElement) 
+        
+        if (this.userToChatId == userToChatId) {
+            Utils.chatboxScrollToBottom(true)
+            chatbox.appendChild(messageTempElement) 
+        }
+
         const response = await this.service.createImageMessage(this.uid, file, extension == 'heic' ? 'jpeg' : extension, messageTempElement, Utils.progressSvgElementCallback)
         if (response.status == 200) { 
             const type = MessageType.IMAGE
@@ -251,9 +255,9 @@ export default class ImageMessageHandler {
         messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
         messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
         
-        Utils.setViewerJsImageElement(messageElement, this.viewer)
-        Utils.chatboxScrollToBottom(true) 
         if (this.userToChatId == userToChatId) { 
+            Utils.setViewerJsImageElement(messageElement, this.viewer)
+            Utils.chatboxScrollToBottom(true) 
             chatbox.replaceChild(messageElement, oldMessageElement)
         } 
 

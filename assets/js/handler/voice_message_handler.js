@@ -197,8 +197,10 @@ export default class VoiceMessageHandler {
         const chatbox = document.getElementById('chatbox') 
         const messageTempElement = Utils.createOutgoingMessageVoiceElement(url, Date.now(), this.timeAgo)
         
-        Utils.chatboxScrollToBottom(true)
-        chatbox.appendChild(messageTempElement) 
+        if (this.userToChatId == userToChatId) {
+            Utils.chatboxScrollToBottom(true)
+            chatbox.appendChild(messageTempElement) 
+        }
 
         await this.ffmpeg.writeFile('input.webm', new Uint8Array(await blob.arrayBuffer()))
         await this.ffmpeg.exec(['-i', 'input.webm', '-c:a', 'libopus', '-b:a', '0', 'output.webm']);
@@ -237,8 +239,8 @@ export default class VoiceMessageHandler {
         messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
         messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
 
-        Utils.chatboxScrollToBottom(true) 
         if (this.userToChatId == userToChatId) { 
+            Utils.chatboxScrollToBottom(true) 
             chatbox.replaceChild(messageElement, oldMessageElement)
         } 
 

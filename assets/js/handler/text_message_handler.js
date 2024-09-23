@@ -88,8 +88,8 @@ export default class TextMessageHandler {
         messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
         messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
 
-        Utils.chatboxScrollToBottom(true) 
         if (this.userToChatId == userToChatId) { 
+            Utils.chatboxScrollToBottom(true) 
             chatbox.appendChild(messageElement) 
         } 
 
