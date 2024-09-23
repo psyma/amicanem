@@ -1,11 +1,10 @@
-import Utils from '../js/utils';
-import Service from '../service/service';
-import MessageType from './message_type';
+import Utils from '../utils/utils';
+import Service from '../../service/service';
+import MessageType from '../types/message_type';
 
 import WaveSurfer from 'wavesurfer.js'
 import RecordPlugin from 'wavesurfer.js/dist/plugins/record.esm.js'
-import TimeAgo from 'javascript-time-ago';
-import en from 'javascript-time-ago/locale/en'
+import TimeAgo from 'javascript-time-ago'; 
 
 export default class VoiceMessageHandler {
     constructor() {
@@ -14,6 +13,7 @@ export default class VoiceMessageHandler {
         this.currentUser = null
         this.userToChatId = null
         this.currentUserPublickey = null
+        this.forwardMessageHandler = null
         this.usersMap = new Map()
         this.timeAgo = new TimeAgo('en-US')
         this.service = new Service()
@@ -22,23 +22,23 @@ export default class VoiceMessageHandler {
         this.isVoiceRecording = false
     }
 
-    init = (uid, currentUser, userToChatId, currentUserPublickey, ffmpeg, usersMap) => {
+    init = (uid, currentUser, userToChatId, currentUserPublickey, ffmpeg, usersMap, forwardMessageHandler) => {
         this.uid = uid
         this.currentUser = currentUser
         this.userToChatId = userToChatId
         this.currentUserPublickey = currentUserPublickey
+        this.forwardMessageHandler = forwardMessageHandler
         this.usersMap = usersMap
         this.ffmpeg = ffmpeg
 
-        this.audioBlob = null
+        this.audioBlob = null 
     }
 
     setButtonClick = () => {
         const sendVoiceButton = document.getElementById('send-voice-button')
         sendVoiceButton.onclick = async () => {  
             if(this.audioBlob != null && !this.isVoiceRecording) {  
-                await this.#sendMessage(this.userToChatId, this.audioBlob)
-                //await this.sendVoiceMessage(this.userToChatId, this.audioBlob)
+                await this.sendMessage(this.userToChatId, this.audioBlob) 
             }
         }
     } 
@@ -185,7 +185,7 @@ export default class VoiceMessageHandler {
         }  
     }
     
-    #sendMessage = async (userToChatId, blob) => {
+    sendMessage = async (userToChatId, blob) => {
         this.audioBlob = null
 
         const voiceChatRecordDelete = document.getElementById('voicechat-record-delete')
@@ -226,19 +226,16 @@ export default class VoiceMessageHandler {
                 receiver: encryptedReceiverTextMessage
             }))
             
-            await this.#setSendMessage(userToChatId, url, content, timestamp, messageTempElement, data)
-            //const messageElement = Utils.createOutgoingMessageVoiceElement(url, timestamp, this.timeAgo)
-            //messageElement.setAttribute('messageData', data)
-            //messageElement.copyTextMessageCallback = this.copyTextMessageCallback
-            //messageElement.forwardMessageCallback = this.forwardMessageCallback
-            //await this.setSentMessage(receiver, content, messageElement, null, type, timestamp, messageTempElement)
+            await this.setSendMessage(userToChatId, url, content, timestamp, messageTempElement, data) 
         }
     }
 
-    #setSendMessage = async (userToChatId, url, content, timestamp, oldMessageElement, data) => {
+    setSendMessage = async (userToChatId, url, content, timestamp, oldMessageElement, data) => {
         const chatbox = document.getElementById('chatbox') 
         const messageElement = Utils.createOutgoingMessageVoiceElement(url, timestamp, this.timeAgo)
         messageElement.setAttribute('messageData', data)
+        messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
+        messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
 
         Utils.chatboxScrollToBottom(true) 
         chatbox.replaceChild(messageElement, oldMessageElement)

@@ -1,30 +1,29 @@
-import Utils from '../js/utils';
-import Service from '../service/service';
-import MessageType from './message_type';
+import Utils from '../utils/utils';
+import Service from '../../service/service';
+import MessageType from '../types/message_type';
 
-import TimeAgo from 'javascript-time-ago';
-import en from 'javascript-time-ago/locale/en'
+import TimeAgo from 'javascript-time-ago'; 
 
 export default class TextMessageHandler {
-    constructor() {
-        //TimeAgo.addDefaultLocale(en)
-
+    constructor() { 
         this.uid = null
         this.currentUser = null
         this.userToChatId = null
         this.currentUserPublickey = null
+        this.forwardMessageHandler = null
         this.usersMap = new Map()
         this.timeAgo = new TimeAgo('en-US')
 
         this.service = new Service()
     }
 
-    init = (uid, currentUser, userToChatId, currentUserPublickey, usersMap) => {
+    init = (uid, currentUser, userToChatId, currentUserPublickey, usersMap, forwardMessageHandler) => {
         this.uid = uid
         this.currentUser = currentUser
         this.userToChatId = userToChatId
         this.currentUserPublickey = currentUserPublickey
-        this.usersMap = usersMap
+        this.forwardMessageHandler = forwardMessageHandler
+        this.usersMap = usersMap 
     }
 
     setButtonClick = () => {
@@ -34,8 +33,7 @@ export default class TextMessageHandler {
         sendTextButton.onclick = async () => {
             const message = chatboxMessageInput.innerText.trim()  
             if (!Utils.isEmptyOrSpaces(message)) { 
-                await this.#sendMessage(this.userToChatId, message)
-                //await this.sendTextMessage(this.userToChatId, message)
+                await this.sendMessage(this.userToChatId, message) 
             }  
         }
     }
@@ -49,15 +47,14 @@ export default class TextMessageHandler {
                     e.preventDefault()
                     
                     if (!Utils.isEmptyOrSpaces(message)) {
-                        await this.#sendMessage(this.userToChatId, message)
-                        //await this.sendTextMessage(this.userToChatId, message)
+                        await this.sendMessage(this.userToChatId, message) 
                     } 
                 }
             }
         }
     }
 
-    #sendMessage = async (userToChatId, message) => {
+    sendMessage = async (userToChatId, message) => {
         const chatboxMessageInput = document.getElementById('chatbox-message-input')
         
         chatboxMessageInput.textContent = ''
@@ -81,18 +78,15 @@ export default class TextMessageHandler {
             receiver: encryptedReceiverTextMessage
         }))
 
-        await this.#setSendMessage(userToChatId, message, content, timestamp, data)
-        //const messageElement = Utils.createOutgoingMessageTextElement(message, timestamp, this.timeAgo)
-        //messageElement.setAttribute('messageData', data)
-        //messageElement.copyTextMessageCallback = this.copyTextMessageCallback
-        //messageElement.forwardMessageCallback = this.forwardMessageCallback
-        //await this.setSentMessage(receiver, content, messageElement, message, type, timestamp)
+        await this.setSendMessage(userToChatId, message, content, timestamp, data) 
     }
 
-    #setSendMessage = async (userToChatId, message, content, timestamp, data) => {
+    setSendMessage = async (userToChatId, message, content, timestamp, data) => {
         const chatbox = document.getElementById('chatbox') 
         const messageElement = Utils.createOutgoingMessageTextElement(message, timestamp, this.timeAgo)
-        messageElement.setAttribute('messageData', data)
+        messageElement.setAttribute('messageData', data) 
+        messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
+        messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
 
         Utils.chatboxScrollToBottom(true) 
         chatbox.appendChild(messageElement) 

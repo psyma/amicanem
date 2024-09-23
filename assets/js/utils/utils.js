@@ -1,4 +1,4 @@
-import MessageType from '../js/message_type';
+import MessageType from '../types/message_type';
 
 import Bowser from 'bowser'; 
 import WaveSurfer from 'wavesurfer.js'
@@ -367,6 +367,10 @@ export default class Utils {
             chatbox.removeChild(element)
             chatbox.appendChild(element)
         })
+    }
+
+    static sleep = (ms) => {
+        return new Promise(resolve => setTimeout(resolve, ms))
     }
 
     static setForwardUserUiDefaults = (usersMap) => {

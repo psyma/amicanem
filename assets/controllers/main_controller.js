@@ -1,22 +1,20 @@
 import { Controller } from '@hotwired/stimulus';
  
-import Utils from '../js/utils';
+import Utils from '../js/utils/utils';
 import Service from "../service/service"   
-import MessageType from '../js/message_type';
-import TextMessageHandler from '../js/text_message_handler';
-import VoiceMessageHandler from '../js/voice_message_handler';
-import ImageMessageHandler from '../js/image_message_handler';
+import MessageType from '../js/types/message_type';
+import TextMessageHandler from '../js/handler/text_message_handler';
+import VoiceMessageHandler from '../js/handler/voice_message_handler';
+import ImageMessageHandler from '../js/handler/image_message_handler';
+import ForwardMessageHandler from '../js/handler/forward_message_handler';
  
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { toBlobURL } from '@ffmpeg/util'
 
 import Viewer from 'viewerjs'   
 import Pusher from 'pusher-js'  
-import CryptoJS from 'crypto-js';
-import WaveSurfer from 'wavesurfer.js'
-import RecordPlugin from 'wavesurfer.js/dist/plugins/record.esm.js'
-import TimeAgo from 'javascript-time-ago';
-import heic2any from 'heic2any';
+import CryptoJS from 'crypto-js'; 
+import TimeAgo from 'javascript-time-ago'; 
 
 import en from 'javascript-time-ago/locale/en'
 import 'emoji-picker-element'
@@ -53,6 +51,7 @@ export default class extends Controller {
         this.textMessageHandler = new TextMessageHandler()
         this.voiceMessageHandler = new VoiceMessageHandler()
         this.imageMessageHandler = new ImageMessageHandler()
+        this.forwardMessageHandler = new ForwardMessageHandler()
 
         this.audioBlob = null
         this.isVoiceRecording = false
@@ -80,28 +79,23 @@ export default class extends Controller {
             const users = await response.json() 
 
             this.setDarkModeToggle() 
-            this.setEmojiPickerElement()
-            //this.setImageButtonClick()
-            this.imageMessageHandler.setButtonClick()
-            //this.setOnChangeImageFileInput()
-            this.imageMessageHandler.setFileInputOnChange()
-            //this.setSendTextButtonClick() 
-            this.textMessageHandler.setButtonClick()
-            //this.setSendVoiceButtonClick()
-            this.voiceMessageHandler.setButtonClick()
-            //this.setSendImageButtonClick()
-            this.imageMessageHandler.setFileInputButtonClick()
-            this.setUserPusherPresenceChannel()
-            //this.setSendMessageChatboxInputKeyDown()
-            this.textMessageHandler.setInputKeyDown()
-            //this.setVoiceChatRecording()
-            this.voiceMessageHandler.setVoiceRecording()
+            this.setEmojiPickerElement() 
+            this.setUserPusherPresenceChannel() 
             this.setChatboxEventListener() 
-
+            
+            this.textMessageHandler.setButtonClick() 
+            this.textMessageHandler.setInputKeyDown() 
+            this.voiceMessageHandler.setButtonClick() 
+            this.voiceMessageHandler.setVoiceRecording()
+            this.imageMessageHandler.setButtonClick() 
+            this.imageMessageHandler.setFileInputOnChange() 
+            this.imageMessageHandler.setFileInputButtonClick()
+            
             users.forEach(async(user) => { 
                 this.usersMap.set(user.id, user)
+                
 
-                this.setForwardUserMessage(user)
+                this.forwardMessageHandler.setForwardMessage(user)
                 await this.setSidebarUserClickEvent(user)
                 await this.setUserPusherMessagesChannel(user) 
             }) 
@@ -154,10 +148,10 @@ export default class extends Controller {
 
                 messageElement.setAttribute('messageId', id)
                 messageElement.setAttribute('messageData', JSON.stringify(messageData))
-                messageElement.copyTextMessageCallback = this.copyTextMessageCallback
-                messageElement.forwardMessageCallback = this.forwardMessageCallback
+                messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
+                messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
 
-                this.chatboxScrollToBottom()
+                Utils.chatboxScrollToBottom()
                 chatbox.appendChild(messageElement)
 
                 Utils.reOrderLastFourChatboxElements()
@@ -183,7 +177,7 @@ export default class extends Controller {
             Utils.reOrderUsersListIfNewMessageIsBeingSentOrReceived(messageData.sender)
         })
 
-        await this.sleep(1)
+        await Utils.sleep(1)
     }
 
     setUserPusherPresenceChannel = () => {
@@ -256,156 +250,14 @@ export default class extends Controller {
 
             this.setUserToChatOnlineStatus()
 
-            this.textMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.usersMap)
-            this.voiceMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.ffmpeg, this.usersMap)
-            this.imageMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.ffmpeg, this.usersMap)
+            this.textMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.usersMap, this.forwardMessageHandler)
+            this.voiceMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.ffmpeg, this.usersMap, this.forwardMessageHandler)
+            this.imageMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.viewer, this.ffmpeg, this.usersMap, this.forwardMessageHandler)
+            this.forwardMessageHandler.init(this.textMessageHandler, this.voiceMessageHandler, this.imageMessageHandler, this.usersMap)
         } 
 
-        await this.sleep(1)
-    } 
-
-    xsetVoiceChatRecording = () => { 
-        const voiceChatRecordButton = document.getElementById('voicechat-record-button')
-        voiceChatRecordButton.onclick = async () => { 
-            if (!this.toSendImagesMap.size) { 
-                const waveFormContainer = document.getElementById('waveform-input')
-                waveFormContainer.textContent = ''
-
-                var wavesurfer = WaveSurfer.create({
-                    container: waveFormContainer,
-                    waveColor: 'rgb(200, 0, 200)', 
-                    hideScrollbar: true,   
-                    autoCenter: true,
-                    height: 30,
-                    barHeight: 25, 
-                    barWidth: 1.5,
-                    cursorWidth: 0, 
-                })
-
-                this.audioBlob = null
-                this.isVoiceRecording = true
-                this.isCloseVoiceRecording = false
-                const MAX_RECORDING_LIMIT = 60
-                const chatboxMessageInput = document.getElementById('chatbox-message-input')
-                const sendTextButton = document.getElementById('send-text-button')
-                const sendVoiceButton = document.getElementById('send-voice-button')
-                const voiceChatRecordInput = document.getElementById('chatbox-voice-input')
-                const voiceChatRecordTime = document.getElementById('voicechat-record-time')
-                const voiceChatRecordStart = document.getElementById('voicechat-record-start')
-                const voiceChatRecordSvgPlay = document.getElementById('voicechat-record-svg-play')
-                const voiceChatRecordSvgStop = document.getElementById('voicechat-record-svg-stop')
-                const voiceChatRecordDelete = document.getElementById('voicechat-record-delete')
-                const voiceChatRecordClose = document.getElementById('voicechat-record-close')
-
-                chatboxMessageInput.classList.add('hidden')
-                voiceChatRecordInput.classList.remove('hidden')
-                sendTextButton.classList.add('hidden')
-                sendVoiceButton.classList.remove('hidden')
-
-                wavesurfer.empty()
-                const record = wavesurfer.registerPlugin(RecordPlugin.create({ scrollingWaveform: false, renderRecordedAudio: false }))
-                record.on('record-end', async (blob) => {   
-                    const recordedUrl = URL.createObjectURL(blob) 
-                    
-                    wavesurfer.destroy() 
-                    wavesurfer = WaveSurfer.create({
-                        container: waveFormContainer,
-                        waveColor: 'rgb(200, 0, 200)', 
-                        progressColor: 'rgb(100, 50, 0)',
-                        hideScrollbar: true,   
-                        autoCenter: true,
-                        height: 30,
-                        barHeight: 25, 
-                        barWidth: 1.5,
-                        cursorWidth: 0, 
-                        url: recordedUrl
-                    }) 
-                    
-                    voiceChatRecordStart.onclick = () => wavesurfer.playPause()   
-
-                    wavesurfer.on('pause', () => { 
-                        voiceChatRecordSvgPlay.classList.remove('hidden')
-                        voiceChatRecordSvgStop.classList.add('hidden')
-                    })
-
-                    wavesurfer.on('play', () => {
-                        voiceChatRecordSvgPlay.classList.add('hidden')
-                        voiceChatRecordSvgStop.classList.remove('hidden')
-                    }) 
-
-                    wavesurfer.on('timeupdate', (currentTime) => { 
-                        const remainingTime = Math.abs(wavesurfer.getDuration() - currentTime)
-                        const minutes = Math.floor(remainingTime / 60)
-                        const seconds = Math.floor(remainingTime % 60)
-                        const formattedTime = `0${minutes}:${seconds.toString().padStart(2, '0')}`
-                        voiceChatRecordTime.textContent = formattedTime
-                    })
-
-                    wavesurfer.on('finish', ( ) => {
-                        wavesurfer.seekTo(0)
-                    })
-
-                    this.audioBlob = blob  
-                    this.isVoiceRecording = false
-                })
-
-                record.on('record-progress', (time) => {   
-                    if (parseInt((time) / 1000) >= MAX_RECORDING_LIMIT + 1) {
-                        voiceChatRecordStart.click()
-                    }
-                    else {
-                        const formattedTime = [
-                            Math.floor((time % 3600000) / 60000),
-                            Math.floor((time % 60000) / 1000),
-                        ].map((v) => (v < 10 ? '0' + v : v)).join(':')
-                        voiceChatRecordTime.textContent = formattedTime 
-                    }
-                })  
-
-                voiceChatRecordStart.onclick = () => {
-                    record.stopRecording()
-
-                    voiceChatRecordSvgPlay.classList.remove('hidden')
-                    voiceChatRecordSvgStop.classList.add('hidden')
-                    voiceChatRecordDelete.classList.remove('hidden')
-                    voiceChatRecordClose.classList.add('hidden')
-                }
-
-                voiceChatRecordDelete.onclick = async () => {
-                    voiceChatRecordSvgPlay.classList.add('hidden')
-                    voiceChatRecordSvgStop.classList.remove('hidden')
-                    voiceChatRecordDelete.classList.add('hidden')
-                    voiceChatRecordClose.classList.remove('hidden')
-
-                    wavesurfer.empty()
-                    wavesurfer.destroy() 
-
-                    voiceChatRecordButton.click()
-                    await record.startRecording() 
-                }
-
-                voiceChatRecordClose.onclick = () => {  
-                    this.isVoiceRecording = false
-                    this.isCloseVoiceRecording = true
-
-                    wavesurfer.empty()
-                    wavesurfer.destroy() 
-
-                    record.destroy()
-                    Utils.unHideMediaGroup()
-
-                    chatboxMessageInput.classList.remove('hidden')
-                    voiceChatRecordInput.classList.add('hidden') 
-                    sendTextButton.classList.remove('hidden')
-                    sendVoiceButton.classList.add('hidden')
-                    record.stopRecording()
-                }
-
-                Utils.hideMediaGroup()
-                await record.startRecording() 
-            }
-        }  
-    }
+        await Utils.sleep(1)
+    }  
 
     setUserLastMessage = async () => {
         const response = await this.service.getLastMessages(this.uidValue, this.currentUserValue.id)
@@ -516,8 +368,8 @@ export default class extends Controller {
 
                                 messageElement.setAttribute('messageId', id)
                                 messageElement.setAttribute('messageData', JSON.stringify(messageData))
-                                messageElement.copyTextMessageCallback = this.copyTextMessageCallback
-                                messageElement.forwardMessageCallback = this.forwardMessageCallback
+                                messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
+                                messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
 
                                 chatbox.prepend(messageElement)
                                 const imgCheck = messageElement.querySelector('.img-check')
@@ -540,8 +392,8 @@ export default class extends Controller {
                                 
                                 messageElement.setAttribute('messageId', id)
                                 messageElement.setAttribute('messageData', JSON.stringify(messageData))
-                                messageElement.copyTextMessageCallback = this.copyTextMessageCallback
-                                messageElement.forwardMessageCallback = this.forwardMessageCallback
+                                messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
+                                messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
 
                                 chatbox.prepend(messageElement) 
                             }
@@ -568,33 +420,8 @@ export default class extends Controller {
             }
         } 
 
-        await this.sleep(1)
-    }
-
-    setForwardUserMessage = (user) => {
-        const forwardUserSvgSent = document.getElementById(`forward-user-svg-sent-${user.id}`)
-        const forwardUserSvgDefault = document.getElementById(`forward-user-svg-default-${user.id}`)
-        const forwardUserSpanText = document.getElementById(`forward-user-span-text-${user.id}`)
-        const forwadUserButton = document.getElementById(`forward-user-button-${user.id}`)
-
-        forwadUserButton.onclick = async () => {   
-            forwadUserButton.setAttribute('disabled', '')
-            forwadUserButton.classList.add("cursor-not-allowed")
-            forwardUserSvgSent.classList.remove('hidden')
-            forwardUserSvgDefault.classList.add('hidden')
-            forwardUserSpanText.textContent = 'Sent'
-
-            if (this.forwardUserMessageType == MessageType.TEXT) {
-                await this.sendTextMessage(user.id, this.forwardUserMessageContent)
-            }
-            else if (this.forwardUserMessageType == MessageType.AUDIO) {
-                await this.sendVoiceMessage(user.id, this.forwardUserMessageBlob)
-            }
-            else if (this.forwardUserMessageType == MessageType.IMAGE) {
-                await this.sendImageMessage(user.id, this.forwardUserMessageBlob, null, null, null, this.forwardUserMessageMimeType, null, this.forwardUserMessageOutput, true)
-            } 
-        }
-    }
+        await Utils.sleep(1)
+    } 
 
     setDefaultValues = () => {
         this.page = 1 
@@ -602,21 +429,7 @@ export default class extends Controller {
         this.isLockInfiniteScrolling = true 
         
         document.getElementById("viewerjs-images-container").innerHTML = '' 
-    } 
-
-    copyTextMessageCallback = async (content) => {
-        await navigator.clipboard.writeText(content)
-    }
-
-    forwardMessageCallback = (type, content, blob, mimeType, output) => {
-        this.forwardUserMessageType = type
-        this.forwardUserMessageContent = content
-        this.forwardUserMessageBlob = blob
-        this.forwardUserMessageMimeType = mimeType
-        this.forwardUserMessageOutput = output 
-
-        Utils.setForwardUserUiDefaults(this.usersMap)
-    }
+    }  
     
     setConversations = async () => {   
         function clearChatboxElement() { 
@@ -656,8 +469,8 @@ export default class extends Controller {
                     
                     messageElement.setAttribute('messageId', id)
                     messageElement.setAttribute('messageData', JSON.stringify(messageData))
-                    messageElement.copyTextMessageCallback = this.copyTextMessageCallback
-                    messageElement.forwardMessageCallback = this.forwardMessageCallback
+                    messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
+                    messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
 
                     chatbox.appendChild(messageElement)
                     const imgCheck = messageElement.querySelector('.img-check')
@@ -679,13 +492,13 @@ export default class extends Controller {
                     
                     messageElement.setAttribute('messageId', id)
                     messageElement.setAttribute('messageData', JSON.stringify(messageData))
-                    messageElement.copyTextMessageCallback = this.copyTextMessageCallback
-                    messageElement.forwardMessageCallback = this.forwardMessageCallback
+                    messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
+                    messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
 
                     chatbox.appendChild(messageElement)  
                 }
             } 
-            this.chatboxScrollToBottom(true)
+            Utils.chatboxScrollToBottom(true)
 
             hasMessages = messages.length ? true : false
         }
@@ -820,415 +633,5 @@ export default class extends Controller {
 
         mainChatbox.classList.remove('hidden')
         mainChatboxIntro.classList.add('hidden') 
-    } 
-
-    setSentMessage = async (receiver, content, messageElement, message, type, timestamp, oldMessageElement=null) => {
-        const chatbox = document.getElementById('chatbox') 
-        
-        this.chatboxScrollToBottom(true) 
-        if (parseInt(this.userToChatId) == parseInt(receiver)) {
-            if (oldMessageElement) {
-                chatbox.replaceChild(messageElement, oldMessageElement)
-            }
-            else {
-                chatbox.appendChild(messageElement) 
-            }
-        }
-
-        Utils.reOrderLastFourChatboxElements()
-        Utils.setChatboxMessageAvatarHidden()
-        Utils.setChatboxDividerTimestamp()
-        Utils.setChatboxMessageBorderAndMargin()  
-
-        const response = await this.service.createTextMessage(this.uidValue, `messages/${this.currentUserValue.id}/${receiver}`, `${this.currentUserValue.id}-${receiver}`, this.currentUserValue.id, receiver, MessageType.TEXT, content, timestamp, true)
-        const imgCheck = messageElement.querySelector('.img-check')
-        if (response.ok) { 
-            const messageData = await response.json()
-            const id = messageData.id
-            messageElement.setAttribute('messageId', id)
-         
-            if (type == MessageType.TEXT) {
-                Utils.setUserLastMessageContent(receiver, message) 
-            }
-            else if (type == MessageType.AUDIO) {
-                Utils.setUserLastMessageContent(receiver, 'You sent an audio') 
-            }
-            else if (type == MessageType.IMAGE) {
-                Utils.setUserLastMessageContent(receiver, 'You sent an image') 
-            }
-            Utils.setUserLastMessageTimestamp(receiver, timestamp)
-            Utils.setUserLastMessageTimeAgo(receiver, timestamp, this.timeAgo)
-            Utils.reOrderUsersListIfNewMessageIsBeingSentOrReceived(receiver)
-            imgCheck.src = '/green_checks.svg'
-        }
-        else {
-            imgCheck.src = '/red_checks.svg'
-        }
-    }
-
-    sendTextMessage = async (receiver, message) => {
-        const chatboxMessageInput = document.getElementById('chatbox-message-input')
-        
-        chatboxMessageInput.textContent = ''
-        const type = MessageType.TEXT
-        const timestamp = Date.now()
-
-        const data = JSON.stringify({
-            sender: this.currentUserValue.id,
-            receiver: receiver,
-            type: type,
-            content: message,
-            timestamp: timestamp
-        })
-
-        const userTochatPublickey = Utils.base64ToArrayBuffer(this.usersMap.get(receiver).userDetails.publickey.publickey)
-        const encryptedSenderTextMessage = await Utils.encryptMessage(this.currentUserPublickey, data)
-        const encryptedReceiverTextMessage = await Utils.encryptMessage(userTochatPublickey, data) 
-        const content = btoa(JSON.stringify({
-            sender: encryptedSenderTextMessage,
-            receiver: encryptedReceiverTextMessage
-        }))
-
-        const messageElement = Utils.createOutgoingMessageTextElement(message, timestamp, this.timeAgo)
-        messageElement.setAttribute('messageData', data)
-        messageElement.copyTextMessageCallback = this.copyTextMessageCallback
-        messageElement.forwardMessageCallback = this.forwardMessageCallback
-        await this.setSentMessage(receiver, content, messageElement, message, type, timestamp)
-    } 
-
-    xsendVoiceMessage = async (receiver, blob) => { 
-        this.audioBlob = null
-  
-        const voiceChatRecordDelete = document.getElementById('voicechat-record-delete')
-        const voiceChatRecordClose = document.getElementById('voicechat-record-close')
-        voiceChatRecordDelete.click()
-        voiceChatRecordClose.click()
-
-        const url = URL.createObjectURL(blob)
-        const chatbox = document.getElementById('chatbox') 
-        const messageTempElement = Utils.createOutgoingMessageVoiceElement(url, Date.now(), this.timeAgo)
-        this.chatboxScrollToBottom(true)
-        if (parseInt(this.userToChatId) == parseInt(receiver)) { 
-            chatbox.appendChild(messageTempElement) 
-        }
- 
-        await this.ffmpeg.writeFile('input.webm', new Uint8Array(await blob.arrayBuffer()))
-        await this.ffmpeg.exec(['-i', 'input.webm', '-c:a', 'libopus', '-b:a', '0', 'output.webm']);
-        const file = new File([await this.ffmpeg.readFile('output.webm')], 'audio.webm', { type: 'audio/webm' }) 
-        const response = await this.service.createAudioMessage(this.uidValue, file, messageTempElement, Utils.progressSvgElementCallback) 
-
-        if (response.status == 200) {   
-            const type = MessageType.AUDIO
-            const timestamp = Date.now()
-
-            const data = JSON.stringify({
-                sender: this.currentUserValue.id,
-                receiver: receiver,
-                type: type,
-                content: response.data,
-                timestamp: timestamp
-            }) 
-
-            const userTochatPublickey = Utils.base64ToArrayBuffer(this.usersMap.get(receiver).userDetails.publickey.publickey)
-            const encryptedSenderTextMessage = await Utils.encryptMessage(this.currentUserPublickey, data)
-            const encryptedReceiverTextMessage = await Utils.encryptMessage(userTochatPublickey, data) 
-            const content = btoa(JSON.stringify({
-                sender: encryptedSenderTextMessage,
-                receiver: encryptedReceiverTextMessage
-            }))
- 
-            const messageElement = Utils.createOutgoingMessageVoiceElement(url, timestamp, this.timeAgo)
-            messageElement.setAttribute('messageData', data)
-            messageElement.copyTextMessageCallback = this.copyTextMessageCallback
-            messageElement.forwardMessageCallback = this.forwardMessageCallback
-            await this.setSentMessage(receiver, content, messageElement, null, type, timestamp, messageTempElement)
-        }
-    }
-
-    sendImageMessage = async (receiver, blob, input, width, height, mimeType, extension, output, isForward=false) => {
-        let file = null 
-        let url = URL.createObjectURL(blob)
-
-        if (isForward) {
-            file = new File([new Uint8Array(await blob.arrayBuffer())], output, { type: mimeType }) 
-        } 
-        else if (extension == 'png') {
-            await this.ffmpeg.writeFile(input, new Uint8Array(await blob.arrayBuffer()))
-            await this.ffmpeg.exec(['-i', input, '-vf', `scale=${width}:${height}`, output]);
-            file = new File([await this.ffmpeg.readFile(output)], output, { type: mimeType })  
-        }
-        else if (extension == 'GIF') {
-            file = new File([new Uint8Array(await blob.arrayBuffer())], output, { type: mimeType }) 
-        }
-        else if (extension == "heic") {
-            const heicBlob = await heic2any({ blob, toType: 'image/jpeg'}) 
-            url = URL.createObjectURL(heicBlob)
-            
-            await this.ffmpeg.writeFile('input.jpeg', new Uint8Array(await heicBlob.arrayBuffer()))
-            await this.ffmpeg.exec(['-i', 'input.jpeg', '-pix_fmt', 'yuv420p', '-vf', `scale=${width}:${height}`, 'output.jpeg']);
-            file = new File([await this.ffmpeg.readFile('output.jpeg')], 'output.jpeg', { type: 'image/jpeg' })  
-        }
-        else {
-            await this.ffmpeg.writeFile(input, new Uint8Array(await blob.arrayBuffer()))
-            await this.ffmpeg.exec(['-i', input, '-pix_fmt', 'yuv420p', '-vf', `scale=${width}:${height}`, output]);
-            file = new File([await this.ffmpeg.readFile(output)], output, { type: mimeType }) 
-        }  
-        
-        const chatbox = document.getElementById('chatbox') 
-        const messageTempElement = Utils.createOutgoingMessageImageElement(url, Date.now(), this.timeAgo)  
-        this.chatboxScrollToBottom(true)
-        if (parseInt(this.userToChatId) == parseInt(receiver)) {
-            chatbox.appendChild(messageTempElement) 
-        }
-
-        const response = await this.service.createImageMessage(this.uidValue, file, extension == 'heic' ? 'jpeg' : extension, messageTempElement, Utils.progressSvgElementCallback)
-        if (response.status == 200) { 
-            const type = MessageType.IMAGE
-            const timestamp = Date.now()
-
-            const data = JSON.stringify({
-                sender: this.currentUserValue.id,
-                receiver: receiver,
-                type: type,
-                content: response.data,
-                timestamp: timestamp
-            })
-
-            const userTochatPublickey = Utils.base64ToArrayBuffer(this.usersMap.get(receiver).userDetails.publickey.publickey)
-            const encryptedSenderTextMessage = await Utils.encryptMessage(this.currentUserPublickey, data)
-            const encryptedReceiverTextMessage = await Utils.encryptMessage(userTochatPublickey, data) 
-            const content = btoa(JSON.stringify({
-                sender: encryptedSenderTextMessage,
-                receiver: encryptedReceiverTextMessage
-            })) 
-
-            const messageElement = Utils.createOutgoingMessageImageElement(url, timestamp, this.timeAgo) 
-            messageElement.setAttribute('messageData', data)
-            messageElement.copyTextMessageCallback = this.copyTextMessageCallback
-            messageElement.forwardMessageCallback = this.forwardMessageCallback
-            Utils.setViewerJsImageElement(messageElement, this.viewer)
-            await this.setSentMessage(receiver, content, messageElement, null, type, timestamp, messageTempElement) 
-        }
-    }
-
-    xsetOnChangeImageFileInput = () => { 
-        const imageFileInput = document.getElementById('image-file-input')
-        imageFileInput.onchange = async (e) => { 
-            const files = e.target.files
-            const chatboxMessageInput = document.getElementById('chatbox-message-input') 
-            const chatboxVoiceInput = document.getElementById('chatbox-voice-input')
-            const chatboxImageInput = document.getElementById('chatbox-image-input')
-            const sendTextButton = document.getElementById('send-text-button')
-            const sendVoiceButton = document.getElementById('send-voice-button')
-            const sendImageButton = document.getElementById('send-image-button') 
-            
-            chatboxImageInput.innerHTML = ''
-            if (files.length) { 
-                Utils.hideMediaGroup()
-                chatboxMessageInput.classList.add('hidden')
-                chatboxVoiceInput.classList.add('hidden')
-                chatboxImageInput.classList.remove('hidden')
-                sendTextButton.classList.add('hidden')
-                sendVoiceButton.classList.add('hidden')
-                sendImageButton.classList.remove('hidden')
-
-                for (let i = 0; i < files.length; i++) {
-                    const file = files[i]
-                    this.toSendImagesMap.set(i, {
-                        'file': file,
-                        'width': null,
-                        'height': null
-                    })
-                    // Create a container div for image and close button
-                    const imageContainer = document.createElement('div');
-                    imageContainer.style.position = 'relative';
-                    imageContainer.style.display = 'inline-block';
-                    imageContainer.style.margin = '5px';
-
-                    // Create the img element
-                    const img = document.createElement('img');
-                    img.setAttribute('mimeType', file.type)
-                    img.setAttribute('key', i)
-                    img.classList.add('image')
-                    img.style.width = '50px';
-                    img.style.height = '50px';
-                    img.style.objectFit = 'fill'
-
-                    // Read the file as a Data URL
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        const fakeImg = document.createElement('img')
-                        fakeImg.src = event.target.result
-                        fakeImg.onload = () => { 
-                            this.toSendImagesMap.set(i, {
-                                'file': file,
-                                'width': fakeImg.width,
-                                'height': fakeImg.height
-                            })
-                        }
-
-                        img.src = event.target.result;
-                    };
-
-                    // Read the image file
-                    reader.readAsDataURL(file);
-
-                    // Create a close button
-                    const closeButton = document.createElement('button');
-                    closeButton.innerHTML = '&times;';
-                    closeButton.style.position = 'absolute';
-                    closeButton.style.top = '0';
-                    closeButton.style.right = '0';
-                    closeButton.style.backgroundColor = 'rgb(234 63 63)';
-                    closeButton.style.color = 'white';
-                    closeButton.style.border = 'none';
-                    closeButton.style.borderRadius = '50%';
-                    closeButton.style.cursor = 'pointer';
-                    closeButton.style.width = '25px';
-                    closeButton.style.height = '25px';
-                    closeButton.style.fontSize = '14px';
-                    closeButton.style.lineHeight = '25px';  // Set line-height to match the button height for vertical centering
-                    closeButton.style.textAlign = 'center';
-
-                    // Add event listener to remove the imageContainer on click
-                    closeButton.onclick = () => {
-                        this.toSendImagesMap.delete(i)
-                        chatboxImageInput.removeChild(imageContainer); 
-
-                        if (!this.toSendImagesMap.size) {
-                            chatboxMessageInput.classList.remove('hidden')
-                            chatboxVoiceInput.classList.add('hidden')
-                            chatboxImageInput.classList.add('hidden')
-                            sendTextButton.classList.remove('hidden')
-                            sendVoiceButton.classList.add('hidden')
-                            sendImageButton.classList.add('hidden')
-                        }
-                    };
-
-                    // Append the img and close button to the container
-                    imageContainer.appendChild(img);
-                    imageContainer.appendChild(closeButton);
-
-                    // Append the container to the chatboxInput div
-                    chatboxImageInput.appendChild(imageContainer);
-                }   
-            } 
-        }
-    }
-
-    xsetImageButtonClick = () => {
-        const imageInputButton = document.getElementById('image-input-button')
-
-        imageInputButton.onclick = () => { 
-            if (!this.isVoiceRecording && this.isCloseVoiceRecording) { 
-                const imageFileInput = document.getElementById('image-file-input')
-                imageFileInput.click()
-            }
-        }
-    }
-
-    xsetSendTextButtonClick = () => { 
-        const chatboxMessageInput = document.getElementById('chatbox-message-input')
-        const sendTextButton = document.getElementById('send-text-button')
-
-        sendTextButton.onclick = async () => {
-            const message = chatboxMessageInput.innerText.trim()  
-            if (!this.isEmptyOrSpaces(message)) { 
-                await this.sendTextMessage(this.userToChatId, message)
-            }  
-        }
-    }
-
-    xsetSendVoiceButtonClick = () => { 
-        const sendVoiceButton = document.getElementById('send-voice-button')
-        sendVoiceButton.onclick = async () => {  
-            if(this.audioBlob != null && !this.isVoiceRecording) {  
-                await this.sendVoiceMessage(this.userToChatId, this.audioBlob)
-            }
-        }
-    }
-
-    xsetSendImageButtonClick = () => { 
-        const chatboxMessageInput = document.getElementById('chatbox-message-input') 
-        const chatboxVoiceInput = document.getElementById('chatbox-voice-input')
-        const chatboxImageInput = document.getElementById('chatbox-image-input')
-        const sendTextButton = document.getElementById('send-text-button') 
-        const sendVoiceButton = document.getElementById('send-voice-button') 
-        const sendImageButton = document.getElementById('send-image-button') 
-
-        sendImageButton.onclick = () => {  
-            if (!Utils.isTotalImagesToSendNotExceeded(this.toSendImagesMap.size)) { return }
-            if (!Utils.isImageFilesizeNotExceeded(Array.from(this.toSendImagesMap))) { return }
-
-            this.toSendImagesMap.forEach(async (value, key) => { 
-                const blob = value['file']
-                const input = value['file'].name
-                const width = Math.floor(value['width'] * .75)
-                const height = Math.floor(value['height'] * .75)
-                const mimeType = value['file'].type
-                const extension = mimeType.split("/")[1] 
-                const output = CryptoJS.MD5(Utils.generateRandomString(16)).toString() + "." + extension
-                
-                await this.sendImageMessage(this.userToChatId, blob, input, width, height, mimeType, extension, output)
-            })
-
-            Utils.unHideMediaGroup()
-            this.toSendImagesMap = new Map()
-            chatboxImageInput.innerHTML = ''
-
-            chatboxMessageInput.classList.remove('hidden')
-            chatboxVoiceInput.classList.add('hidden')
-            chatboxImageInput.classList.add('hidden')
-            sendTextButton.classList.remove('hidden')
-            sendVoiceButton.classList.add('hidden')
-            sendImageButton.classList.add('hidden')
-        }
-    }
-
-    xsetSendMessageChatboxInputKeyDown = () => { 
-        const chatboxMessageInput = document.getElementById('chatbox-message-input')
-        chatboxMessageInput.onkeydown = async (e) => {
-            const message = e.target.innerText.trim()
-            if (Utils.getUserAgentPlatformType() == 'desktop') {
-                if (e.key === 'Enter' && !e.shiftKey) {  
-                    e.preventDefault()
-                    
-                    if (!this.isEmptyOrSpaces(message)) {
-                        await this.sendTextMessage(this.userToChatId, message)
-                    } 
-                }
-            }
-        }
-    } 
-
-    chatboxScrollToBottom = (force=false) => {
-        const chatbox = document.getElementById('chatbox')
-        function isScrollbarAtBottom(element){
-            const offset = Math.abs(element.scrollHeight - element.clientHeight) * .40  
-            return Math.abs(element.scrollHeight - element.clientHeight - element.scrollTop) <= offset
-        }
-
-        if (force) {
-            setTimeout(() => {
-                chatbox.style.scrollBehavior = "smooth"
-                chatbox.scrollTop = chatbox.scrollHeight
-            }, 500)
-        }
-        else {
-            if (isScrollbarAtBottom(chatbox)) {
-                setTimeout(() => {
-                    chatbox.style.scrollBehavior = "smooth"
-                    chatbox.scrollTop = chatbox.scrollHeight
-                }, 500)
-            }
-        }
-    }
-
-    isEmptyOrSpaces = (str) => {
-        return str === null || str.match(/^ *$/) !== null
-    } 
-
-    sleep = (ms) => {
-        return new Promise(resolve => setTimeout(resolve, ms))
-    }
+    }    
 }

@@ -1,18 +1,20 @@
-import Utils from '../js/utils';
-import Service from '../service/service';
-import MessageType from './message_type';
+import Utils from '../utils/utils';
+import Service from '../../service/service';
+import MessageType from '../types/message_type';
 
+import heic2any from 'heic2any';
 import CryptoJS from 'crypto-js';
-import TimeAgo from 'javascript-time-ago';
-import en from 'javascript-time-ago/locale/en'
+import TimeAgo from 'javascript-time-ago'; 
 
 export default class ImageMessageHandler {
     constructor() {
         this.uid = null
         this.ffmpeg = null
+        this.viewer = null
         this.currentUser = null
         this.userToChatId = null
-        this.currentUserPublickey = null
+        this.currentUserPublickey = null 
+        this.forwardMessageHandler = null
         this.usersMap = new Map()
         this.timeAgo = new TimeAgo('en-US')
         this.service = new Service()
@@ -20,14 +22,16 @@ export default class ImageMessageHandler {
         this.imagesMap = new Map()
     }
 
-    init = (uid, currentUser, userToChatId, currentUserPublickey, ffmpeg, usersMap) => {
+    init = (uid, currentUser, userToChatId, currentUserPublickey, viewer, ffmpeg, usersMap, forwardMessageHandler) => {
         this.uid = uid
         this.currentUser = currentUser
         this.userToChatId = userToChatId
-        this.currentUserPublickey = currentUserPublickey
+        this.currentUserPublickey = currentUserPublickey 
+        this.forwardMessageHandler = forwardMessageHandler
         this.usersMap = usersMap
+        this.viewer = viewer
         this.ffmpeg = ffmpeg 
-        this.imagesMap = new Map()
+        this.imagesMap = new Map()  
     }
 
     setButtonClick = () => {
@@ -51,7 +55,7 @@ export default class ImageMessageHandler {
                 const extension = mimeType.split("/")[1] 
                 const output = CryptoJS.MD5(Utils.generateRandomString(16)).toString() + "." + extension
                 
-                await this.#sendMessage(this.userToChatId, blob, input, width, height, mimeType, extension, output)
+                await this.sendMessage(this.userToChatId, blob, input, width, height, mimeType, extension, output)
             })
 
             Utils.unHideMediaGroup()
@@ -181,7 +185,7 @@ export default class ImageMessageHandler {
         }
     }
 
-    #sendMessage = async (userToChatId, blob, input, width, height, mimeType, extension, output, isForward=false) => {
+    sendMessage = async (userToChatId, blob, input, width, height, mimeType, extension, output, isForward=false) => {
         let file = null 
         let url = URL.createObjectURL(blob)
 
@@ -236,21 +240,18 @@ export default class ImageMessageHandler {
                 receiver: encryptedReceiverTextMessage
             })) 
 
-            await this.#setSendMessage(userToChatId, url, content, timestamp, messageTempElement, data)
-            //const messageElement = Utils.createOutgoingMessageImageElement(url, timestamp, this.timeAgo) 
-            //messageElement.setAttribute('messageData', data)
-            //messageElement.copyTextMessageCallback = this.copyTextMessageCallback
-            //messageElement.forwardMessageCallback = this.forwardMessageCallback
-            //Utils.setViewerJsImageElement(messageElement, this.viewer)
-            //await this.setSentMessage(receiver, content, messageElement, null, type, timestamp, messageTempElement) 
+            await this.setSendMessage(userToChatId, url, content, timestamp, messageTempElement, data) 
         }
     }
 
-    #setSendMessage = async (userToChatId, url, content, timestamp, oldMessageElement, data) => {
+    setSendMessage = async (userToChatId, url, content, timestamp, oldMessageElement, data) => {
         const chatbox = document.getElementById('chatbox') 
         const messageElement = Utils.createOutgoingMessageImageElement(url, timestamp, this.timeAgo)
         messageElement.setAttribute('messageData', data)
+        messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
+        messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
         
+        Utils.setViewerJsImageElement(messageElement, this.viewer)
         Utils.chatboxScrollToBottom(true) 
         chatbox.replaceChild(messageElement, oldMessageElement)
 
