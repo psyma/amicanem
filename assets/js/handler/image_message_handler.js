@@ -253,7 +253,9 @@ export default class ImageMessageHandler {
         
         Utils.setViewerJsImageElement(messageElement, this.viewer)
         Utils.chatboxScrollToBottom(true) 
-        chatbox.replaceChild(messageElement, oldMessageElement)
+        if (this.userToChatId == userToChatId) { 
+            chatbox.replaceChild(messageElement, oldMessageElement)
+        } 
 
         Utils.reOrderLastFourChatboxElements()
         Utils.setChatboxMessageAvatarHidden()

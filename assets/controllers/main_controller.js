@@ -94,7 +94,6 @@ export default class extends Controller {
             users.forEach(async(user) => { 
                 this.usersMap.set(user.id, user)
                 
-
                 this.forwardMessageHandler.setForwardMessage(user)
                 await this.setSidebarUserClickEvent(user)
                 await this.setUserPusherMessagesChannel(user) 

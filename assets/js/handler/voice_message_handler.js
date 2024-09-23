@@ -238,7 +238,9 @@ export default class VoiceMessageHandler {
         messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
 
         Utils.chatboxScrollToBottom(true) 
-        chatbox.replaceChild(messageElement, oldMessageElement)
+        if (this.userToChatId == userToChatId) { 
+            chatbox.replaceChild(messageElement, oldMessageElement)
+        } 
 
         Utils.reOrderLastFourChatboxElements()
         Utils.setChatboxMessageAvatarHidden()

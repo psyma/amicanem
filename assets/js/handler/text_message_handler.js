@@ -89,7 +89,9 @@ export default class TextMessageHandler {
         messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
 
         Utils.chatboxScrollToBottom(true) 
-        chatbox.appendChild(messageElement) 
+        if (this.userToChatId == userToChatId) { 
+            chatbox.appendChild(messageElement) 
+        } 
 
         Utils.reOrderLastFourChatboxElements()
         Utils.setChatboxMessageAvatarHidden()
