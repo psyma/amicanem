@@ -254,6 +254,7 @@ export default class ImageMessageHandler {
         messageElement.setAttribute('messageData', data)
         messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
         messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
+        messageElement.deleteMessageCallback = this.service.deleteMessage
         
         if (this.userToChatId == userToChatId) { 
             Utils.setViewerJsImageElement(messageElement, this.viewer)
@@ -271,6 +272,7 @@ export default class ImageMessageHandler {
         if (response.ok) { 
             const messageData = await response.json()
             const id = messageData.id
+            messageElement.setAttribute('uid', this.uid)
             messageElement.setAttribute('messageId', id)
          
             Utils.setUserLastMessageContent(userToChatId, 'You sent a photo') 

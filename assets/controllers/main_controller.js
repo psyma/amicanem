@@ -145,10 +145,12 @@ export default class extends Controller {
                     Utils.setViewerJsImageElement(messageElement, this.viewer)
                 }
 
+                messageElement.setAttribute('uid', this.uidValue) 
                 messageElement.setAttribute('messageId', id)
                 messageElement.setAttribute('messageData', JSON.stringify(messageData))
                 messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
                 messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
+                messageElement.deleteMessageCallback = this.service.deleteMessage 
 
                 Utils.chatboxScrollToBottom()
                 chatbox.appendChild(messageElement)
@@ -161,14 +163,17 @@ export default class extends Controller {
 
             if (messageData.type == MessageType.TEXT) {
                 Utils.setUserLastMessageContent(messageData.sender, messageData.content)  
+                messageElement.setAttribute('lastMessageContent', messageData.content) 
             }
             else if (messageData.type == MessageType.AUDIO) {
                 const firstname = this.usersMap.get(messageData.sender).userDetails.firstname.split(' ')[0]
                 Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent an audio 🔊') 
+                messageElement.setAttribute('lastMessageContent', firstname + ' sent an audio 🔊') 
             }
             else if (messageData.type == MessageType.IMAGE) {
                 const firstname = this.usersMap.get(messageData.sender).userDetails.firstname.split(' ')[0]
                 Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent a photo 🖼️') 
+                messageElement.setAttribute('lastMessageContent', firstname + ' sent a photo 🖼️') 
             }
 
             Utils.setUserLastMessageTimestamp(messageData.sender, messageData.timestamp)
@@ -316,15 +321,16 @@ export default class extends Controller {
     }  
 
     setUserLastMessage = async () => {
-        const response = await this.service.getLastMessages(this.uidValue, this.currentUserValue.id)
+        const response = await this.service.getLastMessages(this.uidValue, this.currentUserValue.id) 
         if (response.ok) {
-            const messages = await response.json()
+            const messages = await response.json() 
             for (let i = 0; i < messages.length; i++) {
                 const { id, content, isSeen } = messages[i]
                 const { sender, receiver } = JSON.parse(atob(content))  
-                
+
                 try { 
-                    const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender)) 
+                    const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender))  
+
                     if (messageData.type == MessageType.TEXT) {
                         Utils.setUserLastMessageContent(messageData.receiver, messageData.content) 
                     }
@@ -336,13 +342,13 @@ export default class extends Controller {
                     }
 
                     Utils.setUserLastMessageTimestamp(messageData.receiver, messageData.timestamp)
-                    Utils.setUserLastMessageTimeAgo(messageData.receiver, messageData.timestamp, this.timeAgo)
-                } catch(e) {  
-                    try{
-
+                    Utils.setUserLastMessageTimeAgo(messageData.receiver, messageData.timestamp, this.timeAgo) 
+                } catch(e) {   
+                    try {  
                         const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver)) 
+                        
                         if (messageData.type == MessageType.TEXT) {
-                            Utils.setUserLastMessageContent(messageData.sender, messageData.content) 
+                            Utils.setUserLastMessageContent(messageData.sender, messageData.content)  
                         } 
                         else if (messageData.type == MessageType.AUDIO) {
                             const firstname = this.usersMap.get(messageData.sender).userDetails.firstname.split(' ')[0]
@@ -354,11 +360,12 @@ export default class extends Controller {
                         }
                         
                         Utils.setUserLastMessageTimestamp(messageData.sender, messageData.timestamp)
-                        Utils.setUserLastMessageTimeAgo(messageData.sender, messageData.timestamp, this.timeAgo) 
-                    }catch(ee) { 
-                    }
+                        Utils.setUserLastMessageTimeAgo(messageData.sender, messageData.timestamp, this.timeAgo)
+                    } catch(e) { }
                 }
             } 
+
+            
         }
 
         Utils.sortUsersListBaseOnLastMessageTimestamp()
@@ -422,10 +429,12 @@ export default class extends Controller {
                                     Utils.setViewerJsImageElement(messageElement, this.viewer)
                                 }      
 
+                                messageElement.setAttribute('uid', this.uidValue)
                                 messageElement.setAttribute('messageId', id)
                                 messageElement.setAttribute('messageData', JSON.stringify(messageData))
                                 messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
                                 messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
+                                messageElement.deleteMessageCallback = this.service.deleteMessage
 
                                 chatbox.prepend(messageElement)
                                 const imgCheck = messageElement.querySelector('.img-check')
@@ -446,10 +455,12 @@ export default class extends Controller {
                                     Utils.setViewerJsImageElement(messageElement, this.viewer)
                                 }
                                 
+                                messageElement.setAttribute('uid', this.uidValue)
                                 messageElement.setAttribute('messageId', id)
                                 messageElement.setAttribute('messageData', JSON.stringify(messageData))
                                 messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
                                 messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
+                                messageElement.deleteMessageCallback = this.service.deleteMessage
 
                                 chatbox.prepend(messageElement) 
                             }
@@ -514,19 +525,24 @@ export default class extends Controller {
                     const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender))   
                     if (messageData.type == MessageType.TEXT) {
                         messageElement = Utils.createOutgoingMessageTextElement(messageData.content, messageData.timestamp, this.timeAgo) 
+                        messageElement.setAttribute('lastMessageContent', messageData.content) 
                     }
                     else if (messageData.type == MessageType.AUDIO) { 
                         messageElement = Utils.createOutgoingMessageVoiceElement(messageData.content, messageData.timestamp, this.timeAgo) 
+                        messageElement.setAttribute('lastMessageContent', 'You sent an audio 🔊') 
                     }
                     else if (messageData.type == MessageType.IMAGE) {
                         messageElement = Utils.createOutgoingMessageImageElement(messageData.content, messageData.timestamp, this.timeAgo) 
+                        messageElement.setAttribute('lastMessageContent', 'You sent a photo 🖼️') 
                         Utils.setViewerJsImageElement(messageElement, this.viewer)
                     }
                     
+                    messageElement.setAttribute('uid', this.uidValue)
                     messageElement.setAttribute('messageId', id)
                     messageElement.setAttribute('messageData', JSON.stringify(messageData))
                     messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
                     messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
+                    messageElement.deleteMessageCallback = this.service.deleteMessage
 
                     chatbox.appendChild(messageElement)
                     const imgCheck = messageElement.querySelector('.img-check')
@@ -540,16 +556,22 @@ export default class extends Controller {
                     }
                     else if (messageData.type == MessageType.AUDIO) {
                         messageElement = Utils.createIncomingMessageVoiceElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
+                        const firstname = this.usersMap.get(messageData.sender).userDetails.firstname.split(' ')[0]
+                        messageElement.setAttribute('lastMessageContent', firstname + ' sent an audio 🔊') 
                     }
                     else if ( messageData.type == MessageType.IMAGE) {
                         messageElement = Utils.createIncommingMessageImageElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
+                        const firstname = this.usersMap.get(messageData.sender).userDetails.firstname.split(' ')[0]
+                        messageElement.setAttribute('lastMessageContent', firstname + ' sent a photo 🖼️') 
                         Utils.setViewerJsImageElement(messageElement, this.viewer)
                     }
                     
+                    messageElement.setAttribute('uid', this.uidValue)
                     messageElement.setAttribute('messageId', id)
                     messageElement.setAttribute('messageData', JSON.stringify(messageData))
                     messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
                     messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
+                    messageElement.deleteMessageCallback = this.service.deleteMessage
 
                     chatbox.appendChild(messageElement)  
                 }

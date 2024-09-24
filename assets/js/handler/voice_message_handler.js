@@ -238,6 +238,7 @@ export default class VoiceMessageHandler {
         messageElement.setAttribute('messageData', data)
         messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
         messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
+        messageElement.deleteMessageCallback = this.service.deleteMessage
 
         if (this.userToChatId == userToChatId) { 
             Utils.chatboxScrollToBottom(true) 
@@ -254,6 +255,7 @@ export default class VoiceMessageHandler {
         if (response.ok) { 
             const messageData = await response.json()
             const id = messageData.id
+            messageElement.setAttribute('uid', this.uid)
             messageElement.setAttribute('messageId', id)
          
             Utils.setUserLastMessageContent(userToChatId, 'You sent an audio 🔊') 
