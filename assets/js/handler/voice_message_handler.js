@@ -256,7 +256,7 @@ export default class VoiceMessageHandler {
             const id = messageData.id
             messageElement.setAttribute('messageId', id)
          
-            Utils.setUserLastMessageContent(userToChatId, 'You sent an audio') 
+            Utils.setUserLastMessageContent(userToChatId, 'You sent an audio 🔊') 
             Utils.setUserLastMessageTimestamp(userToChatId, timestamp)
             Utils.setUserLastMessageTimeAgo(userToChatId, timestamp, this.timeAgo)
             Utils.reOrderUsersListIfNewMessageIsBeingSentOrReceived(userToChatId)

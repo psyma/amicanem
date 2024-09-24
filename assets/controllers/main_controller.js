@@ -163,12 +163,12 @@ export default class extends Controller {
                 Utils.setUserLastMessageContent(messageData.sender, messageData.content)  
             }
             else if (messageData.type == MessageType.AUDIO) {
-                const firstname = this.usersMap.get(messageData.sender).userDetails.firstname
-                Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent an audio') 
+                const firstname = this.usersMap.get(messageData.sender).userDetails.firstname.split(' ')[0]
+                Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent an audio 🔊') 
             }
             else if (messageData.type == MessageType.IMAGE) {
-                const firstname = this.usersMap.get(messageData.sender).userDetails.firstname
-                Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent an image') 
+                const firstname = this.usersMap.get(messageData.sender).userDetails.firstname.split(' ')[0]
+                Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent a photo 🖼️') 
             }
 
             Utils.setUserLastMessageTimestamp(messageData.sender, messageData.timestamp)
@@ -329,10 +329,10 @@ export default class extends Controller {
                         Utils.setUserLastMessageContent(messageData.receiver, messageData.content) 
                     }
                     else if (messageData.type == MessageType.AUDIO) {  
-                        Utils.setUserLastMessageContent(messageData.receiver, 'You sent an audio') 
+                        Utils.setUserLastMessageContent(messageData.receiver, 'You sent an audio 🔊') 
                     }
                     else if (messageData.type == MessageType.IMAGE) {
-                        Utils.setUserLastMessageContent(messageData.receiver, 'You sent an image') 
+                        Utils.setUserLastMessageContent(messageData.receiver, 'You sent a photo 🖼️') 
                     }
 
                     Utils.setUserLastMessageTimestamp(messageData.receiver, messageData.timestamp)
@@ -345,12 +345,12 @@ export default class extends Controller {
                             Utils.setUserLastMessageContent(messageData.sender, messageData.content) 
                         } 
                         else if (messageData.type == MessageType.AUDIO) {
-                            const firstname = this.usersMap.get(messageData.sender).userDetails.firstname
-                            Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent an audio') 
+                            const firstname = this.usersMap.get(messageData.sender).userDetails.firstname.split(' ')[0]
+                            Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent an audio 🔊') 
                         }
                         else if (messageData.type == MessageType.IMAGE) {
-                            const firstname = this.usersMap.get(messageData.sender).userDetails.firstname
-                            Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent an image') 
+                            const firstname = this.usersMap.get(messageData.sender).userDetails.firstname.split(' ')[0]
+                            Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent a photo 🖼️') 
                         }
                         
                         Utils.setUserLastMessageTimestamp(messageData.sender, messageData.timestamp)
