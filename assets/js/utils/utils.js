@@ -383,6 +383,8 @@ export default class Utils {
 
             forwadUserButton.removeAttribute('disabled')
             forwadUserButton.classList.remove("cursor-not-allowed")
+            forwadUserButton.classList.add('bg-indigo-600', 'dark:bg-indigo-300')
+            forwadUserButton.classList.remove('bg-gray-600', 'dark:bg-gray-300')
             forwardUserSvgSent.classList.add('hidden')
             forwardUserSvgDefault.classList.remove('hidden')
             forwardUserSpanText.textContent = 'Send'

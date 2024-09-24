@@ -45,6 +45,8 @@ export default class ForwardMessageHandler {
         forwadUserButton.onclick = async () => {    
             forwadUserButton.setAttribute('disabled', '')
             forwadUserButton.classList.add("cursor-not-allowed")
+            forwadUserButton.classList.remove('bg-indigo-600', 'dark:bg-indigo-300')
+            forwadUserButton.classList.add('bg-gray-600', 'dark:bg-gray-300')
             forwardUserSvgSent.classList.remove('hidden')
             forwardUserSvgDefault.classList.add('hidden')
             forwardUserSpanText.textContent = 'Sent'
