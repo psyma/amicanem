@@ -75,6 +75,15 @@ export default class Service {
         }
     }
 
+    deleteMessage = async (uid, id) => { 
+        try { 
+            const response = await fetch(`/delete_message/${uid}/${id}`, { method: "DELETE" })
+            return await response
+        } catch(e) {
+            return { ok: false }
+        } 
+    }
+
     sendTypingNotification = async (uid, event, channels, isTyping) => {
         const data = new FormData()
         data.append('uid', uid) 
@@ -115,16 +124,7 @@ export default class Service {
         } catch(e) {
             return { ok: false }
         } 
-    }
-
-    deleteMessage = async (uid, id) => { 
-        try { 
-            const response = await fetch(`/message/${uid}/${id}`, { method: "DELETE" })
-            return await response
-        } catch(e) {
-            return { ok: false }
-        } 
-    }
+    } 
 
     createImage = async (uid, sender, file, progressCircle) => {
         const data = new FormData()

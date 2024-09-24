@@ -13,6 +13,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request; 
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class MessageController extends AbstractController
@@ -150,6 +151,24 @@ class MessageController extends AbstractController
 
         return new JsonResponse($last_messages);
     } 
+
+    #[Route('/delete_message/{uid}/{id}', name: 'app_delete_message', methods: ["DELETE"])]
+    public function delete_message(string $uid, int $id): Response
+    {   
+        $this->denyAccessUnlessGranted("ROLE_USER");   
+        $this->denyAccessUnlessCurrentUser($uid);
+
+        $message = $this->messageRepository->find($id);
+        if ($message != null) {
+            $this->entityManager->remove($message);
+            $this->entityManager->flush();
+        }
+        else {
+            return new Response('Message not found', Response::HTTP_NOT_FOUND);
+        }
+
+        return new Response(null, Response::HTTP_NO_CONTENT);
+    }
 
     private function denyAccessUnlessCurrentUser($uid) {
         $user = $this->userRepository->findOneByEmail($this->getUser()->getUserIdentifier());
