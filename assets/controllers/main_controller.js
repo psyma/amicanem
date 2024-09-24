@@ -76,6 +76,7 @@ export default class extends Controller {
             this.setEmojiPickerElement() 
             this.setUserPusherPresenceChannel() 
             this.setChatboxEventListener() 
+            this.setIsTypingNotification()
             
             this.textMessageHandler.setButtonClick() 
             this.textMessageHandler.setInputKeyDown() 
@@ -96,25 +97,7 @@ export default class extends Controller {
             await this.setEncryptionDetails()  
             await this.setUserLastMessage()
             await this.setChatboxInfiniteScrolling()
-        }     
-
-        const chatboxMessageInput = document.getElementById("chatbox-message-input")  
-        chatboxMessageInput.addEventListener("keydown", async () => {
-            if (!this.isTyping) {
-                this.isTyping = true
-                await this.service.sendTypingNotification(this.uidValue, `typing/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, true)
-            }
-            clearTimeout(this.typingTimeout)
-        
-            this.typingTimeout = setTimeout(async () => {
-                this.isTyping = false
-                await this.service.sendTypingNotification(this.uidValue, `typing/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, false)
-            }, 1000)
-        });
-        chatboxMessageInput.addEventListener("blur", async () => {
-            this.isTyping = false
-            await this.service.sendTypingNotification(this.uidValue, `typing/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, false)
-        }) 
+        }    
     } 
 
     setEncryptionDetails = async () => {   
@@ -270,6 +253,34 @@ export default class extends Controller {
 
             myThis.usersOnlineMap.set(id, false)
         });
+    }
+
+    setIsTypingNotification = () => {
+        const chatboxMessageInput = document.getElementById("chatbox-message-input")  
+        chatboxMessageInput.addEventListener("keydown", async () => { 
+            const isOnline = this.usersOnlineMap.get(this.userToChatId)
+            if (!this.isTyping) {
+                this.isTyping = true 
+                if (isOnline) {
+                    await this.service.sendTypingNotification(this.uidValue, `typing/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, true)
+                }
+            }
+            clearTimeout(this.typingTimeout)
+        
+            this.typingTimeout = setTimeout(async () => {
+                this.isTyping = false
+                if (isOnline) {
+                    await this.service.sendTypingNotification(this.uidValue, `typing/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, false)
+                }
+            }, 1000)
+        });
+        chatboxMessageInput.addEventListener("blur", async () => {
+            const isOnline = this.usersOnlineMap.get(this.userToChatId)
+            this.isTyping = false 
+            if (isOnline) {
+                await this.service.sendTypingNotification(this.uidValue, `typing/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, false)
+            }
+        }) 
     }
 
     setSidebarUserClickEvent = async (user) => {
