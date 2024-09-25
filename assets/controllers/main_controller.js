@@ -143,14 +143,9 @@ export default class extends Controller {
                 else if (messageData.type == MessageType.IMAGE) {
                     messageElement = Utils.createIncommingMessageImageElement(messageData.content, user.userDetails.avatar, messageData.timestamp, this.timeAgo)
                     Utils.setViewerJsImageElement(messageElement, this.viewer)
-                }
-
-                messageElement.setAttribute('uid', this.uidValue) 
-                messageElement.setAttribute('messageId', id)
-                messageElement.setAttribute('messageData', JSON.stringify(messageData))
-                messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
-                messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
-                messageElement.deleteMessageCallback = this.service.deleteMessage 
+                } 
+                
+                this.setMessageElementAttribute(messageElement, id, messageData)
 
                 Utils.chatboxScrollToBottom()
                 chatbox.appendChild(messageElement)
@@ -428,13 +423,8 @@ export default class extends Controller {
                                     messageElement = Utils.createOutgoingMessageImageElement(messageData.content, messageData.timestamp, this.timeAgo) 
                                     Utils.setViewerJsImageElement(messageElement, this.viewer)
                                 }      
-
-                                messageElement.setAttribute('uid', this.uidValue)
-                                messageElement.setAttribute('messageId', id)
-                                messageElement.setAttribute('messageData', JSON.stringify(messageData))
-                                messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
-                                messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
-                                messageElement.deleteMessageCallback = this.service.deleteMessage
+ 
+                                this.setMessageElementAttribute(messageElement, id, messageData)
 
                                 chatbox.prepend(messageElement)
                                 const imgCheck = messageElement.querySelector('.img-check')
@@ -454,13 +444,8 @@ export default class extends Controller {
                                     messageElement = Utils.createIncommingMessageImageElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
                                     Utils.setViewerJsImageElement(messageElement, this.viewer)
                                 }
-                                
-                                messageElement.setAttribute('uid', this.uidValue)
-                                messageElement.setAttribute('messageId', id)
-                                messageElement.setAttribute('messageData', JSON.stringify(messageData))
-                                messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
-                                messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
-                                messageElement.deleteMessageCallback = this.service.deleteMessage
+                                 
+                                this.setMessageElementAttribute(messageElement, id, messageData)
 
                                 chatbox.prepend(messageElement) 
                             }
@@ -536,17 +521,13 @@ export default class extends Controller {
                         messageElement.setAttribute('lastMessageContent', 'You sent a photo 🖼️') 
                         Utils.setViewerJsImageElement(messageElement, this.viewer)
                     }
-                    
-                    messageElement.setAttribute('uid', this.uidValue)
-                    messageElement.setAttribute('messageId', id)
-                    messageElement.setAttribute('messageData', JSON.stringify(messageData))
-                    messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
-                    messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
-                    messageElement.deleteMessageCallback = this.service.deleteMessage
+                     
+                    this.setMessageElementAttribute(messageElement, id, messageData)
 
                     chatbox.appendChild(messageElement)
                     const imgCheck = messageElement.querySelector('.img-check')
-                    imgCheck.src = '/green_checks.svg'  
+                    imgCheck.classList.add('hidden')
+                    //imgCheck.src = '/green_checks.svg'  
                      
                 } catch(e) { 
                     let messageElement = null
@@ -565,13 +546,8 @@ export default class extends Controller {
                         messageElement.setAttribute('lastMessageContent', firstname + ' sent a photo 🖼️') 
                         Utils.setViewerJsImageElement(messageElement, this.viewer)
                     }
-                    
-                    messageElement.setAttribute('uid', this.uidValue)
-                    messageElement.setAttribute('messageId', id)
-                    messageElement.setAttribute('messageData', JSON.stringify(messageData))
-                    messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
-                    messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
-                    messageElement.deleteMessageCallback = this.service.deleteMessage
+                     
+                    this.setMessageElementAttribute(messageElement, id, messageData)
 
                     chatbox.appendChild(messageElement)  
                 }
@@ -642,6 +618,15 @@ export default class extends Controller {
             const data = await response.json()  
             element.textContent = "Last seen " + this.timeAgo.format(parseInt(data.timestamp), 'round')
         }
+    }
+
+    setMessageElementAttribute = (messageElement, id, messageData) => {
+        messageElement.setAttribute('uid', this.uidValue) 
+        messageElement.setAttribute('messageId', id)
+        messageElement.setAttribute('messageData', JSON.stringify(messageData))
+        messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
+        messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
+        messageElement.deleteMessageCallback = this.service.deleteMessage 
     }
 
     setDarkModeToggle = () => { 
