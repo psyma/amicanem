@@ -253,21 +253,26 @@ export default class VoiceMessageHandler {
         Utils.setChatboxMessageBorderAndMargin()  
 
         const response = await this.service.createTextMessage(this.uid, `messages/${this.currentUser.id}/${userToChatId}`, `${this.currentUser.id}-${userToChatId}`, this.currentUser.id, userToChatId, MessageType.AUDIO, content, timestamp, true)
-        const imgCheck = messageElement.querySelector('.img-check')
+        const doubleCheck = messageElement.querySelector('.double-check')
         if (response.ok) { 
             const messageData = await response.json()
             const id = messageData.id
             messageElement.setAttribute('uid', this.uid)
             messageElement.setAttribute('messageId', id)
+
+            doubleCheck.classList.remove('text-gray-500', 'dark:text-neutral-500')
+            doubleCheck.classList.add('text-green-500', 'dark:text-green-500')
+            doubleCheck.querySelector('.text-node').textContent = "Sent"
          
             Utils.setUserLastMessageContent(userToChatId, 'You sent an audio 🔊') 
             Utils.setUserLastMessageTimestamp(userToChatId, timestamp)
             Utils.setUserLastMessageTimeAgo(userToChatId, timestamp, this.timeAgo)
             Utils.reOrderUsersListIfNewMessageIsBeingSentOrReceived(userToChatId)
-            imgCheck.src = '/green_checks.svg'
         }
         else {
-            imgCheck.src = '/red_checks.svg'
+            doubleCheck.classList.remove('text-gray-500', 'dark:text-neutral-500')
+            doubleCheck.classList.add('text-red-500', 'dark:text-red-500')
+            doubleCheck.querySelector('.text-node').textContent = "Failed"
         }
     }
 }

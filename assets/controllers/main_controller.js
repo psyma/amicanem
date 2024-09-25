@@ -493,8 +493,8 @@ export default class extends Controller {
                                 this.setMessageElementAttribute(messageElement, id, messageData)
 
                                 chatbox.prepend(messageElement)
-                                const imgCheck = messageElement.querySelector('.img-check')
-                                imgCheck.src = '/green_checks.svg'  
+                                const doubleCheck = messageElement.querySelector('.double-check')
+                                doubleCheck.classList.add('hidden') 
 
                             } catch(e) { 
                                 let messageElement = null
@@ -591,9 +591,8 @@ export default class extends Controller {
                     this.setMessageElementAttribute(messageElement, id, messageData)
 
                     chatbox.appendChild(messageElement)
-                    const imgCheck = messageElement.querySelector('.img-check')
-                    imgCheck.classList.add('hidden')
-                    //imgCheck.src = '/green_checks.svg'  
+                    const doubleCheck = messageElement.querySelector('.double-check') 
+                    doubleCheck.classList.add('hidden') 
                      
                 } catch(e) { 
                     let messageElement = null

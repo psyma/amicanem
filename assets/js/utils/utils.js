@@ -596,6 +596,47 @@ export default class Utils {
         chatbox.appendChild(container) 
     } 
 
+    static createDoubleCheckElement = () => {
+        // Create the span element
+        const span = document.createElement('span')
+        span.className = 'double-check flex items-center gap-x-1 text-xs text-gray-500 dark:text-neutral-500'
+
+        // Create the SVG element
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg') 
+        svg.setAttribute('class', 'shrink-0 size-3')
+        svg.setAttribute('width', '24')
+        svg.setAttribute('height', '24')
+        svg.setAttribute('viewBox', '0 0 24 24')
+        svg.setAttribute('fill', 'none')
+        svg.setAttribute('stroke', 'currentColor')
+        svg.setAttribute('stroke-width', '2')
+        svg.setAttribute('stroke-linecap', 'round')
+        svg.setAttribute('stroke-linejoin', 'round')
+
+        // Create the first path element
+        const path1 = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+        path1.setAttribute('d', 'M18 6 7 17l-5-5')
+
+        // Create the second path element
+        const path2 = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+        path2.setAttribute('d', 'm22 10-7.5 7.5L13 16')
+
+        // Append paths to the SVG
+        svg.appendChild(path1)
+        svg.appendChild(path2)
+
+        // Create the text node
+        const textNode = document.createElement('span')
+        textNode.className = 'text-node'
+        textNode.textContent = 'Sending'
+
+        // Append the SVG and text to the span
+        span.appendChild(svg)
+        span.appendChild(textNode)
+
+        return span 
+    }
+
     static createDividerTimestampElement = (date) => {
         // Create the main container div
         const container = document.createElement('div')
@@ -1003,9 +1044,8 @@ export default class Utils {
         
         const [dropdownElement, dropdown] = createDropdownElement(options, placement)
         
-        options.classList.add('invisible', 'cursor-pointer', 'p-2') 
-        options.appendChild(svg) 
-        //options.appendChild(dropdownElement)
+        options.classList.add('invisible', 'cursor-pointer') 
+        options.appendChild(svg)  
 
         options.onclick = () => { 
             dropdown.show()    
@@ -1056,12 +1096,10 @@ export default class Utils {
         divOptions.style.height = '100%'
         divOptions.classList.add('flex', 'flex-col', 'justify-between', 'items-center')
 
-        const img = document.createElement('img')
-        img.src = '/gray_checks.svg'
-        img.classList.add('w-[.875rem]', 'h-[.875rem]', 'img-check')
+        const doubleCheckSpan = this.createDoubleCheckElement() 
         
-        divOptions.appendChild(options)
-        divOptions.appendChild(img)
+        divOptions.appendChild(options) 
+        divOptions.appendChild(doubleCheckSpan)
         divOptions.appendChild(dropdownElement)
           
         flexItemsDiv.appendChild(chatMessageContainer)
@@ -1123,13 +1161,11 @@ export default class Utils {
 
         divOptions.style.height = '100%'
         divOptions.classList.add('flex', 'flex-col', 'justify-between', 'items-center')
- 
-        const img = document.createElement('img')
-        img.src = '/gray_checks.svg'
-        img.classList.add('w-[.875rem]', 'h-[.875rem]', 'img-check')
+        
+        const doubleCheckSpan = this.createDoubleCheckElement() 
 
-        divOptions.appendChild(options)
-        divOptions.appendChild(img)
+        divOptions.appendChild(options) 
+        divOptions.appendChild(doubleCheckSpan)
         divOptions.appendChild(dropdownElement)
  
         flexItemsDiv.appendChild(chatMessageContainer)
@@ -1188,13 +1224,11 @@ export default class Utils {
 
         divOptions.style.height = '100%'
         divOptions.classList.add('flex', 'flex-col', 'justify-between', 'items-center')
- 
-        const img = document.createElement('img')
-        img.src = '/gray_checks.svg'
-        img.classList.add('w-[.875rem]', 'h-[.875rem]', 'img-check')
+        
+        const doubleCheckSpan = this.createDoubleCheckElement() 
 
-        divOptions.appendChild(options)
-        divOptions.appendChild(img)
+        divOptions.appendChild(options) 
+        divOptions.appendChild(doubleCheckSpan)
         divOptions.appendChild(dropdownElement)
           
         flexItemsDiv.appendChild(chatMessageContainer)
