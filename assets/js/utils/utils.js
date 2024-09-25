@@ -725,7 +725,7 @@ export default class Utils {
         const wavesurfer = WaveSurfer.create({
             container: waveformDiv,
             waveColor: 'rgb(200, 0, 200)', 
-            progresscolor: '#94a3b8',
+            progressColor: '#94a3b8',
             hideScrollbar: true,   
             autoCenter: true,
             height: 30,
