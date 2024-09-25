@@ -136,12 +136,17 @@ export default class extends Controller {
                 let messageElement = null
                 if (messageData.type == MessageType.TEXT) {
                     messageElement = Utils.createIncomingMessageTextElement(messageData.content, user.userDetails.avatar, messageData.timestamp, this.timeAgo)
+                    messageElement.setAttribute('lastMessageContent', messageData.content) 
                 }
                 else if (messageData.type == MessageType.AUDIO) {
                     messageElement = Utils.createIncomingMessageVoiceElement(messageData.content, user.userDetails.avatar, messageData.timestamp, this.timeAgo)
+                    const firstname = this.usersMap.get(messageData.sender).userDetails.firstname.split(' ')[0]
+                    messageElement.setAttribute('lastMessageContent', firstname + ' sent an audio 🔊')  
                 }
                 else if (messageData.type == MessageType.IMAGE) {
                     messageElement = Utils.createIncommingMessageImageElement(messageData.content, user.userDetails.avatar, messageData.timestamp, this.timeAgo)
+                    const firstname = this.usersMap.get(messageData.sender).userDetails.firstname.split(' ')[0]
+                    messageElement.setAttribute('lastMessageContent', firstname + ' sent a photo 🖼️') 
                     Utils.setViewerJsImageElement(messageElement, this.viewer)
                 } 
                 
@@ -157,18 +162,15 @@ export default class extends Controller {
             }
 
             if (messageData.type == MessageType.TEXT) {
-                Utils.setUserLastMessageContent(messageData.sender, messageData.content)  
-                messageElement.setAttribute('lastMessageContent', messageData.content) 
+                Utils.setUserLastMessageContent(messageData.sender, messageData.content)   
             }
             else if (messageData.type == MessageType.AUDIO) {
                 const firstname = this.usersMap.get(messageData.sender).userDetails.firstname.split(' ')[0]
                 Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent an audio 🔊') 
-                messageElement.setAttribute('lastMessageContent', firstname + ' sent an audio 🔊') 
             }
             else if (messageData.type == MessageType.IMAGE) {
                 const firstname = this.usersMap.get(messageData.sender).userDetails.firstname.split(' ')[0]
-                Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent a photo 🖼️') 
-                messageElement.setAttribute('lastMessageContent', firstname + ' sent a photo 🖼️') 
+                Utils.setUserLastMessageContent(messageData.sender, firstname + ' sent a photo 🖼️')
             }
 
             Utils.setUserLastMessageTimestamp(messageData.sender, messageData.timestamp)
@@ -202,8 +204,68 @@ export default class extends Controller {
             }
         })
 
-        channel.bind(`delete_message/${user.id}/${this.currentUserValue.id}`, async (data) => {
-            console.log(data)
+        channel.bind(`delete_message-${user.id}-${this.currentUserValue.id}`, async (data) => {
+            if (this.userToChatId == user.id) {
+                const messageId = data
+                const chatbox = document.getElementById('chatbox')
+
+                // find the message which should be deleted
+                let messageElement = null
+                let index = chatbox.children.length - 1  
+                while (index >= 0) {
+                    const element = chatbox.children[index] 
+                    messageElement = element
+                    if (element.getAttribute('messageId')) {
+                        const elementMessageId = element.getAttribute('messageId') 
+                        if (messageId == elementMessageId) {
+                            chatbox.removeChild(element)
+                            break
+                        }
+                    }
+                    index--
+                } 
+
+                Utils.chatboxScrollToBottom() 
+                Utils.reOrderLastFourChatboxElements()
+                Utils.setChatboxMessageAvatarHidden()
+                Utils.setChatboxDividerTimestamp()
+                Utils.setChatboxMessageBorderAndMargin()
+
+                // find the previous message after deleting
+                let prevMessageElement = null
+                index = chatbox.children.length - 1 
+                while (index >= 0) {
+                    prevMessageElement = chatbox.children[index] 
+                    if (prevMessageElement.getAttribute('lastMessageContent')) {
+                        break
+                    }
+                    index--
+                } 
+
+                if (prevMessageElement.getAttribute('lastMessageContent')) {
+                    const currentUserId = prevMessageElement.getAttribute('currentUserId')
+                    const lastMessageContent = prevMessageElement.getAttribute('lastMessageContent')
+                    const messageData = JSON.parse(prevMessageElement.getAttribute('messageData'))    
+
+                    let id = messageData.sender
+                    if (currentUserId == messageData.sender) { 
+                        id = messageData.receiver 
+                    }  
+                    
+                    Utils.setUserLastMessageContent(id, lastMessageContent)  
+                    Utils.setUserLastMessageTimestamp(id, messageData.timestamp)
+                    Utils.setUserLastMessageTimeAgo(id, messageData.timestamp, this.timeAgo)
+                    Utils.reOrderUsersListIfNewMessageIsBeingSentOrReceived(id) 
+                }
+                else {
+                    const messageData = JSON.parse(messageElement.getAttribute('messageData'))   
+                    Utils.setUserLastMessageContent(messageData.receiver, '...')  
+                    Utils.setUserLastMessageTimestamp(messageData.receiver, 1)
+                    Utils.reOrderUsersListIfNewMessageIsBeingSentOrReceived(messageData.receiver)
+                }
+
+                Utils.sortUsersListBaseOnLastMessageTimestamp()
+            } 
         })
 
         await Utils.sleep(1)
@@ -538,6 +600,7 @@ export default class extends Controller {
                     const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver)) 
                     if (messageData.type == MessageType.TEXT) { 
                         messageElement = Utils.createIncomingMessageTextElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
+                        messageElement.setAttribute('lastMessageContent', messageData.content) 
                     }
                     else if (messageData.type == MessageType.AUDIO) {
                         messageElement = Utils.createIncomingMessageVoiceElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)

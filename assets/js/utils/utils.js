@@ -938,8 +938,7 @@ export default class Utils {
                         myThis.setChatboxMessageBorderAndMargin()
 
                         let prevMessageElement = null
-                        let index = chatbox.children.length - 1
-                        console.log(chatbox.children)
+                        let index = chatbox.children.length - 1 
                         while (index >= 0) {
                             prevMessageElement = chatbox.children[index] 
                             if (prevMessageElement.getAttribute('lastMessageContent')) {
@@ -948,14 +947,18 @@ export default class Utils {
                             index--
                         } 
 
+                        let userToChatId = null
+                        let currentUserId = null
                         if (prevMessageElement.getAttribute('lastMessageContent')) {
-                            const currentUserId = prevMessageElement.getAttribute('currentUserId')
+                            currentUserId = prevMessageElement.getAttribute('currentUserId')
                             const lastMessageContent = prevMessageElement.getAttribute('lastMessageContent')
                             const messageData = JSON.parse(prevMessageElement.getAttribute('messageData'))    
 
                             let id = messageData.sender
+                            userToChatId = messageData.sender
                             if (currentUserId == messageData.sender) { 
                                 id = messageData.receiver 
+                                userToChatId = messageData.receiver
                             }  
                             
                             myThis.setUserLastMessageContent(id, lastMessageContent)  
@@ -964,21 +967,14 @@ export default class Utils {
                             myThis.reOrderUsersListIfNewMessageIsBeingSentOrReceived(id) 
                         }
                         else {
-                            const currentUserId = messageElement.getAttribute('currentUserId')
                             const messageData = JSON.parse(messageElement.getAttribute('messageData'))   
-                            
-                            let id = messageData.sender
-                            if (currentUserId == messageData.sender) { 
-                                id = messageData.receiver 
-                            }  
-
-                            myThis.setUserLastMessageContent(id, '...')  
-                            myThis.setUserLastMessageTimestamp(id, 1)
-                            myThis.reOrderUsersListIfNewMessageIsBeingSentOrReceived(id)
+                            myThis.setUserLastMessageContent(messageData.receiver, '...')  
+                            myThis.setUserLastMessageTimestamp(messageData.receiver, 1)
+                            myThis.reOrderUsersListIfNewMessageIsBeingSentOrReceived(messageData.receiver)
                         }
 
                         myThis.sortUsersListBaseOnLastMessageTimestamp()
-                        const response = await messageElement.deleteMessageCallback(uid, messageId)
+                        const response = await messageElement.deleteMessageCallback(uid, messageId, `delete_message-${currentUserId}-${userToChatId}`, `${currentUserId}-${userToChatId}`)
                     }
                 }
 

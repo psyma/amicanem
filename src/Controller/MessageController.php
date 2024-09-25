@@ -152,8 +152,8 @@ class MessageController extends AbstractController
         return new JsonResponse($last_messages);
     } 
 
-    #[Route('/delete_message/{uid}/{id}', name: 'app_delete_message', methods: ["DELETE"])]
-    public function delete_message(string $uid, int $id): Response
+    #[Route('/delete_message/{uid}/{id}/{event}/{channels}', name: 'app_delete_message', methods: ["DELETE"])]
+    public function delete_message(string $uid, int $id, string $event, string $channels): Response
     {   
         $this->denyAccessUnlessGranted("ROLE_USER");   
         $this->denyAccessUnlessCurrentUser($uid);
@@ -162,6 +162,8 @@ class MessageController extends AbstractController
         if ($message != null) {
             $this->entityManager->remove($message);
             $this->entityManager->flush();
+
+            $this->pusher->trigger($channels, $event, $id);
         }
         else {
             return new Response('Message not found', Response::HTTP_NOT_FOUND);

@@ -76,8 +76,8 @@ export default class Service {
     }
 
     deleteMessage = async (uid, id, event, channels) => { 
-        try { 
-            const response = await fetch(`/delete_message/${uid}/${id}`, { method: "DELETE" })
+        try {  
+            const response = await fetch(`/delete_message/${uid}/${id}/${event}/${channels}`, { method: "DELETE" })
             return await response
         } catch(e) {
             return { ok: false }
