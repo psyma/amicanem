@@ -502,7 +502,7 @@ export default class Utils {
     static setUserLastMessageContent = (id, content) => {
         const userLastMessage = document.getElementById(`user${id}-last-message`)
         userLastMessage.classList.remove('is-typing-loader', 'w-10')  
-        userLastMessage.textContent = content
+        userLastMessage.textContent = content 
     } 
 
     static setUserLastMessageTimestamp = (id, timestamp) => {
@@ -725,7 +725,7 @@ export default class Utils {
         const wavesurfer = WaveSurfer.create({
             container: waveformDiv,
             waveColor: 'rgb(200, 0, 200)', 
-            progressColor: '#94a3b8',
+            progresscolor: '#94a3b8',
             hideScrollbar: true,   
             autoCenter: true,
             height: 30,
@@ -809,7 +809,9 @@ export default class Utils {
         return divContainer
     } 
 
-    static createVerticalThreeDotsOptionsElement = (placement, type, isIncomingMessage=false) => { 
+    static createVerticalThreeDotsOptionsElement = (placement, type, isIncomingMessage=false, timeAgo) => { 
+        const myThis = this
+
         function getRootParent(node) {
             let current = node
     
@@ -881,7 +883,6 @@ export default class Utils {
                 btn.appendChild(icon);
                 btn.appendChild(document.createTextNode(button.label))
 
-                
                 btn.onclick = async () => {    
                     dropdown.hide()     
 
@@ -895,7 +896,7 @@ export default class Utils {
                     }
                     else if (button.label == 'Forward') {
                         const forwardButtonTrigger = document.getElementById('static-modal-forward-users-list-button')
-                        const messageElement = getRootParent(btn)
+                        const messageElement = getRootParent(btn)  
                         const messageData = JSON.parse(messageElement.getAttribute('messageData'))  
                         
                         forwardButtonTrigger.click()
@@ -923,7 +924,46 @@ export default class Utils {
                         } 
                     }
                     else if (button.label == 'Delete Message') {
+                        const messageElement = getRootParent(btn)   
+                        const uid = messageElement.getAttribute('uid')
+                        const messageId = messageElement.getAttribute('messageId') 
+                         
+                        const chatbox = document.getElementById('chatbox')
+                        chatbox.removeChild(messageElement)
+                        
+                        myThis.chatboxScrollToBottom() 
+                        myThis.reOrderLastFourChatboxElements()
+                        myThis.setChatboxMessageAvatarHidden()
+                        myThis.setChatboxDividerTimestamp()
+                        myThis.setChatboxMessageBorderAndMargin()
 
+                        let prevMessageElement = null
+                        let index = chatbox.children.length - 1
+                        while (index >= 0) {
+                            prevMessageElement = chatbox.children[index] 
+                            if (prevMessageElement.getAttribute('lastMessageContent')) {
+                                break
+                            }
+                            index--
+                        } 
+
+                        if (prevMessageElement.getAttribute('lastMessageContent')) {
+                            const lastMessageContent = prevMessageElement.getAttribute('lastMessageContent')
+                            const messageData = JSON.parse(prevMessageElement.getAttribute('messageData'))   
+                            myThis.setUserLastMessageContent(messageData.receiver, lastMessageContent)  
+                            myThis.setUserLastMessageTimestamp(messageData.receiver, messageData.timestamp)
+                            myThis.setUserLastMessageTimeAgo(messageData.receiver, messageData.timestamp, timeAgo)
+                            myThis.reOrderUsersListIfNewMessageIsBeingSentOrReceived(messageData.receiver)
+                        }
+                        else {
+                            const messageData = JSON.parse(messageElement.getAttribute('messageData'))   
+                            myThis.setUserLastMessageContent(messageData.receiver, '...')  
+                            myThis.setUserLastMessageTimestamp(messageData.receiver, 1)
+                            myThis.reOrderUsersListIfNewMessageIsBeingSentOrReceived(messageData.receiver)
+                        }
+
+                        myThis.sortUsersListBaseOnLastMessageTimestamp()
+                        const response = await messageElement.deleteMessageCallback(uid, messageId)
                     }
                 }
 
@@ -1000,7 +1040,7 @@ export default class Utils {
         mainDiv.appendChild(timeText) 
         
         const divOptions = document.createElement('div')  
-        const [options, dropdownElement] = this.createVerticalThreeDotsOptionsElement ('top-end', MessageType.TEXT)
+        const [options, dropdownElement] = this.createVerticalThreeDotsOptionsElement ('top-end', MessageType.TEXT, false, timeAgo)
 
         divOptions.style.height = '100%'
         divOptions.classList.add('flex', 'flex-col', 'justify-between', 'items-center')
@@ -1068,7 +1108,7 @@ export default class Utils {
         mainDiv.appendChild(timeText) 
 
         const divOptions = document.createElement('div')  
-        const [options, dropdownElement] = this.createVerticalThreeDotsOptionsElement ('top-end', MessageType.AUDIO)
+        const [options, dropdownElement] = this.createVerticalThreeDotsOptionsElement ('top-end', MessageType.AUDIO, false, timeAgo)
 
         divOptions.style.height = '100%'
         divOptions.classList.add('flex', 'flex-col', 'justify-between', 'items-center')
@@ -1133,7 +1173,7 @@ export default class Utils {
         mainDiv.appendChild(timeText) 
 
         const divOptions = document.createElement('div')  
-        const [options, dropdownElement] = this.createVerticalThreeDotsOptionsElement ('top-end', MessageType.IMAGE)
+        const [options, dropdownElement] = this.createVerticalThreeDotsOptionsElement ('top-end', MessageType.IMAGE, false, timeAgo)
 
         divOptions.style.height = '100%'
         divOptions.classList.add('flex', 'flex-col', 'justify-between', 'items-center')
@@ -1209,7 +1249,7 @@ export default class Utils {
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
         mainDiv.append(timeText)  
         
-        const [options, dropdownElement] = this.createVerticalThreeDotsOptionsElement ('top-start', MessageType.TEXT, true)
+        const [options, dropdownElement] = this.createVerticalThreeDotsOptionsElement ('top-start', MessageType.TEXT, true, timeAgo)
 
         chatContainer.appendChild(chatMessageContainer)
         chatContainer.appendChild(timeContainer)
@@ -1275,7 +1315,7 @@ export default class Utils {
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
         mainDiv.append(timeText) 
  
-        const [options, dropdownElement] = this.createVerticalThreeDotsOptionsElement ('top-start', MessageType.AUDIO, true)
+        const [options, dropdownElement] = this.createVerticalThreeDotsOptionsElement ('top-start', MessageType.AUDIO, true, timeAgo)
 
         chatContainer.appendChild(chatMessageContainer)
         chatContainer.appendChild(timeContainer)
@@ -1338,7 +1378,7 @@ export default class Utils {
         this.setMessageTextElementTimeAgo(timeText, timestamp, timeAgo)
         mainDiv.append(timeText)  
         
-        const [options, dropdownElement] = this.createVerticalThreeDotsOptionsElement ('top-start', MessageType.IMAGE, true)
+        const [options, dropdownElement] = this.createVerticalThreeDotsOptionsElement ('top-start', MessageType.IMAGE, true, timeAgo)
 
         chatContainer.appendChild(chatMessageContainer)
         chatContainer.appendChild(timeContainer)

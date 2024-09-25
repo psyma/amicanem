@@ -202,6 +202,10 @@ export default class extends Controller {
             }
         })
 
+        channel.bind(`delete_message/${user.id}/${this.currentUserValue.id}`, async (data) => {
+            console.log(data)
+        })
+
         await Utils.sleep(1)
     }
 
