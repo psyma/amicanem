@@ -873,7 +873,7 @@ export default class Utils {
             const dropdownDiv = document.createElement('div')
             const dropdown = new Dropdown(dropdownDiv, options, { placement: placement }) 
 
-            dropdownDiv.classList.add('hidden', 'top-0', 'absolute', 'z-[100]', 'w-[12.5rem]', 'mt-2', 'rounded-sm', 'bg-white', 'dark:bg-gray-800', 'shadow-lg', 'border', 'border-gray-100', 'dark:border-gray-600', 'focus:outline-none')
+            dropdownDiv.classList.add('hidden', 'top-0', 'absolute', 'z-[100]', 'w-[12.5rem]', 'mt-2', 'rounded-lg', 'bg-white', 'dark:bg-gray-800', 'shadow-lg', 'border', 'border-gray-100', 'dark:border-gray-600', 'focus:outline-none')
             dropdownDiv.setAttribute('role', 'menu')
             dropdownDiv.setAttribute('aria-orientation', 'vertical')
             dropdownDiv.setAttribute('aria-labelledby', 'menu-button')
@@ -898,7 +898,7 @@ export default class Utils {
             // Create buttons 
             buttons.forEach(button => { 
                 const btn = document.createElement('button');  
-                btn.classList.add('w-full', 'px-4', 'py-3', 'flex', 'items-center', 'border-b', 'opacity-60', 'dark:opacity-70', 'outline-none', 'text-sm', 'border-gray-200', 'dark:border-gray-600', 'transition-all', 'duration-200', 'text-black',   'hover:bg-gray-50', 'dark:hover:bg-gray-600', 'active:bg-gray-100', 'dark:focus:bg-gray-600')
+                btn.classList.add('w-full', 'px-3', 'py-2.5', 'flex', 'items-center', 'border-b', 'opacity-60', 'dark:opacity-70', 'outline-none', 'text-sm', 'border-gray-200', 'dark:border-gray-600', 'transition-all', 'duration-200', 'text-black',   'hover:bg-gray-50', 'dark:hover:bg-gray-600', 'active:bg-gray-100', 'dark:focus:bg-gray-600')
 
                 if (button.label === 'Delete Message') {
                     btn.classList.add('text-red-500', 'hover:bg-red-50', 'dark:hover:text-red-50', 'active:bg-red-100', 'dark:hover:bg-red-900')
@@ -914,7 +914,7 @@ export default class Utils {
                 icon.setAttribute('stroke-width', '1.5')
                 icon.setAttribute('stroke', 'currentColor')
                 icon.setAttribute('aria-hidden', 'true')
-                icon.classList.add('h-5', 'w-5', 'mr-3')
+                icon.classList.add('h-4', 'w-4', 'mr-3')
                
                 const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
                 path.setAttribute('stroke-linecap', 'round')
