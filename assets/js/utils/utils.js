@@ -437,7 +437,8 @@ export default class Utils {
             } 
             else {
                 if (i != elements.length - 2) {
-                    next.classList.add('my-5')  
+                    next.classList.add('mb-5')  
+                    next.classList.add('mt-5')
                 }
             } 
         } 
