@@ -628,6 +628,7 @@ export default class extends Controller {
         messageElement.setAttribute('uid', this.uidValue) 
         messageElement.setAttribute('messageId', id)
         messageElement.setAttribute('messageData', JSON.stringify(messageData))
+        messageElement.setAttribute('currentUserId', this.currentUserValue.id)
         messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
         messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
         messageElement.deleteMessageCallback = this.service.deleteMessage 

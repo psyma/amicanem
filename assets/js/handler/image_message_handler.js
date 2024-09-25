@@ -252,6 +252,8 @@ export default class ImageMessageHandler {
         const chatbox = document.getElementById('chatbox') 
         const messageElement = Utils.createOutgoingMessageImageElement(url, timestamp, this.timeAgo)
         messageElement.setAttribute('messageData', data)
+        messageElement.setAttribute('lastMessageContent', 'You sent a photo 🖼️')
+        messageElement.setAttribute('currentUserId', this.currentUser.id)
         messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
         messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
         messageElement.deleteMessageCallback = this.service.deleteMessage
@@ -275,7 +277,7 @@ export default class ImageMessageHandler {
             messageElement.setAttribute('uid', this.uid)
             messageElement.setAttribute('messageId', id)
          
-            Utils.setUserLastMessageContent(userToChatId, 'You sent a photo') 
+            Utils.setUserLastMessageContent(userToChatId, 'You sent a photo 🖼️') 
             Utils.setUserLastMessageTimestamp(userToChatId, timestamp)
             Utils.setUserLastMessageTimeAgo(userToChatId, timestamp, this.timeAgo)
             Utils.reOrderUsersListIfNewMessageIsBeingSentOrReceived(userToChatId)

@@ -85,6 +85,8 @@ export default class TextMessageHandler {
         const chatbox = document.getElementById('chatbox') 
         const messageElement = Utils.createOutgoingMessageTextElement(message, timestamp, this.timeAgo)
         messageElement.setAttribute('messageData', data) 
+        messageElement.setAttribute('lastMessageContent', message) 
+        messageElement.setAttribute('currentUserId', this.currentUser.id)
         messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
         messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
         messageElement.deleteMessageCallback = this.service.deleteMessage

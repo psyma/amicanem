@@ -236,6 +236,8 @@ export default class VoiceMessageHandler {
         const chatbox = document.getElementById('chatbox') 
         const messageElement = Utils.createOutgoingMessageVoiceElement(url, timestamp, this.timeAgo)
         messageElement.setAttribute('messageData', data)
+        messageElement.setAttribute('lastMessageContent', 'You sent an audio 🔊')
+        messageElement.setAttribute('currentUserId', this.currentUser.id)
         messageElement.copyTextMessageCallback = this.forwardMessageHandler.copyTextMessageCallback
         messageElement.forwardMessageCallback = this.forwardMessageHandler.forwardMessageCallback
         messageElement.deleteMessageCallback = this.service.deleteMessage

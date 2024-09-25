@@ -939,6 +939,7 @@ export default class Utils {
 
                         let prevMessageElement = null
                         let index = chatbox.children.length - 1
+                        console.log(chatbox.children)
                         while (index >= 0) {
                             prevMessageElement = chatbox.children[index] 
                             if (prevMessageElement.getAttribute('lastMessageContent')) {
@@ -948,18 +949,32 @@ export default class Utils {
                         } 
 
                         if (prevMessageElement.getAttribute('lastMessageContent')) {
+                            const currentUserId = prevMessageElement.getAttribute('currentUserId')
                             const lastMessageContent = prevMessageElement.getAttribute('lastMessageContent')
-                            const messageData = JSON.parse(prevMessageElement.getAttribute('messageData'))   
-                            myThis.setUserLastMessageContent(messageData.receiver, lastMessageContent)  
-                            myThis.setUserLastMessageTimestamp(messageData.receiver, messageData.timestamp)
-                            myThis.setUserLastMessageTimeAgo(messageData.receiver, messageData.timestamp, timeAgo)
-                            myThis.reOrderUsersListIfNewMessageIsBeingSentOrReceived(messageData.receiver)
+                            const messageData = JSON.parse(prevMessageElement.getAttribute('messageData'))    
+
+                            let id = messageData.sender
+                            if (currentUserId == messageData.sender) { 
+                                id = messageData.receiver 
+                            }  
+                            
+                            myThis.setUserLastMessageContent(id, lastMessageContent)  
+                            myThis.setUserLastMessageTimestamp(id, messageData.timestamp)
+                            myThis.setUserLastMessageTimeAgo(id, messageData.timestamp, timeAgo)
+                            myThis.reOrderUsersListIfNewMessageIsBeingSentOrReceived(id) 
                         }
                         else {
+                            const currentUserId = messageElement.getAttribute('currentUserId')
                             const messageData = JSON.parse(messageElement.getAttribute('messageData'))   
-                            myThis.setUserLastMessageContent(messageData.receiver, '...')  
-                            myThis.setUserLastMessageTimestamp(messageData.receiver, 1)
-                            myThis.reOrderUsersListIfNewMessageIsBeingSentOrReceived(messageData.receiver)
+                            
+                            let id = messageData.sender
+                            if (currentUserId == messageData.sender) { 
+                                id = messageData.receiver 
+                            }  
+
+                            myThis.setUserLastMessageContent(id, '...')  
+                            myThis.setUserLastMessageTimestamp(id, 1)
+                            myThis.reOrderUsersListIfNewMessageIsBeingSentOrReceived(id)
                         }
 
                         myThis.sortUsersListBaseOnLastMessageTimestamp()
@@ -969,7 +984,6 @@ export default class Utils {
 
                 dropdownDiv.appendChild(btn);
             });
-
             
             return [dropdownDiv, dropdown]
         }
