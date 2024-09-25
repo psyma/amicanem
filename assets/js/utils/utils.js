@@ -418,7 +418,7 @@ export default class Utils {
             const avatar1 = current.querySelector('.avatar')
             const avatar2 = next.querySelector('.avatar')
             if (avatar1 != null && avatar2 != null) { 
-                current.classList.remove('mb-5')
+                current.classList.remove('mb-5') 
                 current.querySelector('.chat-message-container').classList.remove('rounded-bl-none')
                 
                 if (i != elements.length - 2) {
@@ -437,7 +437,7 @@ export default class Utils {
             } 
             else {
                 if (i != elements.length - 2) {
-                    next.classList.add('mb-5') 
+                    next.classList.add('my-5')  
                 }
             } 
         } 
@@ -1030,7 +1030,7 @@ export default class Utils {
         flexItemsDiv.classList.add('flex', 'relative', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
-        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'order-2', 'bg-indigo-50', 'dark:bg-gray-600')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded-lg', 'rounded-br-none', 'order-2', 'bg-indigo-50', 'dark:bg-gray-600')
  
         const chatContent = document.createElement('p')
         chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90')
@@ -1098,7 +1098,7 @@ export default class Utils {
         flexItemsDiv.classList.add('flex', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
-        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'order-2', 'bg-indigo-50', 'dark:bg-gray-600')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded-lg', 'rounded-br-none', 'order-2', 'bg-indigo-50', 'dark:bg-gray-600')
  
         const chatContent = document.createElement('p')
         chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90')
@@ -1166,7 +1166,7 @@ export default class Utils {
         flexItemsDiv.classList.add('flex', 'relative', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
-        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'transition', 'duration-500', 'rounded', 'rounded-br-none', 'order-2', 'bg-indigo-50', 'dark:bg-gray-600')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'transition', 'duration-500', 'rounded-lg', 'rounded-br-none', 'order-2', 'bg-indigo-50', 'dark:bg-gray-600')
         
         const imageContent = this.createImageMessageElement(url)
    
@@ -1242,7 +1242,7 @@ export default class Utils {
         chatContainer.classList.add('flex', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
-        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded-lg', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
  
         const chatContent = document.createElement('p')
         chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90')
@@ -1308,7 +1308,7 @@ export default class Utils {
         chatContainer.classList.add('flex', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
-        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded-lg', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
  
         const chatContent = document.createElement('p')
         chatContent.classList.add('whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90')
@@ -1374,7 +1374,7 @@ export default class Utils {
         chatContainer.classList.add('flex', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
-        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'transition', 'duration-500', 'rounded', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'transition', 'duration-500', 'rounded-lg', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
  
         const imageElement = this.createImageMessageElement(url)
  
@@ -1436,7 +1436,7 @@ export default class Utils {
         chatContainer.classList.add('flex', 'items-end')
  
         const chatMessageContainer = document.createElement('div')
-        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
+        chatMessageContainer.classList.add('chat-message-container', 'group', 'max-w-[31.25rem]', 'p-4', 'transition', 'duration-500', 'rounded-lg', 'rounded-bl-none', 'mr-4', 'bg-gray-100', 'dark:bg-gray-600')
  
         const chatContent = document.createElement('p')
         chatContent.classList.add('is-typing-loader', 'w-10', 'whitespace-pre-wrap', 'break-all', 'text-sm', 'font-normal', 'leading-4', 'tracking-[.01rem]', 'outline-none', 'text-black', 'opacity-80', 'dark:text-white', 'dark:opacity-90')
