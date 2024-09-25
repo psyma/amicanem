@@ -342,8 +342,8 @@ export default class Utils {
     static progressSvgElementCallback = (messageTempElement, percentCompleted) => { 
         const svgCircleElement = messageTempElement.querySelector(".svgCircle")  
         const progressCircleElement = messageTempElement.querySelector(".progressCircle")  
-        const imgCheck = messageTempElement.querySelector('.img-check')
-        imgCheck.classList.add('hidden')  
+        const doubleCheck = messageTempElement.querySelector('.double-check')
+        doubleCheck.classList.add('hidden') 
 
         if (percentCompleted == 100) {
             svgCircleElement.classList.add('hidden')
@@ -664,7 +664,7 @@ export default class Utils {
         return container;
     }
 
-    static createProgressSvgElemet = () => {
+    static createProgressSvgElement = () => {
         const SVG_NS = "http://www.w3.org/2000/svg";
 
         // Create the SVG element
@@ -813,7 +813,7 @@ export default class Utils {
             timer.textContent = formattedTime
         })
 
-        const progressSvg = this.createProgressSvgElemet()
+        const progressSvg = this.createProgressSvgElement()
         flexContainer.appendChild(progressSvg)
         flexContainer.appendChild(startBtn)
         flexContainer.appendChild(waveformDiv)
@@ -835,7 +835,7 @@ export default class Utils {
         imageDiv.className = 'image relative rounded bg-cover bg-center w-56 h-56'
         imageDiv.style.backgroundImage = `url("${url}")`
 
-        const progressSvg = this.createProgressSvgElemet()
+        const progressSvg = this.createProgressSvgElement()
 
         // Create inner div for overlay
         const overlayDiv = document.createElement('div')
