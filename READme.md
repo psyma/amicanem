@@ -1,5 +1,4 @@
 # Amicanem (Your another chat application 😀) 
-# Live (https://amicanem.com)
 # App status: under construction 🚧
 
 # Features
@@ -54,6 +53,12 @@ PUSHER_KEY=
 PUSHER_SECRET=
 PUSHER_CLUSTER=
 ###< pusher/pusher-php-server ###
+```
+
+# Packages
+```
+composer install
+npm install
 ```
 
 # Migration

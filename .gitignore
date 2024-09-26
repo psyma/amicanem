@@ -34,3 +34,6 @@ yarn-error.log
 
 /public/uploads/*
 !/public/uploads/.gitkeep
+
+/templates/privacy.html.twig
+/templates/terms.html.twig
