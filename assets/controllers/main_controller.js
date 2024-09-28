@@ -77,6 +77,7 @@ export default class extends Controller {
             this.setUserPusherPresenceChannel() 
             this.setChatboxEventListener() 
             this.setIsTypingNotification()
+            this.setSidebarMenus()
             
             this.textMessageHandler.setButtonClick() 
             this.textMessageHandler.setInputKeyDown() 
@@ -97,7 +98,7 @@ export default class extends Controller {
             await this.setEncryptionDetails()  
             await this.setUserLastMessage()
             await this.setChatboxInfiniteScrolling()
-        }    
+        }   
     } 
 
     setEncryptionDetails = async () => {   
@@ -645,6 +646,99 @@ export default class extends Controller {
     setUserToChatAvatar = (avatar) => {
         const userToChatAvatar = document.getElementById('usertochat-avatar')
         userToChatAvatar.style.backgroundImage = `url('${avatar}')`
+    }
+
+    setSidebarMenus = () => {
+        const chatsMenuLi = document.getElementById('chats-menu-li')
+        const contactsMenuLi = document.getElementById('contacts-menu-li')
+        const profileMenuLi = document.getElementById('profile-menu-li')
+        const callsMenuLi = document.getElementById('calls-menu-li')
+        const settingsMenuLi = document.getElementById('settings-menu-li')
+
+        const chatsMenuDiv = document.getElementById('chats-menu-div')
+        const contactsMenuDiv = document.getElementById('contacts-menu-div') 
+        const callsMenuDiv = document.getElementById('calls-menu-div')
+        const settingsMenuDiv = document.getElementById('settings-menu-div')
+
+        chatsMenuLi.onclick = () => {
+            chatsMenuLi.classList.add('text-indigo-400')
+            chatsMenuLi.classList.remove('text-gray-400')
+
+            contactsMenuLi.classList.remove('text-indigo-400')
+            profileMenuLi.classList.remove('text-indigo-400')
+            callsMenuLi.classList.remove('text-indigo-400')
+            settingsMenuLi.classList.remove('text-indigo-400')
+
+            contactsMenuLi.classList.add('text-gray-400')
+            profileMenuLi.classList.add('text-gray-400')
+            callsMenuLi.classList.add('text-gray-400')
+            settingsMenuLi.classList.add('text-gray-400')
+
+            chatsMenuDiv.classList.remove('hidden')
+            contactsMenuDiv.classList.add('hidden')
+            callsMenuDiv.classList.add('hidden')
+            settingsMenuDiv.classList.add('hidden')
+        }
+        contactsMenuLi.onclick = () => {
+            contactsMenuLi.classList.add('text-indigo-400')
+            contactsMenuLi.classList.remove('text-gray-400')
+
+            chatsMenuLi.classList.remove('text-indigo-400')
+            profileMenuLi.classList.remove('text-indigo-400')
+            callsMenuLi.classList.remove('text-indigo-400')
+            settingsMenuLi.classList.remove('text-indigo-400')
+
+            chatsMenuLi.classList.add('text-gray-400')
+            profileMenuLi.classList.add('text-gray-400')
+            callsMenuLi.classList.add('text-gray-400')
+            settingsMenuLi.classList.add('text-gray-400')
+
+            chatsMenuDiv.classList.add('hidden')
+            contactsMenuDiv.classList.remove('hidden')
+            callsMenuDiv.classList.add('hidden')
+            settingsMenuDiv.classList.add('hidden')
+        }
+        profileMenuLi.onclick = () => {
+         
+        }
+        callsMenuLi.onclick = () => {
+            callsMenuLi.classList.add('text-indigo-400')
+            callsMenuLi.classList.remove('text-gray-400')
+
+            chatsMenuLi.classList.remove('text-indigo-400')
+            contactsMenuLi.classList.remove('text-indigo-400')
+            profileMenuLi.classList.remove('text-indigo-400')
+            settingsMenuLi.classList.remove('text-indigo-400')
+
+            chatsMenuLi.classList.add('text-gray-400')
+            contactsMenuLi.classList.add('text-gray-400')
+            profileMenuLi.classList.add('text-gray-400')
+            settingsMenuLi.classList.add('text-gray-400')
+
+            chatsMenuDiv.classList.add('hidden')
+            contactsMenuDiv.classList.add('hidden')
+            callsMenuDiv.classList.remove('hidden')
+            settingsMenuDiv.classList.add('hidden')
+        }
+        settingsMenuLi.onclick = () => {
+            settingsMenuLi.classList.add('text-indigo-400')
+            settingsMenuLi.classList.remove('text-gray-400')
+
+            chatsMenuLi.classList.remove('text-indigo-400')
+            contactsMenuLi.classList.remove('text-indigo-400')
+            profileMenuLi.classList.remove('text-indigo-400')
+            callsMenuLi.classList.remove('text-indigo-400')
+
+            chatsMenuLi.classList.add('text-gray-400')
+            contactsMenuLi.classList.add('text-gray-400')
+            profileMenuLi.classList.add('text-gray-400')
+            callsMenuLi.classList.add('text-gray-400')
+
+            chatsMenuDiv.classList.add('hidden')
+            contactsMenuDiv.classList.add('hidden')
+            callsMenuDiv.classList.add('hidden')
+            settingsMenuDiv.classList.remove('hidden')
+        }
     }
 
     setUserToChatBadge = (badge, badgeColor) => {

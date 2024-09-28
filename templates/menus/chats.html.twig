@@ -1,6 +1,6 @@
 <p class="text-black opacity-80 dark:text-white text-normal leading-4 tracking-[.01rem] outline-none px-5 py-5" tabindex="0">Recent chats</p> 
 
-<div id="users-list" role="list" aria-label="conversations" class="w-full h-full scroll-smooth scrollbar-hidden" style="overflow: visible auto;">
+<div id="users-list" role="list" aria-label="conversations">
     {% for user in users %} 
         <div id="user{{ user.id }}" class="select-none {{ user == currentUser ? 'hidden' : '' }} {{ user.isVerified ? '' : 'hidden' }}" role="listitem">
             <button aria-label="Chat with {{ user.userDetails.firstname }} {{ user.userDetails.lastname }}" title="Chat with {{ user.userDetails.firstname }} {{ user.userDetails.lastname }}" tabindex="0" class="w-full px-5 py-3 flex items-center focus:bg-indigo-100 dark:active:bg-gray-600 dark:focus:bg-gray-600 dark:hover:bg-gray-600 hover:bg-indigo-100 active:bg-indigo-100 focus:outline-none transition duration-500 ease-out">
