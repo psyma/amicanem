@@ -6,7 +6,7 @@
 Audio Calls ❌
 Video Calls ❌
 End-to-End Encryption ✅
-Two-Factor Authentication (2FA) ❌
+Two-Factor Authentication (2FA) ✅
 Optional Message Saving ❌
 ```
 

@@ -7,6 +7,8 @@ use Pusher\Pusher;
 use App\Entity\UserPassphrase;
 use App\Entity\UserPrivateKey;
 use App\Entity\UserPublicKey;
+use App\Entity\UserSettings;
+use App\Form\UserSettingsFormType;
 use App\Repository\UserRepository; 
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -26,7 +28,7 @@ class MainController extends AbstractController
     }
     
     #[Route('/', name: 'app_main')]
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $users = $this->userRepository->findAll();
         $currentUser = $this->userRepository->findOneByEmail($this->getUser()->getUserIdentifier());
@@ -36,7 +38,23 @@ class MainController extends AbstractController
         $publickey = $userDetails->getPublickey() == null ? null : $userDetails->getPublickey()->getPublickey();
         $privatekey = $userDetails->getPrivatekey() == null ? null : $userDetails->getPrivatekey()->getPrivatekey();
         $passphrase = $userDetails->getPassphrase() == null ? null : $userDetails->getPassphrase()->getPassphrase();
- 
+        
+        $userSettings = $userDetails->getUserSettings();
+        $settingsForm = $this->createForm(UserSettingsFormType::class, $userSettings);
+        $settingsForm->handleRequest($request);
+        if ($settingsForm->isSubmitted() && $settingsForm->isValid()) {
+            $isNotification = $settingsForm->get('isNotification')->getData();
+            $isSaveMessage = $settingsForm->get('isSaveMessage')->getData();
+            $isTwoFactorAuth = $settingsForm->get('isTwoFactorAuth')->getData();
+
+            $userSettings->setNotification($isNotification);
+            $userSettings->setSaveMessage($isSaveMessage);
+            $userSettings->setTwoFactorAuth($isTwoFactorAuth);
+            $userDetails->setUserSettings($userSettings);
+
+            $this->entityManager->persist($userSettings);
+            $this->entityManager->flush($userSettings);
+        }
         return $this->render('main/index.html.twig', [
             'controller_name' => 'MainController',
             'users' => $users,
@@ -45,6 +63,7 @@ class MainController extends AbstractController
             'publickey' => $publickey,
             'privatekey' => $privatekey,
             'passphrase' => $passphrase,
+            'settingsForm' => $settingsForm,
         ]);
     } 
 

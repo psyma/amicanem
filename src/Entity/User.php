@@ -5,7 +5,7 @@ namespace App\Entity;
 use JsonSerializable;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
-
+use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface, JsonSerializable
+class User implements UserInterface, PasswordAuthenticatedUserInterface, JsonSerializable, TwoFactorInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -37,6 +37,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JsonSer
 
     #[ORM\Column]
     private bool $isVerified = false;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $authCode;  
 
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?UserDetails $userDetails = null;
@@ -157,4 +160,45 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JsonSer
 
         return $this;
     }
+
+    public function setAuthCode(?string $authCode) {
+        $this->authCode = $authCode;
+
+        return $this;
+    }
+
+    public function getAuthCode() {
+        return $this->authCode;
+    }
+
+    public function isEmailAuthEnabled(): bool
+    {   
+        if ($this->userDetails->getUserSettings() == null) {
+            return false;
+        }
+        else if ($this->userDetails->getUserSettings()->isTwoFactorAuth() == null) {
+            return false;
+        }
+
+        return $this->userDetails->getUserSettings()->isTwoFactorAuth();
+    }
+
+    public function getEmailAuthRecipient(): string
+    {
+        return $this->email;
+    }
+
+    public function getEmailAuthCode(): string
+    {
+        if (null === $this->authCode) {
+            throw new \LogicException('The email authentication code was not set');
+        }
+
+        return $this->authCode;
+    }
+
+    public function setEmailAuthCode(string $authCode): void
+    {
+        $this->authCode = $authCode;
+    } 
 }
