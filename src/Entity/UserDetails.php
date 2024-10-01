@@ -51,6 +51,9 @@ class UserDetails implements JsonSerializable
 
     #[ORM\OneToOne(inversedBy: 'userDetails', cascade: ['persist', 'remove'])]
     private ?UserPublicKey $publickey = null;
+
+    #[ORM\OneToOne(mappedBy: 'userDetails', cascade: ['persist', 'remove'])]
+    private ?UserSettings $userSettings = null;
     
     public function jsonSerialize(): mixed
     {
@@ -211,6 +214,28 @@ class UserDetails implements JsonSerializable
     public function setPublickey(?UserPublicKey $publickey): static
     {
         $this->publickey = $publickey;
+
+        return $this;
+    }
+
+    public function getUserSettings(): ?UserSettings
+    {
+        return $this->userSettings;
+    }
+
+    public function setUserSettings(?UserSettings $userSettings): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($userSettings === null && $this->userSettings !== null) {
+            $this->userSettings->setUserDetails(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($userSettings !== null && $userSettings->getUserDetails() !== $this) {
+            $userSettings->setUserDetails($this);
+        }
+
+        $this->userSettings = $userSettings;
 
         return $this;
     } 
