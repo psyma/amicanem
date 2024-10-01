@@ -91,8 +91,10 @@ export default class extends Controller {
                 this.usersMap.set(user.id, user)
                 
                 this.forwardMessageHandler.setForwardMessage(user)
-                await this.setSidebarUserClickEvent(user)
-                await this.setUserPusherMessagesChannel(user) 
+                this.setUserPusherMessagesChannel(user)
+                this.setUserPusherIsTypingChannel(user)
+                this.setUserPusherDeleteMessageChannel(user) 
+                await this.setSidebarUserClickEvent(user) 
             }) 
 
             await this.setEncryptionDetails()  
@@ -117,17 +119,12 @@ export default class extends Controller {
             this.currentUserPublickey = Utils.base64ToArrayBuffer(this.publickeyValue)
             this.currentUserPrivatekey = Utils.base64ToArrayBuffer(CryptoJS.AES.decrypt(this.privatekeyValue, this.passphraseValue).toString(CryptoJS.enc.Utf8))
         }
-    } 
+    }  
 
-    setUserPusherMessagesChannel = async (user) => {  
-        const chatbox = document.getElementById('chatbox')
-        const avatar = this.usersMap.get(user.id).userDetails.avatar
-        const channel = this.pusher.subscribe(`${user.id}-${this.currentUserValue.id}`)
-        const typingElement = Utils.createIncomingIsTypingElement(avatar)
+    setUserPusherMessagesChannel = (user) => {
+        const chatbox = document.getElementById('chatbox') 
+        const channel = this.pusher.subscribe(`${user.id}-${this.currentUserValue.id}`) 
         
-        const userLastMessage = document.getElementById(`user${user.id}-last-message`)
-        let userLastMessageContent = userLastMessage.textContent
-
         channel.bind(`messages/${user.id}/${this.currentUserValue.id}`, async (data) => { 
             const { id, content, isSeen } = data
             const { sender, receiver } = JSON.parse(atob(content))
@@ -178,6 +175,16 @@ export default class extends Controller {
             Utils.setUserLastMessageTimeAgo(messageData.sender, messageData.timestamp, this.timeAgo)
             Utils.reOrderUsersListIfNewMessageIsBeingSentOrReceived(messageData.sender)
         })
+    }
+
+    setUserPusherIsTypingChannel = (user) => {
+        const chatbox = document.getElementById('chatbox')
+        const avatar = this.usersMap.get(user.id).userDetails.avatar
+        const channel = this.pusher.subscribe(`${user.id}-${this.currentUserValue.id}`)
+        const typingElement = Utils.createIncomingIsTypingElement(avatar)
+        
+        const userLastMessage = document.getElementById(`user${user.id}-last-message`)
+        let userLastMessageContent = userLastMessage.textContent
 
         channel.bind(`typing/${user.id}/${this.currentUserValue.id}`, async (data) => {
             if (user.id == this.userToChatId) {   
@@ -204,11 +211,15 @@ export default class extends Controller {
                 }
             }
         })
+    }
+
+    setUserPusherDeleteMessageChannel = (user) => {
+        const chatbox = document.getElementById('chatbox') 
+        const channel = this.pusher.subscribe(`${user.id}-${this.currentUserValue.id}`) 
 
         channel.bind(`delete_message-${user.id}-${this.currentUserValue.id}`, async (data) => {
             if (this.userToChatId == user.id) {
-                const messageId = data
-                const chatbox = document.getElementById('chatbox')
+                const messageId = data 
 
                 // find the message which should be deleted
                 let messageElement = null
@@ -268,9 +279,39 @@ export default class extends Controller {
                 Utils.sortUsersListBaseOnLastMessageTimestamp()
             } 
         })
+    }
+
+    setSidebarUserClickEvent = async (user) => {
+        const userElement = document.getElementById(`user${user.id}`) // sidebar user list element   
+        userElement.onclick = async () => {
+            const name = `${user.userDetails.firstname} ${user.userDetails.lastname}`
+            const badge = user.userDetails.badge
+            const badgeColor = user.userDetails.badgecolor
+            const avatar = user.userDetails.avatar
+            const publickey = user.userDetails.publickey.publickey 
+            this.userTochatPublickey = Utils.base64ToArrayBuffer(publickey)
+            this.userToChatId = user.id
+            this.isSidebarUserClickOnce = true
+
+            this.setUserToChatName(name)
+            this.setUserToChatAvatar(avatar) 
+            this.setUserToChatBadge(badge, badgeColor)
+            this.setSidebarUserToggleForMobile() 
+            this.setMainChatbox()
+            
+            this.setDefaultValues()
+            await this.setConversations()
+
+            this.setUserToChatOnlineStatus()
+
+            this.textMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.usersMap, this.forwardMessageHandler)
+            this.voiceMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.ffmpeg, this.usersMap, this.forwardMessageHandler)
+            this.imageMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.viewer, this.ffmpeg, this.usersMap, this.forwardMessageHandler)
+            this.forwardMessageHandler.init(this.textMessageHandler, this.voiceMessageHandler, this.imageMessageHandler, this.usersMap)
+        } 
 
         await Utils.sleep(1)
-    }
+    } 
 
     setUserPusherPresenceChannel = () => {
         const myThis = this
@@ -348,39 +389,7 @@ export default class extends Controller {
                 await this.service.sendTypingNotification(this.uidValue, `typing/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, false)
             }
         }) 
-    }
-
-    setSidebarUserClickEvent = async (user) => {
-        const userElement = document.getElementById(`user${user.id}`) // sidebar user list element   
-        userElement.onclick = async () => {
-            const name = `${user.userDetails.firstname} ${user.userDetails.lastname}`
-            const badge = user.userDetails.badge
-            const badgeColor = user.userDetails.badgecolor
-            const avatar = user.userDetails.avatar
-            const publickey = user.userDetails.publickey.publickey 
-            this.userTochatPublickey = Utils.base64ToArrayBuffer(publickey)
-            this.userToChatId = user.id
-            this.isSidebarUserClickOnce = true
-
-            this.setUserToChatName(name)
-            this.setUserToChatAvatar(avatar) 
-            this.setUserToChatBadge(badge, badgeColor)
-            this.setSidebarUserToggleForMobile() 
-            this.setMainChatbox()
-            
-            this.setDefaultValues()
-            await this.setConversations()
-
-            this.setUserToChatOnlineStatus()
-
-            this.textMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.usersMap, this.forwardMessageHandler)
-            this.voiceMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.ffmpeg, this.usersMap, this.forwardMessageHandler)
-            this.imageMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.viewer, this.ffmpeg, this.usersMap, this.forwardMessageHandler)
-            this.forwardMessageHandler.init(this.textMessageHandler, this.voiceMessageHandler, this.imageMessageHandler, this.usersMap)
-        } 
-
-        await Utils.sleep(1)
-    }  
+    } 
 
     setUserLastMessage = async () => {
         const response = await this.service.getLastMessages(this.uidValue, this.currentUserValue.id) 
