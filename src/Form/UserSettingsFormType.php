@@ -13,9 +13,9 @@ class UserSettingsFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('isNotification', CheckboxType::class, array('required' => false, 'mapped' => false))
-            ->add('isSaveMessage', CheckboxType::class, array('required' => false, 'mapped' => false))
-            ->add('isTwoFactorAuth', CheckboxType::class, array('required' => false, 'mapped' => false)) 
+            ->add('isNotification', CheckboxType::class, array('required' => false))
+            ->add('isSaveMessage', CheckboxType::class, array('required' => false))
+            ->add('isTwoFactorAuth', CheckboxType::class, array('required' => false)) 
         ;
     }
 

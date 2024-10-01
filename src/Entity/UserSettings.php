@@ -20,7 +20,7 @@ class UserSettings
     private ?bool $isSaveMessage = null;
 
     #[ORM\Column(nullable: true)]
-    private ?bool $isTwoFactorAuth = null;
+    public ?bool $isTwoFactorAuth = null;
 
     #[ORM\OneToOne(inversedBy: 'userSettings', cascade: ['persist', 'remove'])]
     private ?UserDetails $userDetails = null;

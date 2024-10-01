@@ -39,22 +39,8 @@ class MainController extends AbstractController
         $privatekey = $userDetails->getPrivatekey() == null ? null : $userDetails->getPrivatekey()->getPrivatekey();
         $passphrase = $userDetails->getPassphrase() == null ? null : $userDetails->getPassphrase()->getPassphrase();
         
-        $userSettings = $userDetails->getUserSettings();
-        $settingsForm = $this->createForm(UserSettingsFormType::class, $userSettings);
-        $settingsForm->handleRequest($request);
-        if ($settingsForm->isSubmitted() && $settingsForm->isValid()) {
-            $isNotification = $settingsForm->get('isNotification')->getData();
-            $isSaveMessage = $settingsForm->get('isSaveMessage')->getData();
-            $isTwoFactorAuth = $settingsForm->get('isTwoFactorAuth')->getData();
-
-            $userSettings->setNotification($isNotification);
-            $userSettings->setSaveMessage($isSaveMessage);
-            $userSettings->setTwoFactorAuth($isTwoFactorAuth);
-            $userDetails->setUserSettings($userSettings);
-
-            $this->entityManager->persist($userSettings);
-            $this->entityManager->flush($userSettings);
-        }
+        $settingsForm = $this->handleUserSettingsFormRequest($request);
+        
         return $this->render('main/index.html.twig', [
             'controller_name' => 'MainController',
             'users' => $users,
@@ -146,6 +132,37 @@ class MainController extends AbstractController
         }
 
         return new JsonResponse(true);
+    }
+
+    private function handleUserSettingsFormRequest($request)
+    {
+        $currentUser = $this->userRepository->findOneByEmail($this->getUser()->getUserIdentifier());
+        $userDetails = $currentUser->getUserDetails();
+
+        $userSettings = new UserSettings();
+        if ($userDetails->getUserSettings() != null) {
+            $userSettings = $userDetails->getUserSettings();
+        } 
+        else {
+            $userDetails->setUserSettings($userSettings);
+        }
+        
+        $settingsForm = $this->createForm(UserSettingsFormType::class, $userSettings);
+        $settingsForm->handleRequest($request);
+        if ($settingsForm->isSubmitted() && $settingsForm->isValid()) {
+            $isNotification = $settingsForm->get('isNotification')->getData();
+            $isSaveMessage = $settingsForm->get('isSaveMessage')->getData();
+            $isTwoFactorAuth = $settingsForm->get('isTwoFactorAuth')->getData();
+
+            $userSettings->setNotification($isNotification);
+            $userSettings->setSaveMessage($isSaveMessage);
+            $userSettings->setTwoFactorAuth($isTwoFactorAuth); 
+
+            $this->entityManager->persist($userSettings);
+            $this->entityManager->flush($userSettings);
+        }
+
+        return $settingsForm;
     }
 
     private function denyAccessUnlessCurrentUser($uid) {
