@@ -14,10 +14,10 @@ class UserSettings
     private ?int $id = null;
 
     #[ORM\Column(nullable: true)]
-    private ?bool $isNotification = null;
+    public ?bool $isNotification = null;
 
     #[ORM\Column(nullable: true)]
-    private ?bool $isSaveMessage = null;
+    public ?bool $isSaveMessage = null;
 
     #[ORM\Column(nullable: true)]
     public ?bool $isTwoFactorAuth = null;
