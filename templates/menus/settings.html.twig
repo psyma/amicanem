@@ -14,8 +14,55 @@
     </h2>
     <div id="accordion-flush-body-1" class="hidden" aria-labelledby="accordion-flush-heading-1">
         <div class="py-5 px-5 border-b border-gray-200 dark:border-gray-700">
-            <p class="mb-2 text-gray-500 dark:text-gray-400">Flowbite is an open-source library of interactive components built on top of Tailwind CSS including buttons, dropdowns, modals, navbars, and more.</p>
-            <p class="text-gray-500 dark:text-gray-400">Check out this guide to learn how to <a href="/docs/getting-started/introduction/" class="text-blue-600 dark:text-blue-500 hover:underline">get started</a> and start developing websites even faster with components on top of Tailwind CSS. </p>
+            <div class="w-full flex flex-col gap-7">
+                <div>
+                    <div class="flex justify-start">
+                        <label class="mb-2">
+                            <span class="w-13 text-sm text-black opacity-80 dark:text-white dark:opacity-90 font-semibold leading-4 tracking-[.01rem]">First name</span>
+                        </label>
+                    </div>
+                    <div class="relative">
+                        <input type="text" class="max-w-full w-full h-8 p-4 rounded-sm content-center placeholder:text-black placeholder:opacity-40 text-opacity-90 dark:placeholder:text-white dark:placeholder:opacity-90 focus:outline-none transition duration-200 ease-out text-black bg-gray-50 dark:text-white border-opacity-0 dark:bg-gray-700 dark:bg-opacity-90 dark:border-opacity-90 dark:border-gray-700 focus:ring focus:ring-indigo-100 dark:focus:bg-opacity-0 focus:bg-opacity-0">
+                        <div class="absolute top-0 right-0"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-start">
+                        <label class="mb-2">
+                            <span class="w-13 text-sm text-black opacity-80 dark:text-white dark:opacity-90 font-semibold leading-4 tracking-[.01rem]">Last name</span>
+                        </label>
+                    </div>
+                    <div class="relative">
+                        <input type="text" class="max-w-full w-full h-8 p-4 rounded-sm content-center placeholder:text-black placeholder:opacity-40 text-opacity-90 dark:placeholder:text-white dark:placeholder:opacity-90 focus:outline-none transition duration-200 ease-out text-black bg-gray-50 dark:text-white border-opacity-0 dark:bg-gray-700 dark:bg-opacity-90 dark:border-opacity-90 dark:border-gray-700 focus:ring focus:ring-indigo-100 dark:focus:bg-opacity-0 focus:bg-opacity-0">
+                        <div class="absolute top-0 right-0"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-start">
+                        <label class="mb-2">
+                            <span class="w-13 text-sm text-black opacity-80 dark:text-white dark:opacity-90 font-semibold leading-4 tracking-[.01rem]">Nickname</span>
+                        </label>
+                    </div>
+                    <div class="relative">
+                        <input type="text" class="max-w-full w-full h-8 p-4 rounded-sm content-center placeholder:text-black placeholder:opacity-40 text-opacity-90 dark:placeholder:text-white dark:placeholder:opacity-90 focus:outline-none transition duration-200 ease-out text-black bg-gray-50 dark:text-white border-opacity-0 dark:bg-gray-700 dark:bg-opacity-90 dark:border-opacity-90 dark:border-gray-700 focus:ring focus:ring-indigo-100 dark:focus:bg-opacity-0 focus:bg-opacity-0">
+                        <div class="absolute top-0 right-0"></div>
+                    </div>
+                </div>
+                <div class="flex flex-col">
+                    <div class="flex justify-start">
+                        <label class="mb-2">
+                            <span class="w-13 text-black text-opacity-80 dark:text-white dark:text-opacity-90 text-sm font-semibold leading-4 tracking-[.01rem]">Avatar</span>
+                        </label>
+                    </div>
+                    <label tabindex="0" class="cursor-pointer w-full h-[6.25rem] border border-dashed rounded-sm p-5 border-gray-200 dark:border-gray-500 flex justify-center items-center hover:bg-opacity-0 active:bg-opacity-0 focus:bg-opacity-0 outline-none focus:outline-none duration-500 transition-all bg-gray-50 dark:bg-opacity-90 dark:bg-gray-700 dark:hover:bg-opacity-0 dark:focus:bg-opacity-0">
+                        <input type="file" hidden="" name="files[]" accept="image/*">
+                        <div class="">
+                            <p class="outline-none text-sm font-normal leading-4 tracking-[.01rem] text-black text-opacity-40 dark:text-white dark:text-opacity-90"> Choose a file <br> or drop it here. </p>
+                        </div>
+                    </label>
+                </div>
+                <button type="submit" class="float-right p-2 px-3 bg-blue-600 text-white rounded px-3 py-2 text-sm font-medium">Save account settings</button> 
+            </div>
         </div>
     </div>
 
