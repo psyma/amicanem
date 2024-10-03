@@ -114,11 +114,14 @@
                 </div>
             </li>
         </ul> 
+    </div> 
+    
+    <div>
+        <hr class="h-px mt-4 mb-2 bg-gray-200 border-0 dark:bg-gray-700">
+        <p id="menu-text-p" class="text-black opacity-80 dark:text-white text-normal leading-4 tracking-[.01rem] outline-none px-5 py-5" tabindex="0">Recent chats</p> 
     </div>
-    
-    <hr class="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"> 
-    
-    <div id="chats-menu-div" class="overflow-auto h-full">
+
+    <div id="chats-menu-div" class="overflow-auto">
         {% include '/menus/chats.html.twig' %}
     </div>
     <div id="contacts-menu-div" class="overflow-auto hidden">

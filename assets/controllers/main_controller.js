@@ -669,7 +669,10 @@ export default class extends Controller {
         const callsMenuDiv = document.getElementById('calls-menu-div')
         const settingsMenuDiv = document.getElementById('settings-menu-div')
 
+        const menuTextP = document.getElementById('menu-text-p') 
+
         chatsMenuLi.onclick = () => {
+            menuTextP.textContent = "Recent chats"
             chatsMenuLi.classList.add('text-indigo-400')
             chatsMenuLi.classList.remove('text-gray-400')
 
@@ -689,6 +692,7 @@ export default class extends Controller {
             settingsMenuDiv.classList.add('hidden')
         }
         contactsMenuLi.onclick = () => {
+            menuTextP.textContent = "Contacts"
             contactsMenuLi.classList.add('text-indigo-400')
             contactsMenuLi.classList.remove('text-gray-400')
 
@@ -711,6 +715,7 @@ export default class extends Controller {
          
         }
         callsMenuLi.onclick = () => {
+            menuTextP.textContent = "Calls"
             callsMenuLi.classList.add('text-indigo-400')
             callsMenuLi.classList.remove('text-gray-400')
 
@@ -730,6 +735,7 @@ export default class extends Controller {
             settingsMenuDiv.classList.add('hidden')
         }
         settingsMenuLi.onclick = () => {
+            menuTextP.textContent = "Settings"
             settingsMenuLi.classList.add('text-indigo-400')
             settingsMenuLi.classList.remove('text-gray-400')
 
