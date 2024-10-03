@@ -7,6 +7,7 @@ use App\Entity\Settings;
 use App\Utils\Utils;
 use App\Entity\User;
 use App\Entity\UserDetails;
+use App\Entity\UserSettings;
 use Symfony\Component\Uid\Uuid;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -40,11 +41,16 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
             );
             shuffle($avatars); 
 
+            $userSettings = new UserSettings();
+            $userSettings->setSaveMessage(true);
+
             $userDetails = new UserDetails();
             $userDetails->setAvatar($avatars[0]);
             $userDetails->setUid(Uuid::v7()->toString());
             $userDetails->setFirstname($response->getFirstName());
-            $userDetails->setLastname($response->getLastName());
+            $userDetails->setLastname($response->getLastName()); 
+            $userDetails->setUserSettings($userSettings);
+            
 
             $user = new User(); 
             $user->setEmail($email); 

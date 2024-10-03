@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\UserDetails;
+use App\Entity\UserSettings;
 use App\Form\RegistrationFormType; 
 use App\Repository\UserRepository;
 use App\Security\EmailVerifier;
@@ -55,11 +56,16 @@ class RegistrationController extends AbstractController
             // encode the plain password
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
 
+            $userSettings = new UserSettings();
+            $userSettings->setSaveMessage(true);
+
             $user->setRoles(['ROLE_USER']);
             $userDetails->setAvatar($avatars[0]);
             $userDetails->setUid(Uuid::v7()->toString());
             $userDetails->setFirstname($registrationForm->get('firstname')->getData());
             $userDetails->setLastname($registrationForm->get('lastname')->getData());
+            $userDetails->setUserSettings($userSettings);
+
             $user->setUserDetails($userDetails);
 
             $entityManager->persist($user);
