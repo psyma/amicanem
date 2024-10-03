@@ -804,6 +804,25 @@ export default class extends Controller {
         let themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
         let emojiPicker = document.querySelector('.emoji-picker')
 
+        let themeToggleInput = document.getElementById('theme-toggle-input') 
+
+        themeToggleInput.onchange = (e) => {
+            if (e.target.checked) {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('color-theme', 'dark');
+
+                emojiPicker.classList.remove('light')
+                emojiPicker.classList.add('dark')
+            }
+            else {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
+
+                emojiPicker.classList.add('light')
+                emojiPicker.classList.remove('dark')
+            }
+        }
+
         // Change the icons inside the button based on previous settings
         if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             themeToggleLightIcon.classList.remove('hidden');
@@ -811,12 +830,16 @@ export default class extends Controller {
 
             emojiPicker.classList.remove('light')
             emojiPicker.classList.add('dark')
+
+            themeToggleInput.checked = true
         } else {
             themeToggleDarkIcon.classList.remove('hidden');
             document.documentElement.classList.remove('dark');
 
             emojiPicker.classList.add('light')
             emojiPicker.classList.remove('dark')
+
+            themeToggleInput.checked = false
         } 
  
         var themeToggleBtn = document.getElementById('theme-toggle');
@@ -834,12 +857,16 @@ export default class extends Controller {
 
                     emojiPicker.classList.remove('light')
                     emojiPicker.classList.add('dark')
+
+                    themeToggleInput.checked = true
                 } else {
                     document.documentElement.classList.remove('dark');
                     localStorage.setItem('color-theme', 'light');
 
                     emojiPicker.classList.add('light')
                     emojiPicker.classList.remove('dark')
+
+                    themeToggleInput.checked = false
                 }
 
             // if NOT set via local storage previously
