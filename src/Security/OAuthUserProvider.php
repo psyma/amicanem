@@ -43,6 +43,7 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
 
             $userSettings = new UserSettings();
             $userSettings->setSaveMessage(true);
+            $userSettings->setNotification(true);
 
             $userDetails = new UserDetails();
             $userDetails->setAvatar($avatars[0]);

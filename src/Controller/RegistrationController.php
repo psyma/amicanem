@@ -58,6 +58,7 @@ class RegistrationController extends AbstractController
 
             $userSettings = new UserSettings();
             $userSettings->setSaveMessage(true);
+            $userSettings->setNotification(true);
 
             $user->setRoles(['ROLE_USER']);
             $userDetails->setAvatar($avatars[0]);
