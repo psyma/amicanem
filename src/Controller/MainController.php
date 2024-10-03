@@ -2,12 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\UserAbout;
 use Pusher\Pusher;
  
 use App\Entity\UserPassphrase;
 use App\Entity\UserPrivateKey;
 use App\Entity\UserPublicKey;
 use App\Entity\UserSettings;
+use App\Form\UserProfileFormType;
 use App\Form\UserSettingsFormType;
 use App\Repository\UserRepository; 
 use Doctrine\ORM\EntityManagerInterface;
@@ -39,6 +41,7 @@ class MainController extends AbstractController
         $privatekey = $userDetails->getPrivatekey() == null ? null : $userDetails->getPrivatekey()->getPrivatekey();
         $passphrase = $userDetails->getPassphrase() == null ? null : $userDetails->getPassphrase()->getPassphrase();
         
+        $profileForm = $this->handleUserProfileFormRequest($request);
         $settingsForm = $this->handleUserSettingsFormRequest($request);
         
         return $this->render('main/index.html.twig', [
@@ -49,6 +52,7 @@ class MainController extends AbstractController
             'publickey' => $publickey,
             'privatekey' => $privatekey,
             'passphrase' => $passphrase,
+            'profileForm' => $profileForm,
             'settingsForm' => $settingsForm,
         ]);
     } 
@@ -150,19 +154,34 @@ class MainController extends AbstractController
         $settingsForm = $this->createForm(UserSettingsFormType::class, $userSettings);
         $settingsForm->handleRequest($request);
         if ($settingsForm->isSubmitted() && $settingsForm->isValid()) {
-            $isNotification = $settingsForm->get('isNotification')->getData();
-            $isSaveMessage = $settingsForm->get('isSaveMessage')->getData();
-            $isTwoFactorAuth = $settingsForm->get('isTwoFactorAuth')->getData();
-
-            $userSettings->setNotification($isNotification);
-            $userSettings->setSaveMessage($isSaveMessage);
-            $userSettings->setTwoFactorAuth($isTwoFactorAuth); 
-
             $this->entityManager->persist($userSettings);
             $this->entityManager->flush($userSettings);
         }
 
         return $settingsForm;
+    }
+
+    private function handleUserProfileFormRequest($request)
+    {
+        $currentUser = $this->userRepository->findOneByEmail($this->getUser()->getUserIdentifier());
+        $userDetails = $currentUser->getUserDetails();
+
+        $userAbout = new UserAbout();
+        if ($userDetails->getAbout() != null) {
+            $userAbout = $userDetails->getAbout();
+        }
+        else {
+            $userDetails->setAbout($userAbout);
+        }
+
+        $profileForm = $this->createForm(UserProfileFormType::class, $userDetails);
+        $profileForm->handleRequest($request);
+        if ($profileForm->isSubmitted() && $profileForm->isValid()) {
+            $this->entityManager->persist($userDetails);
+            $this->entityManager->flush($userDetails);
+        }
+
+        return $profileForm;
     }
 
     private function denyAccessUnlessCurrentUser($uid) {

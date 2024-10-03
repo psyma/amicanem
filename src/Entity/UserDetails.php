@@ -64,7 +64,7 @@ class UserDetails implements JsonSerializable
             'avatar' => $this->avatar,
             'badge' => $this->badge,
             'badgecolor' => $this->badgecolor, 
-            'about' => $this->about,
+            'about' => $this->about ? $this->about->getAbout() : null,
             'publickey' => $this->publickey
         );
     }
