@@ -50,12 +50,11 @@
                     <div>
                         <div class="flex justify-start">
                             <label class="mb-2">
-                                {{ form_label(profileForm.about, 'Bio', {'label_attr': {'class': 'w-13 text-sm text-black opacity-80 dark:text-white dark:opacity-90 font-semibold leading-4 tracking-[.01rem]'}}) }}
+                                {{ form_label(profileForm.about.about, 'Bio', {'label_attr': {'class': 'w-13 text-sm text-black opacity-80 dark:text-white dark:opacity-90 font-semibold leading-4 tracking-[.01rem]'}}) }}
                             </label>
                         </div>
                         <div class="relative">
                             {{ form_widget(profileForm.about.about, {'attr': {'rows': '6', 'placeholder': 'Tell us about yourself ...', 'class': 'resize-none block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'}}) }}
-                            <textarea id="about" rows="6" class="hidden resize-none block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Tell us about yourself ..."></textarea>
                         </div>
                     </div>
                     <div class="flex flex-col">
@@ -64,11 +63,11 @@
                                 {{ form_label(profileForm.avatar, 'Avatar', {'label_attr': {'class': 'w-13 text-sm text-black opacity-80 dark:text-white dark:opacity-90 font-semibold leading-4 tracking-[.01rem]'}}) }}
                             </label>
                         </div>
-                        <label tabindex="0" class="cursor-pointer w-full h-[6.25rem] border border-dashed rounded-sm p-5 border-gray-200 dark:border-gray-500 flex justify-center items-center hover:bg-opacity-0 active:bg-opacity-0 focus:bg-opacity-0 outline-none focus:outline-none duration-500 transition-all bg-gray-50 dark:bg-opacity-90 dark:bg-gray-700 dark:hover:bg-opacity-0 dark:focus:bg-opacity-0">
+                        <label tabindex="0" class="cursor-pointer w-full h-[6.25rem] border border-dashed rounded-sm border-gray-200 dark:border-gray-500 flex justify-center items-center hover:bg-opacity-0 active:bg-opacity-0 focus:bg-opacity-0 outline-none focus:outline-none duration-500 transition-all bg-gray-50 dark:bg-opacity-90 dark:bg-gray-700 dark:hover:bg-opacity-0 dark:focus:bg-opacity-0">
                             {{ form_widget(profileForm.avatar, {'attr': {'name': 'files[]', 'hidden': '', 'class': ''}}) }}
-                            <div class="">
-                                <p class="outline-none text-sm font-normal leading-4 tracking-[.01rem] text-black text-opacity-40 dark:text-white dark:text-opacity-90"> Choose a file <br> or drop it here. </p>
-                            </div>
+                            <div class="w-full h-full flex justify-center items-center">
+                                <div id="user-profile-preview" class="text-center outline-none text-sm font-normal leading-4 tracking-[.01rem] text-black text-opacity-40 dark:text-white dark:text-opacity-90">Choose an image</div>
+                            </div> 
                         </label>
                     </div>
                     <button type="submit" class="float-right p-2 px-3 bg-blue-600 text-white rounded px-3 py-2 text-sm font-medium">Save account settings</button> 

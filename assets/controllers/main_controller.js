@@ -75,6 +75,7 @@ export default class extends Controller {
             this.setDarkModeToggle() 
             this.setEmojiPickerElement() 
             this.setUserPusherPresenceChannel() 
+            this.setUserProfileInputAvatar()
             this.setChatboxEventListener() 
             this.setIsTypingNotification()
             this.setSidebarMenus()
@@ -100,7 +101,9 @@ export default class extends Controller {
             await this.setEncryptionDetails()  
             await this.setUserLastMessage()
             await this.setChatboxInfiniteScrolling()
-        }   
+        }    
+
+        
     } 
 
     setEncryptionDetails = async () => {   
@@ -281,38 +284,6 @@ export default class extends Controller {
         })
     }
 
-    setSidebarUserClickEvent = async (user) => {
-        const userElement = document.getElementById(`user${user.id}`) // sidebar user list element   
-        userElement.onclick = async () => {
-            const name = `${user.userDetails.firstname} ${user.userDetails.lastname}`
-            const badge = user.userDetails.badge
-            const badgeColor = user.userDetails.badgecolor
-            const avatar = user.userDetails.avatar
-            const publickey = user.userDetails.publickey.publickey 
-            this.userTochatPublickey = Utils.base64ToArrayBuffer(publickey)
-            this.userToChatId = user.id
-            this.isSidebarUserClickOnce = true
-
-            this.setUserToChatName(name)
-            this.setUserToChatAvatar(avatar) 
-            this.setUserToChatBadge(badge, badgeColor)
-            this.setSidebarUserToggleForMobile() 
-            this.setMainChatbox()
-            
-            this.setDefaultValues()
-            await this.setConversations()
-
-            this.setUserToChatOnlineStatus()
-
-            this.textMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.usersMap, this.forwardMessageHandler)
-            this.voiceMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.ffmpeg, this.usersMap, this.forwardMessageHandler)
-            this.imageMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.viewer, this.ffmpeg, this.usersMap, this.forwardMessageHandler)
-            this.forwardMessageHandler.init(this.textMessageHandler, this.voiceMessageHandler, this.imageMessageHandler, this.usersMap)
-        } 
-
-        await Utils.sleep(1)
-    } 
-
     setUserPusherPresenceChannel = () => {
         const myThis = this
         const channel = this.pusher.subscribe('presence-online-users'); 
@@ -362,34 +333,6 @@ export default class extends Controller {
             myThis.usersOnlineMap.set(id, false)
         });
     }
-
-    setIsTypingNotification = () => {
-        const chatboxMessageInput = document.getElementById("chatbox-message-input")  
-        chatboxMessageInput.addEventListener("keydown", async () => { 
-            const isOnline = this.usersOnlineMap.get(this.userToChatId)
-            if (!this.isTyping) {
-                this.isTyping = true 
-                if (isOnline) {
-                    await this.service.sendTypingNotification(this.uidValue, `typing/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, true)
-                }
-            }
-            clearTimeout(this.typingTimeout)
-        
-            this.typingTimeout = setTimeout(async () => {
-                this.isTyping = false
-                if (isOnline) {
-                    await this.service.sendTypingNotification(this.uidValue, `typing/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, false)
-                }
-            }, 1000)
-        });
-        chatboxMessageInput.addEventListener("blur", async () => {
-            const isOnline = this.usersOnlineMap.get(this.userToChatId)
-            this.isTyping = false 
-            if (isOnline) {
-                await this.service.sendTypingNotification(this.uidValue, `typing/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, false)
-            }
-        }) 
-    } 
 
     setUserLastMessage = async () => {
         const response = await this.service.getLastMessages(this.uidValue, this.currentUserValue.id) 
@@ -441,6 +384,120 @@ export default class extends Controller {
 
         Utils.sortUsersListBaseOnLastMessageTimestamp()
     }
+
+    setUserProfileInputAvatar = () => {
+        const inputAvatar = document.getElementById('user_profile_form_avatar')
+        const userProfilePreview = document.getElementById('user-profile-preview')
+          
+        inputAvatar.onchange = async (e) => {
+            const files = e.target.files
+            let file = files[0] 
+            if (file) { 
+                const reader = new FileReader()
+                reader.readAsDataURL(file)
+
+                reader.onload = async (event) => {
+                    const img = document.createElement('img')
+                    img.src = event.target.result
+                    img.onload = async () => { 
+                        const width = Math.floor(img.width * .75)
+                        const height = Math.floor(img.height * .75)
+                        const mimeType = file.type
+                        const extension = mimeType.split("/")[1] 
+                        const input = file.name
+                        const output = CryptoJS.MD5(Utils.generateRandomString(16)).toString() + "." + extension
+
+                        if (!this.currentUserValue.userDetails.badge) {
+                            if (extension.toLowerCase() == "gif") {
+                                let dataTransfer = new DataTransfer()
+                                inputAvatar.files = dataTransfer.files 
+                                return
+
+                            }
+                        }
+ 
+                        await this.ffmpeg.writeFile(input, new Uint8Array(await file.arrayBuffer()))
+                        await this.ffmpeg.exec(['-i', input, '-vf', `scale=${width}:${height}`, output]);
+                        file = new File([await this.ffmpeg.readFile(output)], output, { type: mimeType }) 
+                        
+                        let dataTransfer = new DataTransfer()
+                        dataTransfer.items.add(file)
+                        inputAvatar.files = dataTransfer.files
+
+                        const url = URL.createObjectURL(file)
+                        userProfilePreview.textContent = ''
+                        userProfilePreview.style.backgroundImage = `url('${url}')` 
+        
+                        userProfilePreview.style.backgroundSize = 'contain';
+                        userProfilePreview.style.backgroundPosition = 'center'
+                        userProfilePreview.style.backgroundRepeat = 'no-repeat'
+                        userProfilePreview.style.width = '100%'
+                        userProfilePreview.style.height = '100%'
+                     } 
+                }
+            }
+        }
+    }
+
+    setSidebarUserClickEvent = async (user) => {
+        const userElement = document.getElementById(`user${user.id}`) // sidebar user list element   
+        userElement.onclick = async () => {
+            const name = `${user.userDetails.firstname} ${user.userDetails.lastname}`
+            const badge = user.userDetails.badge
+            const badgeColor = user.userDetails.badgecolor
+            const avatar = user.userDetails.avatar
+            const publickey = user.userDetails.publickey.publickey 
+            this.userTochatPublickey = Utils.base64ToArrayBuffer(publickey)
+            this.userToChatId = user.id
+            this.isSidebarUserClickOnce = true
+
+            this.setUserToChatName(name)
+            this.setUserToChatAvatar(avatar) 
+            this.setUserToChatBadge(badge, badgeColor)
+            this.setSidebarUserToggleForMobile() 
+            this.setMainChatbox()
+            
+            this.setDefaultValues()
+            await this.setConversations()
+
+            this.setUserToChatOnlineStatus()
+
+            this.textMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.usersMap, this.forwardMessageHandler)
+            this.voiceMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.ffmpeg, this.usersMap, this.forwardMessageHandler)
+            this.imageMessageHandler.init(this.uidValue, this.currentUserValue, user.id, this.currentUserPublickey, this.viewer, this.ffmpeg, this.usersMap, this.forwardMessageHandler)
+            this.forwardMessageHandler.init(this.textMessageHandler, this.voiceMessageHandler, this.imageMessageHandler, this.usersMap)
+        } 
+
+        await Utils.sleep(1)
+    }  
+
+    setIsTypingNotification = () => {
+        const chatboxMessageInput = document.getElementById("chatbox-message-input")  
+        chatboxMessageInput.addEventListener("keydown", async () => { 
+            const isOnline = this.usersOnlineMap.get(this.userToChatId)
+            if (!this.isTyping) {
+                this.isTyping = true 
+                if (isOnline) {
+                    await this.service.sendTypingNotification(this.uidValue, `typing/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, true)
+                }
+            }
+            clearTimeout(this.typingTimeout)
+        
+            this.typingTimeout = setTimeout(async () => {
+                this.isTyping = false
+                if (isOnline) {
+                    await this.service.sendTypingNotification(this.uidValue, `typing/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, false)
+                }
+            }, 1000)
+        });
+        chatboxMessageInput.addEventListener("blur", async () => {
+            const isOnline = this.usersOnlineMap.get(this.userToChatId)
+            this.isTyping = false 
+            if (isOnline) {
+                await this.service.sendTypingNotification(this.uidValue, `typing/${this.currentUserValue.id}/${this.userToChatId}`, `${this.currentUserValue.id}-${this.userToChatId}`, false)
+            }
+        }) 
+    } 
 
     setChatboxEventListener = () => {
         const chatbox = document.getElementById('chatbox-message-input') 

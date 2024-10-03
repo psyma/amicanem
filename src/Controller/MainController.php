@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\UserAbout;
 use Pusher\Pusher;
- 
+
 use App\Entity\UserPassphrase;
 use App\Entity\UserPrivateKey;
 use App\Entity\UserPublicKey;
@@ -14,6 +14,7 @@ use App\Form\UserSettingsFormType;
 use App\Repository\UserRepository; 
 use Doctrine\ORM\EntityManagerInterface;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,10 +41,10 @@ class MainController extends AbstractController
         $publickey = $userDetails->getPublickey() == null ? null : $userDetails->getPublickey()->getPublickey();
         $privatekey = $userDetails->getPrivatekey() == null ? null : $userDetails->getPrivatekey()->getPrivatekey();
         $passphrase = $userDetails->getPassphrase() == null ? null : $userDetails->getPassphrase()->getPassphrase();
-        
-        $profileForm = $this->handleUserProfileFormRequest($request);
+         
         $settingsForm = $this->handleUserSettingsFormRequest($request);
-        
+        $profileForm = $this->handleUserProfileFormRequest($request);
+
         return $this->render('main/index.html.twig', [
             'controller_name' => 'MainController',
             'users' => $users,
@@ -104,7 +105,8 @@ class MainController extends AbstractController
     }
 
     #[Route('/set_encryption_details', name: 'app_encryption_details', methods: ["POST"])]
-    public function set_encryption_details(Request $request): JsonResponse {
+    public function set_encryption_details(Request $request): JsonResponse 
+    {
         $this->denyAccessUnlessGranted("ROLE_USER");  
         $this->denyAccessUnlessCurrentUser($request->request->get("uid"));
 
@@ -136,7 +138,7 @@ class MainController extends AbstractController
         }
 
         return new JsonResponse(true);
-    }
+    } 
 
     private function handleUserSettingsFormRequest($request)
     {
@@ -177,6 +179,15 @@ class MainController extends AbstractController
         $profileForm = $this->createForm(UserProfileFormType::class, $userDetails);
         $profileForm->handleRequest($request);
         if ($profileForm->isSubmitted() && $profileForm->isValid()) {
+            $file = $profileForm->get('avatar')->getData();
+            if ($file) {    
+                $extension = $file->guessExtension(); 
+                $uploadPath = $this->getParameter('kernel.project_dir') . '/public/profile-pictures/'; 
+                 
+                $file->move($uploadPath, $file->getClientOriginalName() . $extension); 
+                $userDetails->setAvatar('profile-pictures/' . $file->getClientOriginalName() . $extension);
+            }
+
             $this->entityManager->persist($userDetails);
             $this->entityManager->flush($userDetails);
         }
