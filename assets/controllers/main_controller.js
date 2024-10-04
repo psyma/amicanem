@@ -13,6 +13,7 @@ import { toBlobURL } from '@ffmpeg/util'
 
 import Viewer from 'viewerjs'   
 import Pusher from 'pusher-js'  
+import heic2any from 'heic2any';
 import CryptoJS from 'crypto-js'; 
 import TimeAgo from 'javascript-time-ago'; 
 
@@ -391,21 +392,33 @@ export default class extends Controller {
           
         inputAvatar.onchange = async (e) => {
             const files = e.target.files
-            let file = files[0] 
+            let file = files[0]   
+
             if (file) { 
+                let mimeType = file.type
+                let extension = mimeType.split("/")[1] 
+                let input = CryptoJS.MD5(Utils.generateRandomString(16)).toString() + "." + extension
+                let output = CryptoJS.MD5(Utils.generateRandomString(16)).toString() + "." + extension
+ 
+                if (extension.toLowerCase() == "heic" || extension.toLowerCase() == "heif") {
+                    file = await heic2any({ blob: file, toType: 'image/jpeg'})    
+
+                    input = 'input.jpeg'
+                    output = 'output.jpeg'
+                    mimeType = 'image/jpeg'
+                    extension = 'jpeg'
+                }
+
                 const reader = new FileReader()
                 reader.readAsDataURL(file)
 
-                reader.onload = async (event) => {
+                reader.onload = (event) => {
                     const img = document.createElement('img')
                     img.src = event.target.result
-                    img.onload = async () => { 
+                    
+                    img.onload = async () => {
                         const width = Math.floor(img.width * .75)
                         const height = Math.floor(img.height * .75)
-                        const mimeType = file.type
-                        const extension = mimeType.split("/")[1] 
-                        const input = file.name
-                        const output = CryptoJS.MD5(Utils.generateRandomString(16)).toString() + "." + extension
 
                         if (!this.currentUserValue.userDetails.badge) {
                             if (extension.toLowerCase() == "gif") {
@@ -416,10 +429,20 @@ export default class extends Controller {
                             }
                         }
  
-                        await this.ffmpeg.writeFile(input, new Uint8Array(await file.arrayBuffer()))
-                        await this.ffmpeg.exec(['-i', input, '-vf', `scale=${width}:${height}`, output]);
-                        file = new File([await this.ffmpeg.readFile(output)], output, { type: mimeType }) 
-                        
+                        if (extension.toLowerCase() == 'png') {
+                            await this.ffmpeg.writeFile(input, new Uint8Array(await file.arrayBuffer()))
+                            await this.ffmpeg.exec(['-i', input, '-vf', `scale=${width}:${height}`, output]);
+                            file = new File([await this.ffmpeg.readFile(output)], output, { type: mimeType })  
+                        }
+                        else if (extension.toLowerCase() == 'gif') {
+                            file = new File([new Uint8Array(await file.arrayBuffer())], output, { type: mimeType }) 
+                        } 
+                        else {
+                            await this.ffmpeg.writeFile(input, new Uint8Array(await file.arrayBuffer()))
+                            await this.ffmpeg.exec(['-i', input, '-pix_fmt', 'yuv420p', '-vf', `scale=${width}:${height}`, output])
+                            file = new File([await this.ffmpeg.readFile(output)], output, { type: mimeType }) 
+                        } 
+ 
                         let dataTransfer = new DataTransfer()
                         dataTransfer.items.add(file)
                         inputAvatar.files = dataTransfer.files
@@ -433,7 +456,7 @@ export default class extends Controller {
                         userProfilePreview.style.backgroundRepeat = 'no-repeat'
                         userProfilePreview.style.width = '100%'
                         userProfilePreview.style.height = '100%'
-                     } 
+                    } 
                 }
             }
         }

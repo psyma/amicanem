@@ -192,25 +192,25 @@ export default class ImageMessageHandler {
         if (isForward) {
             file = new File([new Uint8Array(await blob.arrayBuffer())], output, { type: mimeType }) 
         } 
-        else if (extension == 'png') {
+        else if (extension.toLowerCase() == 'png') {
             await this.ffmpeg.writeFile(input, new Uint8Array(await blob.arrayBuffer()))
-            await this.ffmpeg.exec(['-i', input, '-vf', `scale=${width}:${height}`, output]);
+            await this.ffmpeg.exec(['-i', input, '-vf', `scale=${width}:${height}`, output])
             file = new File([await this.ffmpeg.readFile(output)], output, { type: mimeType })  
         }
-        else if (extension == 'GIF') {
+        else if (extension.toLowerCase() == 'gif') {
             file = new File([new Uint8Array(await blob.arrayBuffer())], output, { type: mimeType }) 
         }
-        else if (extension == "heic") {
+        else if (extension.toLowerCase() == "heic" || extension.toLowerCase() == "heif") {
             const heicBlob = await heic2any({ blob, toType: 'image/jpeg'}) 
             url = URL.createObjectURL(heicBlob)
             
             await this.ffmpeg.writeFile('input.jpeg', new Uint8Array(await heicBlob.arrayBuffer()))
-            await this.ffmpeg.exec(['-i', 'input.jpeg', '-pix_fmt', 'yuv420p', '-vf', `scale=${width}:${height}`, 'output.jpeg']);
+            await this.ffmpeg.exec(['-i', 'input.jpeg', '-pix_fmt', 'yuv420p', '-vf', `scale=${width}:${height}`, 'output.jpeg'])
             file = new File([await this.ffmpeg.readFile('output.jpeg')], 'output.jpeg', { type: 'image/jpeg' })  
         }
         else {
             await this.ffmpeg.writeFile(input, new Uint8Array(await blob.arrayBuffer()))
-            await this.ffmpeg.exec(['-i', input, '-pix_fmt', 'yuv420p', '-vf', `scale=${width}:${height}`, output]);
+            await this.ffmpeg.exec(['-i', input, '-pix_fmt', 'yuv420p', '-vf', `scale=${width}:${height}`, output])
             file = new File([await this.ffmpeg.readFile(output)], output, { type: mimeType }) 
         }  
 
@@ -222,7 +222,7 @@ export default class ImageMessageHandler {
             chatbox.appendChild(messageTempElement) 
         }
 
-        const response = await this.service.createImageMessage(this.uid, file, extension == 'heic' ? 'jpeg' : extension, messageTempElement, Utils.progressSvgElementCallback)
+        const response = await this.service.createImageMessage(this.uid, file, messageTempElement, Utils.progressSvgElementCallback)
         if (response.status == 200) { 
             const type = MessageType.IMAGE
             const timestamp = Date.now()

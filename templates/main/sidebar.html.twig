@@ -4,7 +4,7 @@
         <div class="flex flex-row items-center gap-2">
             <div aria-label="Amicanem" title="Amicanem" class="w-11 h-11 rounded-full bg-contain bg-center shadow border border-gray-200 dark:border-gray-700" style="background-image: url('/logo.png');"></div>
             <div>
-                <div class="flex items-center">
+                <div class="flex items-center mb-1">
                     <p class="select-none text-black opacity-80 dark:text-white text-normal leading-4 tracking-[.01rem] outline-none font-semibold truncate max-w-60" tabindex="0">{{ currentUser.userDetails.firstname }}  {{ currentUser.userDetails.lastname }}</p>
                     {% if currentUser.userDetails.badge %}
                         <span class="inline-flex self-center items-center justify-center align-center w-6 h-4 text-sm font-semibold text-{{ currentUser.userDetails.badgeColor }}-600 rounded-full px-1">

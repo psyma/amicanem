@@ -65,7 +65,7 @@ class MessageController extends AbstractController
         $this->denyAccessUnlessCurrentUser($request->request->get("uid"));
 
         $file = $request->files->get("file");    
-        $extension = $request->files->get("extension");
+        $extension = $file->guessExtension(); 
 
         $uploadPath = $this->getParameter('kernel.project_dir') . '/public/uploads/';
         $file->move($uploadPath, $file->getClientOriginalName() . $extension);
