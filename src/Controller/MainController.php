@@ -42,8 +42,15 @@ class MainController extends AbstractController
         $privatekey = $userDetails->getPrivatekey() == null ? null : $userDetails->getPrivatekey()->getPrivatekey();
         $passphrase = $userDetails->getPassphrase() == null ? null : $userDetails->getPassphrase()->getPassphrase();
          
-        $settingsForm = $this->handleUserSettingsFormRequest($request);
-        $profileForm = $this->handleUserProfileFormRequest($request);
+        $settingsForm = $this->handleUserSettingsFormRequest($request, $userDetails); 
+        $profileForm = $this->handleUserProfileFormRequest($request, $userDetails);
+
+        if ($settingsForm === 'success') {
+            return $this->redirectToRoute('app_main');
+        }
+        if ($profileForm === 'success') {
+            return $this->redirectToRoute('app_main');
+        }
 
         return $this->render('main/index.html.twig', [
             'controller_name' => 'MainController',
@@ -140,11 +147,8 @@ class MainController extends AbstractController
         return new JsonResponse(true);
     } 
 
-    private function handleUserSettingsFormRequest($request)
-    {
-        $currentUser = $this->userRepository->findOneByEmail($this->getUser()->getUserIdentifier());
-        $userDetails = $currentUser->getUserDetails();
-
+    private function handleUserSettingsFormRequest($request, $userDetails)
+    {  
         $userSettings = new UserSettings();
         if ($userDetails->getUserSettings() != null) {
             $userSettings = $userDetails->getUserSettings();
@@ -158,12 +162,14 @@ class MainController extends AbstractController
         if ($settingsForm->isSubmitted() && $settingsForm->isValid()) {
             $this->entityManager->persist($userSettings);
             $this->entityManager->flush($userSettings);
+
+            return 'success';
         }
 
         return $settingsForm;
     }
 
-    private function handleUserProfileFormRequest($request)
+    private function handleUserProfileFormRequest($request, $userDetails)
     {
         $currentUser = $this->userRepository->findOneByEmail($this->getUser()->getUserIdentifier());
         $userDetails = $currentUser->getUserDetails();
@@ -190,6 +196,8 @@ class MainController extends AbstractController
 
             $this->entityManager->persist($userDetails);
             $this->entityManager->flush($userDetails);
+
+            return 'success';
         }
 
         return $profileForm;
