@@ -80,6 +80,7 @@ export default class extends Controller {
             this.setChatboxEventListener() 
             this.setIsTypingNotification()
             this.setSidebarMenus()
+            this.setChatboxMutationObserver()
             
             this.textMessageHandler.setButtonClick() 
             this.textMessageHandler.setInputKeyDown() 
@@ -102,9 +103,7 @@ export default class extends Controller {
             await this.setEncryptionDetails()  
             await this.setUserLastMessage()
             await this.setChatboxInfiniteScrolling()
-        }    
-
-        
+        }   
     } 
 
     setEncryptionDetails = async () => {   
@@ -493,6 +492,49 @@ export default class extends Controller {
 
         await Utils.sleep(1)
     }  
+
+    setChatboxMutationObserver = () => {
+        const chatboxMessageInput = document.getElementById('chatbox-message-input') 
+        const chatboxMessageInputLimit = document.getElementById('chatbox-message-input-limit') 
+
+        function setChatboxMessageInputLimit(characterCount) {
+            chatboxMessageInputLimit.textContent = `${characterCount}/1000`
+            
+            if (characterCount <= 1000) {
+                chatboxMessageInputLimit.classList.remove('text-red-600')
+                chatboxMessageInputLimit.classList.remove('dark:text-red-600')
+
+                chatboxMessageInputLimit.classList.add('text-black')
+                chatboxMessageInputLimit.classList.add('dark:text-white')
+            }
+            else {
+                chatboxMessageInputLimit.classList.add('text-red-600')
+                chatboxMessageInputLimit.classList.add('dark:text-red-600')
+
+                chatboxMessageInputLimit.classList.remove('text-black')
+                chatboxMessageInputLimit.classList.remove('dark:text-white')
+            } 
+        }
+
+        function countCharacters() { 
+            const textContent = chatboxMessageInput.innerText || chatboxMessageInput.textContent
+            const characters = [...textContent.trim()]
+            const characterCount = characters.length
+            return characterCount;
+        }
+
+        const observer = new MutationObserver((mutationsList, observer) => {
+            for (const mutation of mutationsList) {
+                if (mutation.type === 'childList' || mutation.type === 'characterData') {
+                    const count = countCharacters()
+                    setChatboxMessageInputLimit(count)
+                }
+            }
+        })
+         
+        const config = { childList: true, subtree: true, characterData: true }
+        observer.observe(chatboxMessageInput, config)
+    }
 
     setIsTypingNotification = () => {
         const chatboxMessageInput = document.getElementById("chatbox-message-input")  

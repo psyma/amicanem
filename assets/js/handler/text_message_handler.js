@@ -38,10 +38,10 @@ export default class TextMessageHandler {
         }
     }
 
-    setInputKeyDown = () => {
-        const chatboxMessageInput = document.getElementById('chatbox-message-input')
+    setInputKeyDown = () => { 
+        const chatboxMessageInput = document.getElementById('chatbox-message-input') 
         chatboxMessageInput.onkeydown = async (e) => {
-            const message = e.target.innerText.trim()
+            const message = e.target.innerText.trim()  
             if (Utils.getUserAgentPlatformType() == 'desktop') {
                 if (e.key === 'Enter' && !e.shiftKey) {  
                     e.preventDefault()
@@ -50,35 +50,37 @@ export default class TextMessageHandler {
                         await this.sendMessage(this.userToChatId, message) 
                     } 
                 }
-            }
-        }
+            } 
+        }  
     }
 
     sendMessage = async (userToChatId, message) => {
-        const chatboxMessageInput = document.getElementById('chatbox-message-input')
-        
-        chatboxMessageInput.textContent = ''
-        const type = MessageType.TEXT
-        const timestamp = Date.now()
+        if (message.length <= 1000) { 
+            const chatboxMessageInput = document.getElementById('chatbox-message-input')
+            
+            chatboxMessageInput.textContent = ''
+            const type = MessageType.TEXT
+            const timestamp = Date.now()
 
-        const data = JSON.stringify({
-            sender: this.currentUser.id,
-            receiver: userToChatId,
-            type: type,
-            content: message,
-            timestamp: timestamp
-        })
+            const data = JSON.stringify({
+                sender: this.currentUser.id,
+                receiver: userToChatId,
+                type: type,
+                content: message,
+                timestamp: timestamp
+            })
 
-        const publickey = this.usersMap.get(userToChatId).userDetails.publickey.publickey
-        const userTochatPublickey = Utils.base64ToArrayBuffer(publickey)
-        const encryptedSenderTextMessage = await Utils.encryptMessage(this.currentUserPublickey, data)
-        const encryptedReceiverTextMessage = await Utils.encryptMessage(userTochatPublickey, data) 
-        const content = btoa(JSON.stringify({
-            sender: encryptedSenderTextMessage,
-            receiver: encryptedReceiverTextMessage
-        }))
+            const publickey = this.usersMap.get(userToChatId).userDetails.publickey.publickey
+            const userTochatPublickey = Utils.base64ToArrayBuffer(publickey)
+            const encryptedSenderTextMessage = await Utils.encryptMessage(this.currentUserPublickey, data)
+            const encryptedReceiverTextMessage = await Utils.encryptMessage(userTochatPublickey, data) 
+            const content = btoa(JSON.stringify({
+                sender: encryptedSenderTextMessage,
+                receiver: encryptedReceiverTextMessage
+            }))
 
-        await this.setSendMessage(userToChatId, message, content, timestamp, data) 
+            await this.setSendMessage(userToChatId, message, content, timestamp, data) 
+        }
     }
 
     setSendMessage = async (userToChatId, message, content, timestamp, data) => {

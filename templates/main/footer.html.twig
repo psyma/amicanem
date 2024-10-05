@@ -23,8 +23,11 @@
                 <emoji-picker class="emoji-picker light"></emoji-picker> 
             </div>
         </div> 
- 
-        <div contenteditable="true" placeholder="Your message..." title="Message input" aria-label="Message input" id="chatbox-message-input" class="whitespace-pre-wrap w-full mx-2 relative max-h-44 overflow-y-auto px-5 py-4 text-sm rounded-sm content-center outline-none text-sm placeholder:text-black placeholder:opacity-70 text-opacity-90 dark:placeholder:text-white dark:placeholder:opacity-90 focus:outline-none transition duration-200 ease-out text-black bg-gray-100 dark:text-white border-opacity-0 dark:bg-gray-700 dark:bg-opacity-90 dark:border-opacity-90 dark:border-gray-700"></div> 
+
+        <div class="w-full overflow-y-auto mx-2"> 
+            <div id="chatbox-message-input-limit" class="flex justify-end text-black text-xs opacity-80 dark:text-white text-normal leading-4 tracking-[.01rem] outline-none">0/1000</div>
+            <div contenteditable="true" placeholder="Your message..." title="Message input" aria-label="Message input" id="chatbox-message-input" class="whitespace-pre-wrap w-full relative max-h-44 overflow-y-auto px-5 py-4 text-sm rounded-sm content-center outline-none text-sm placeholder:text-black placeholder:opacity-70 text-opacity-90 dark:placeholder:text-white dark:placeholder:opacity-90 focus:outline-none transition duration-200 ease-out text-black bg-gray-100 dark:text-white border-opacity-0 dark:bg-gray-700 dark:bg-opacity-90 dark:border-opacity-90 dark:border-gray-700"></div> 
+        </div>
      
         <div id="chatbox-voice-input" class="hidden group w-full mx-2 p-3 mt-5 self-center rounded transition duration-500 bg-indigo-50 dark:bg-gray-600">  
             <div class="flex items-center outline-none" tabindex="0" aria-label="audio message">
