@@ -4,8 +4,7 @@ namespace App\Entity;
 
 use JsonSerializable;
 
-use App\Repository\UserDetailsRepository;
-use Doctrine\DBAL\Types\Types;
+use App\Repository\UserDetailsRepository; 
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserDetailsRepository::class)]

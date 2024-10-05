@@ -14,13 +14,13 @@ class UserSettings
     private ?int $id = null;
 
     #[ORM\Column(nullable: true)]
-    public ?bool $isNotification = null;
+    private ?bool $isNotification = null;
 
     #[ORM\Column(nullable: true)]
-    public ?bool $isSaveMessage = null;
+    private ?bool $isSaveMessage = null;
 
     #[ORM\Column(nullable: true)]
-    public ?bool $isTwoFactorAuth = null;
+    private ?bool $isTwoFactorAuth = null;
 
     #[ORM\OneToOne(inversedBy: 'userSettings', cascade: ['persist', 'remove'])]
     private ?UserDetails $userDetails = null;
@@ -42,6 +42,13 @@ class UserSettings
         return $this;
     }
 
+    public function setIsNotification(?bool $isNotification): static
+    {
+        $this->isNotification = $isNotification;
+
+        return $this;
+    }
+
     public function isSaveMessage(): ?bool
     {
         return $this->isSaveMessage;
@@ -54,12 +61,26 @@ class UserSettings
         return $this;
     }
 
+    public function setIsSaveMessage(?bool $isSaveMessage)
+    {
+        $this->isSaveMessage = $isSaveMessage;
+
+        return $this;
+    }
+
     public function isTwoFactorAuth(): ?bool
     {
         return $this->isTwoFactorAuth;
     }
 
     public function setTwoFactorAuth(?bool $isTwoFactorAuth): static
+    {
+        $this->isTwoFactorAuth = $isTwoFactorAuth;
+
+        return $this;
+    }
+
+    public function setIsTwoFactorAuth(?bool $isTwoFactorAuth)
     {
         $this->isTwoFactorAuth = $isTwoFactorAuth;
 
