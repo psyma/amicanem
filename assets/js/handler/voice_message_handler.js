@@ -66,6 +66,7 @@ export default class VoiceMessageHandler {
             this.isCloseVoiceRecording = false
             const MAX_RECORDING_LIMIT = 60
             const chatboxMessageInput = document.getElementById('chatbox-message-input')
+            const chatboxMessageContainer = document.getElementById('chatbox-message-container')
             const sendTextButton = document.getElementById('send-text-button')
             const sendVoiceButton = document.getElementById('send-voice-button')
             const voiceChatRecordInput = document.getElementById('chatbox-voice-input')
@@ -77,6 +78,7 @@ export default class VoiceMessageHandler {
             const voiceChatRecordClose = document.getElementById('voicechat-record-close')
 
             chatboxMessageInput.classList.add('hidden')
+            chatboxMessageContainer.classList.add('hidden')
             voiceChatRecordInput.classList.remove('hidden')
             sendTextButton.classList.add('hidden')
             sendVoiceButton.classList.remove('hidden')
@@ -174,6 +176,7 @@ export default class VoiceMessageHandler {
                 Utils.unHideMediaGroup()
 
                 chatboxMessageInput.classList.remove('hidden')
+                chatboxMessageContainer.classList.remove('hidden')
                 voiceChatRecordInput.classList.add('hidden') 
                 sendTextButton.classList.remove('hidden')
                 sendVoiceButton.classList.add('hidden')

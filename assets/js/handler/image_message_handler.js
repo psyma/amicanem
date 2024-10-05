@@ -36,6 +36,7 @@ export default class ImageMessageHandler {
 
     setButtonClick = () => {
         const chatboxMessageInput = document.getElementById('chatbox-message-input') 
+        const chatboxMessageContainer = document.getElementById('chatbox-message-container')
         const chatboxVoiceInput = document.getElementById('chatbox-voice-input')
         const chatboxImageInput = document.getElementById('chatbox-image-input')
         const sendTextButton = document.getElementById('send-text-button') 
@@ -63,6 +64,7 @@ export default class ImageMessageHandler {
             chatboxImageInput.innerHTML = ''
 
             chatboxMessageInput.classList.remove('hidden')
+            chatboxMessageContainer.classList.remove('hidden')
             chatboxVoiceInput.classList.add('hidden')
             chatboxImageInput.classList.add('hidden')
             sendTextButton.classList.remove('hidden')
@@ -85,6 +87,7 @@ export default class ImageMessageHandler {
         imageFileInput.onchange = async (e) => { 
             const files = e.target.files
             const chatboxMessageInput = document.getElementById('chatbox-message-input') 
+            const chatboxMessageContainer = document.getElementById('chatbox-message-container')
             const chatboxVoiceInput = document.getElementById('chatbox-voice-input')
             const chatboxImageInput = document.getElementById('chatbox-image-input')
             const sendTextButton = document.getElementById('send-text-button')
@@ -95,6 +98,7 @@ export default class ImageMessageHandler {
             if (files.length) { 
                 Utils.hideMediaGroup()
                 chatboxMessageInput.classList.add('hidden')
+                chatboxMessageContainer.classList.add('hidden')
                 chatboxVoiceInput.classList.add('hidden')
                 chatboxImageInput.classList.remove('hidden')
                 sendTextButton.classList.add('hidden')
@@ -166,6 +170,7 @@ export default class ImageMessageHandler {
 
                         if (!this.imagesMap.size) {
                             chatboxMessageInput.classList.remove('hidden')
+                            chatboxMessageContainer.classList.remove('hidden')
                             chatboxVoiceInput.classList.add('hidden')
                             chatboxImageInput.classList.add('hidden')
                             sendTextButton.classList.remove('hidden')
