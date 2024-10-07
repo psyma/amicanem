@@ -82,6 +82,7 @@ export default class extends Controller {
             this.setIsTypingNotification()
             this.setSidebarMenus()
             this.setChatboxMutationObserver()
+            this.setChatboxInfiniteScrolling()
             
             this.textMessageHandler.setButtonClick() 
             this.textMessageHandler.setInputKeyDown() 
@@ -102,8 +103,7 @@ export default class extends Controller {
             }) 
 
             await this.setEncryptionDetails()  
-            await this.setUserLastMessage()
-            await this.setChatboxInfiniteScrolling()
+            await this.setUserLastMessage() 
         } 
          
     } 
@@ -667,13 +667,11 @@ export default class extends Controller {
             this.isSidebarUserClickOnce = false
         } 
     }
-    
-    setChatboxInfiniteScrolling = async () => {
+
+    setChatboxInfiniteScrolling = () => {
         const chatbox = document.getElementById('chatbox')   
         const handleScroll = throttle(this.loadMoreMessages, 500)
         chatbox.onscroll = handleScroll
-
-        await Utils.sleep(1)
     } 
 
     setDefaultValues = () => {
