@@ -36,7 +36,7 @@ yarn-error.log
 !/public/uploads/.gitkeep
 
 /public/profile-pictures/*
-!/public/profile-pictures/.gitkeep
+!/public/profile-pictures/.gitkeep 
 
 /templates/privacy.html.twig
 /templates/terms.html.twig

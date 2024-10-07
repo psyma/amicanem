@@ -667,6 +667,7 @@ export default class extends Controller {
             this.isSidebarUserClickOnce = false
         } 
     }
+    
     setChatboxInfiniteScrolling = async () => {
         const chatbox = document.getElementById('chatbox')   
         const handleScroll = throttle(this.loadMoreMessages, 500)
