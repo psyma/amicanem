@@ -13,9 +13,10 @@ import { toBlobURL } from '@ffmpeg/util'
 
 import Viewer from 'viewerjs'   
 import Pusher from 'pusher-js'  
-import heic2any from 'heic2any';
-import CryptoJS from 'crypto-js'; 
-import TimeAgo from 'javascript-time-ago'; 
+import heic2any from 'heic2any'
+import CryptoJS from 'crypto-js'
+import throttle  from 'lodash/throttle'
+import TimeAgo from 'javascript-time-ago'
 
 import en from 'javascript-time-ago/locale/en'
 import 'emoji-picker-element'
@@ -53,7 +54,7 @@ export default class extends Controller {
         this.voiceMessageHandler = new VoiceMessageHandler()
         this.imageMessageHandler = new ImageMessageHandler()
         this.forwardMessageHandler = new ForwardMessageHandler()
-   
+    
         this.isReceivedFirstMessage = false
         this.isLockInfiniteScrolling = false
         this.usersOnlineMap = new Map()
@@ -103,7 +104,8 @@ export default class extends Controller {
             await this.setEncryptionDetails()  
             await this.setUserLastMessage()
             await this.setChatboxInfiniteScrolling()
-        }   
+        } 
+         
     } 
 
     setEncryptionDetails = async () => {   
@@ -574,101 +576,101 @@ export default class extends Controller {
         chatbox.onfocus = () => { 
             Utils.hideMediaGroup()
         }
-    }
+    } 
 
-    setChatboxInfiniteScrolling = async () => {
+    loadMoreMessages = async () => {   
         const chatbox = document.getElementById('chatbox') 
-        chatbox.onscroll = async () => {
-            const scrollTop = chatbox.scrollTop; 
-            if (scrollTop == 0 && !this.isReceivedFirstMessage && !this.isLockInfiniteScrolling) {
-                this.page += 1   
-                this.isLockInfiniteScrolling = true
-                const flexGrowChild = chatbox.removeChild(chatbox.children[0])  
+        const scrollTop = chatbox.scrollTop; 
+        if (scrollTop == 0 && !this.isReceivedFirstMessage && !this.isLockInfiniteScrolling) {
+            this.page += 1   
+            this.isLockInfiniteScrolling = true
+            const flexGrowChild = chatbox.removeChild(chatbox.children[0])  
 
-                let index = 0
-                let firstChild = null
-                while (index < chatbox.children.length) {
-                    firstChild = chatbox.children[index] 
-                    if (!firstChild.classList.contains('divider-timestamp')) {
-                        break
-                    }
-                    index++
+            let index = 0
+            let firstChild = null
+            while (index < chatbox.children.length) {
+                firstChild = chatbox.children[index] 
+                if (!firstChild.classList.contains('divider-timestamp')) {
+                    break
                 }
-                 
-                const loader = Utils.createLoaderElement()
-                chatbox.prepend(loader)
- 
-                const response = await this.service.getMessages(this.uidValue, this.currentUserValue.id, this.userToChatId, this.page, this.pageSize, 1)
-                if (response.ok) {
-                    const messages = await response.json()
-                    chatbox.removeChild(loader)
-                    if (messages.length) { 
-                        for(let i = 0; i < messages.length; i++) { 
-                            const { id, content, isSeen } = messages[i] 
-                            const { sender, receiver } = JSON.parse(atob(content)) 
-            
-                            try {
-                                let messageElement = null
-                                const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender)) 
-                                
-                                if (messageData.type == MessageType.TEXT) {
-                                    messageElement = Utils.createOutgoingMessageTextElement(messageData.content, messageData.timestamp, this.timeAgo)
-                                }
-                                else if (messageData.type == MessageType.AUDIO) {
-                                    messageElement = Utils.createOutgoingMessageVoiceElement(messageData.content, messageData.timestamp, this.timeAgo) 
-                                }
-                                else if (messageData.type == MessageType.IMAGE) {
-                                    messageElement = Utils.createOutgoingMessageImageElement(messageData.content, messageData.timestamp, this.timeAgo) 
-                                    Utils.setViewerJsImageElement(messageElement, this.viewer)
-                                }      
- 
-                                this.setMessageElementAttribute(messageElement, id, messageData)
-
-                                chatbox.prepend(messageElement)
-                                const doubleCheck = messageElement.querySelector('.double-check')
-                                doubleCheck.classList.add('hidden') 
-
-                            } catch(e) { 
-                                let messageElement = null
-                                const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver)) 
-                                
-                                if (messageData.type == MessageType.TEXT) {
-                                    messageElement = Utils.createIncomingMessageTextElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
-                                }
-                                else if (messageData.type == MessageType.AUDIO) {
-                                    messageElement = Utils.createIncomingMessageVoiceElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
-                                }
-                                else if (messageData.type == MessageType.IMAGE) {
-                                    messageElement = Utils.createIncommingMessageImageElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
-                                    Utils.setViewerJsImageElement(messageElement, this.viewer)
-                                }
-                                 
-                                this.setMessageElementAttribute(messageElement, id, messageData)
-
-                                chatbox.prepend(messageElement) 
-                            }
-                        } 
-
-                        Utils.setChatboxMessageAvatarHidden()
-                        Utils.setChatboxDividerTimestamp()
-                        Utils.setChatboxMessageBorderAndMargin()
-
-                        setTimeout(() => {
-                            firstChild.scrollIntoView({ behavior: "smooth", block: "end" })
-                            chatbox.prepend(flexGrowChild)
-                            this.isLockInfiniteScrolling = false
-                        }, 500)
-                    }
-                    else {
-                        this.isReceivedFirstMessage = true
-                    }
-                }
+                index++
             }
+                
+            const loader = Utils.createLoaderElement()
+            chatbox.prepend(loader)
 
-            else {
-                this.isSidebarUserClickOnce = false
+            const response = await this.service.getMessages(this.uidValue, this.currentUserValue.id, this.userToChatId, this.page, this.pageSize, 1)
+            if (response.ok) {
+                const messages = await response.json()
+                chatbox.removeChild(loader)
+                if (messages.length) { 
+                    for(let i = 0; i < messages.length; i++) { 
+                        const { id, content, isSeen } = messages[i] 
+                        const { sender, receiver } = JSON.parse(atob(content)) 
+        
+                        try {
+                            let messageElement = null
+                            const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, sender)) 
+                            
+                            if (messageData.type == MessageType.TEXT) {
+                                messageElement = Utils.createOutgoingMessageTextElement(messageData.content, messageData.timestamp, this.timeAgo)
+                            }
+                            else if (messageData.type == MessageType.AUDIO) {
+                                messageElement = Utils.createOutgoingMessageVoiceElement(messageData.content, messageData.timestamp, this.timeAgo) 
+                            }
+                            else if (messageData.type == MessageType.IMAGE) {
+                                messageElement = Utils.createOutgoingMessageImageElement(messageData.content, messageData.timestamp, this.timeAgo) 
+                                Utils.setViewerJsImageElement(messageElement, this.viewer)
+                            }      
+
+                            this.setMessageElementAttribute(messageElement, id, messageData)
+
+                            chatbox.prepend(messageElement)
+                            const doubleCheck = messageElement.querySelector('.double-check')
+                            doubleCheck.classList.add('hidden') 
+
+                        } catch(e) { 
+                            let messageElement = null
+                            const messageData = JSON.parse(await Utils.decryptMessage(this.currentUserPrivatekey, receiver)) 
+                            
+                            if (messageData.type == MessageType.TEXT) {
+                                messageElement = Utils.createIncomingMessageTextElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
+                            }
+                            else if (messageData.type == MessageType.AUDIO) {
+                                messageElement = Utils.createIncomingMessageVoiceElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
+                            }
+                            else if (messageData.type == MessageType.IMAGE) {
+                                messageElement = Utils.createIncommingMessageImageElement(messageData.content, this.usersMap.get(messageData.sender).userDetails.avatar, messageData.timestamp, this.timeAgo)
+                                Utils.setViewerJsImageElement(messageElement, this.viewer)
+                            }
+                                
+                            this.setMessageElementAttribute(messageElement, id, messageData)
+
+                            chatbox.prepend(messageElement) 
+                        }
+                    } 
+
+                    Utils.setChatboxMessageAvatarHidden()
+                    Utils.setChatboxDividerTimestamp()
+                    Utils.setChatboxMessageBorderAndMargin()
+
+                    firstChild.scrollIntoView({ behavior: "smooth", block: "end" })
+                    chatbox.prepend(flexGrowChild)
+                    this.isLockInfiniteScrolling = false
+                }
+                else {
+                    this.isReceivedFirstMessage = true
+                }
             }
         } 
+        else {
+            this.isSidebarUserClickOnce = false
+        } 
+    }
+    setChatboxInfiniteScrolling = async () => {
+        const chatbox = document.getElementById('chatbox')   
+        const handleScroll = throttle(this.loadMoreMessages, 500)
+        chatbox.onscroll = handleScroll
 
         await Utils.sleep(1)
     } 
