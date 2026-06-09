@@ -1,0 +1,23 @@
+{
+  "name": "amicanem",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "cssnano": "^7.0.7",
+    "postcss": "^8.5.4",
+    "postcss-cli": "^11.0.1",
+    "tailwindcss": "^3.4.17",
+    "webpack": "^5.97.0",
+    "webpack-cli": "^6.0.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch-css": "npx postcss ./wwwroot/css/amicanem.css -o ./wwwroot/css/amicanem.min.css --verbose --watch",
+    "watch-js": "webpack ./index.js --output-path ./wwwroot/js --output-filename index.bundle.js --mode development --watch",
+    "build": "webpack ./index.js --output-path ./wwwroot/js --output-filename index.bundle.js --mode production"
+  },
+  "author": "Rickben Anthony Q. Gimeda",
+  "license": "ISC",
+  "description": ""
+}
