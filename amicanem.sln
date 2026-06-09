@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "amicanem", "amicanem\amicanem.csproj", "{E2F0AE02-2697-459C-A0F2-400AB0D1DDF6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "amicanem.Shared", "amicanem.Shared\amicanem.Shared.csproj", "{A3AADF57-51B0-4DDE-860B-B279F868614C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "amicanem.Web", "amicanem.Web\amicanem.Web.csproj", "{FE800FD8-6CFA-4902-AA57-C21FBC427C1F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "amicanem.Web.Client", "amicanem.Web.Client\amicanem.Web.Client.csproj", "{9E6D9EBC-02A3-488A-A46A-076C4C2F9090}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E2F0AE02-2697-459C-A0F2-400AB0D1DDF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2F0AE02-2697-459C-A0F2-400AB0D1DDF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2F0AE02-2697-459C-A0F2-400AB0D1DDF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2F0AE02-2697-459C-A0F2-400AB0D1DDF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3AADF57-51B0-4DDE-860B-B279F868614C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3AADF57-51B0-4DDE-860B-B279F868614C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3AADF57-51B0-4DDE-860B-B279F868614C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3AADF57-51B0-4DDE-860B-B279F868614C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE800FD8-6CFA-4902-AA57-C21FBC427C1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE800FD8-6CFA-4902-AA57-C21FBC427C1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE800FD8-6CFA-4902-AA57-C21FBC427C1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE800FD8-6CFA-4902-AA57-C21FBC427C1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E6D9EBC-02A3-488A-A46A-076C4C2F9090}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E6D9EBC-02A3-488A-A46A-076C4C2F9090}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E6D9EBC-02A3-488A-A46A-076C4C2F9090}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E6D9EBC-02A3-488A-A46A-076C4C2F9090}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
