@@ -1,19 +1,52 @@
-﻿@inherits LayoutComponentBase
+﻿@using amicanem.Shared.Service.Platform
+@inherits LayoutComponentBase
 
-<MudThemeProvider />
+@implements IBrowserViewportObserver
+@implements IAsyncDisposable 
+
+@inject IPlatformService PlatformService
+@inject IBrowserViewportService BrowserViewportService 
+
+<MudThemeProvider IsDarkMode="IsDarkMode" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar>
-        My Application
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+        <MudSpacer />
+        <div class="flex flex-row gap-2"> 
+            <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Href="https://github.com/MudBlazor/MudBlazor" Target="_blank" />
+            <MudIconButton 
+                Color="@(IsDarkMode ? Color.Default : Color.Primary)"
+                OnClick="@ToggleDarkMode" 
+                Icon="@(IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)" 
+                Variant="Variant.Filled" Size="Size.Small"/>
+        </div>
+    
     </MudAppBar>
-    <MudDrawer Open="true">
-
+    <MudDrawer @bind-Open="@IsDrawerOpen" ClipMode="DrawerClipMode.Always" Elevation="1" Variant="@DrawerVariant.Responsive" Width="@DrawerWidth">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6">My App</MudText>
+            <MudSpacer />
+            @if (IsMobileView)
+            {
+                <div>
+                    <MudIconButton Color="Color.Error" Variant="Variant.Filled" Size="Size.Small" Icon="@Icons.Material.Outlined.Close" OnClick="@ToggleDrawer"/>
+                </div>
+            }
+        </MudDrawerHeader>
+        <MudNavMenu>
+            <MudNavLink Match="NavLinkMatch.All">Store</MudNavLink>
+            <MudNavLink Match="NavLinkMatch.All">Library</MudNavLink>
+            <MudNavLink Match="NavLinkMatch.All">Community</MudNavLink>
+        </MudNavMenu>
     </MudDrawer>
     <MudMainContent>
-        @Body
+        <MudContainer>
+            @Body
+        </MudContainer>
     </MudMainContent>
 </MudLayout>
 
@@ -22,3 +55,53 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code{
+    private bool IsMobileView { get; set; }
+    private bool IsDrawerOpen { get; set; }
+    private bool IsDarkMode { get; set; }
+    private string? DrawerWidth { get; set; }
+    
+    Guid IBrowserViewportObserver.Id { get; } = Guid.NewGuid();
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        { 
+            IsDrawerOpen = PlatformService.IsWeb;
+            await BrowserViewportService.SubscribeAsync(this, fireImmediately: true);
+        }
+    }
+
+    private void ToggleDrawer()
+    {
+        IsDrawerOpen = !IsDrawerOpen;
+    }
+
+    private void ToggleDarkMode()
+    {
+        IsDarkMode = !IsDarkMode;
+    }
+    
+    public async Task NotifyBrowserViewportChangeAsync(BrowserViewportEventArgs browserViewportEventArgs)
+    {
+        var ok = browserViewportEventArgs.Breakpoint == Breakpoint.Sm || browserViewportEventArgs.Breakpoint == Breakpoint.Xs;
+        if (ok)
+        {
+            IsMobileView = true;
+            DrawerWidth = "100%";
+        }
+        else
+        {
+            IsMobileView = false;
+            DrawerWidth = "320px";
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    public async ValueTask DisposeAsync()
+    {
+        await BrowserViewportService.UnsubscribeAsync(this);
+    }
+}

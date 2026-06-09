@@ -1,3 +1,5 @@
+using amicanem.Shared.Service.Platform;
+using amicanem.Web.Client.Service.Platform;
 using amicanem.Web.Components;
 using MudBlazor.Services;
 
@@ -8,6 +10,9 @@ builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddMudServices();
+
+// Client
+builder.Services.AddSingleton<IPlatformService, WebPlatformService>();
 
 var app = builder.Build();
 

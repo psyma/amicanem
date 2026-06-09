@@ -1,9 +1,12 @@
 ﻿@page "/"
+@using amicanem.Shared.Service.Platform
+
+@inject IPlatformService PlatformService
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world! tata wew</h1>
+<h1>Hello, world!</h1>
 
-Welcome to your new app.
+Welcome to your new app. @PlatformService.PlatformName
 
 <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary">Hello World!</MudButton>
