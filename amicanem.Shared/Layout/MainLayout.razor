@@ -15,38 +15,67 @@
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Elevation="1">
+    <MudAppBar Elevation="1" Dense="true">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
         <MudSpacer />
         <div class="flex flex-row gap-2"> 
-            <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Href="https://github.com/MudBlazor/MudBlazor" Target="_blank" />
-            <MudIconButton 
-                Color="@(IsDarkMode ? Color.Default : Color.Primary)"
-                OnClick="@ToggleDarkMode" 
-                Icon="@(IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)" 
-                Variant="Variant.Filled" Size="Size.Small"/>
+            <div class="flex flex-row items-center gap-1">
+                <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Href="https://github.com/MudBlazor/MudBlazor" Target="_blank" />
+                <MudIconButton 
+                    Color="@(IsDarkMode ? Color.Default : Color.Primary)"
+                    OnClick="@ToggleDarkMode" 
+                    Icon="@(IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)" 
+                    Variant="Variant.Filled" Size="Size.Small"/>
+            </div>
         </div>
     
     </MudAppBar>
     <MudDrawer @bind-Open="@IsDrawerOpen" ClipMode="DrawerClipMode.Always" Elevation="1" Variant="@DrawerVariant.Responsive" Width="@DrawerWidth">
         <MudDrawerHeader>
-            <div class="flex flex-col gap-1 w-full">
-                <div class="flex justify-between">
-                    <MudText Typo="Typo.h6">Latest chats</MudText>
+             <div class="flex justify-between w-full">
+                    <div>
+                        <MudText Typo="Typo.h6">Latest chats</MudText>
+                        <MudText Typo="Typo.caption">Stay connected with your conversations</MudText>
+                    </div>
                     @if (IsMobileView)
                     {
-                        <MudIconButton Color="Color.Error" Variant="Variant.Filled" Size="Size.Small" Icon="@Icons.Material.Outlined.Close" OnClick="@ToggleDrawer"/>
+                        <div>
+                            <MudIconButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Small" Icon="@Icons.Material.Outlined.Close" OnClick="@ToggleDrawer"/>
+                        </div>
                     }
                 </div>
-                <MudText Typo="Typo.body2">Stay connected with your conversations</MudText>
-            </div>
         </MudDrawerHeader>
-        <MudNavMenu>
-            <MudButton OnClick="@AppEventService.RaiseMenuClicked">Click</MudButton>
-            <MudNavLink Match="NavLinkMatch.All">Store</MudNavLink>
-            <MudNavLink Match="NavLinkMatch.All">Library</MudNavLink>
-            <MudNavLink Match="NavLinkMatch.All">Community</MudNavLink>
-        </MudNavMenu>
+        <MudDrawerContainer Class="overflow-hidden h-full">
+            <MudDivider/>
+            <div class="flex flex-col gap-3 px-5 py-5 overflow-auto h-full">
+                @for (var i = 0; i < 20; i++)
+                {
+                    <MudPaper Elevation="5" Class="rounded-lg" Outlined="true">
+                        @* ReSharper disable Asp.Entity *@
+                        <MudNavLink Class="[&>a]:p-0 [&>a]:rounded-lg [&_a>div:first-child]:ml-0 [&_a>div:first-child]:me-0 px-3 py-2">
+                            @* ReSharper restore Asp.Entity *@
+                            <div class="flex flex-row gap-3 items-center py-3 px-1 rounded-lg">
+                                <div class="relative">
+                                    <MudAvatar Size="Size.Large">
+                                        A
+                                    </MudAvatar>
+                                    <MudIcon Class="absolute bottom-0 right-0" Icon="@Icons.Material.Filled.Circle" Color="Color.Success" Size="Size.Small"/>
+                                </div>
+                                <div class="flex flex-col justify-between w-full">
+                                    <div class="flex flex-row items-center justify-between">
+                                        <MudText Typo=@(PlatformService.IsMobile ? Typo.body1 : Typo.body2)>Rickben Anthony Gimeda</MudText>
+                                        <MudBadge Content="@("16d")" Overlap="true" Class="mx-3"/>
+                                    </div>
+                                    <MudText Typo=@(PlatformService.IsMobile ? Typo.body2 : Typo.caption)>You: Lorem Ipsum</MudText>
+                                </div>
+                                <div>
+                                </div>
+                            </div>
+                        </MudNavLink>
+                    </MudPaper>
+                }
+            </div>
+        </MudDrawerContainer>
     </MudDrawer>
     <MudMainContent>
         <MudContainer>
@@ -89,9 +118,8 @@
     }
     
     public async Task NotifyBrowserViewportChangeAsync(BrowserViewportEventArgs browserViewportEventArgs)
-    {
-        var ok = browserViewportEventArgs.Breakpoint == Breakpoint.Sm || browserViewportEventArgs.Breakpoint == Breakpoint.Xs;
-        if (ok)
+    { 
+        if (browserViewportEventArgs.Breakpoint == Breakpoint.Xs)
         {
             IsMobileView = true;
             DrawerWidth = "100%";
@@ -99,7 +127,7 @@
         else
         {
             IsMobileView = false;
-            DrawerWidth = "320px";
+            DrawerWidth = "360px";
         }
 
         await InvokeAsync(StateHasChanged);
