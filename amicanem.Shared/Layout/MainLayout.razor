@@ -1,11 +1,13 @@
-﻿@using amicanem.Shared.Service.Platform
-@inherits LayoutComponentBase
+﻿@using amicanem.Shared.Service.AppEvent
+@using amicanem.Shared.Service.Platform
 
+@inherits LayoutComponentBase
 @implements IBrowserViewportObserver
 @implements IAsyncDisposable 
 
 @inject IPlatformService PlatformService
 @inject IBrowserViewportService BrowserViewportService 
+@inject IAppEventService AppEventService
 
 <MudThemeProvider IsDarkMode="IsDarkMode" />
 <MudPopoverProvider />
@@ -28,21 +30,19 @@
     </MudAppBar>
     <MudDrawer @bind-Open="@IsDrawerOpen" ClipMode="DrawerClipMode.Always" Elevation="1" Variant="@DrawerVariant.Responsive" Width="@DrawerWidth">
         <MudDrawerHeader>
-            <div class="flex-1 flex-column gap-1">
-                <div>
+            <div class="flex flex-col gap-1 w-full">
+                <div class="flex justify-between">
                     <MudText Typo="Typo.h6">Latest chats</MudText>
+                    @if (IsMobileView)
+                    {
+                        <MudIconButton Color="Color.Error" Variant="Variant.Filled" Size="Size.Small" Icon="@Icons.Material.Outlined.Close" OnClick="@ToggleDrawer"/>
+                    }
                 </div>
                 <MudText Typo="Typo.body2">Stay connected with your conversations</MudText>
             </div>
-            @if (IsMobileView)
-            {
-                <MudSpacer/>
-                <div>
-                    <MudIconButton Color="Color.Error" Variant="Variant.Filled" Size="Size.Small" Icon="@Icons.Material.Outlined.Close" OnClick="@ToggleDrawer"/>
-                </div>
-            }
         </MudDrawerHeader>
         <MudNavMenu>
+            <MudButton OnClick="@AppEventService.RaiseMenuClicked">Click</MudButton>
             <MudNavLink Match="NavLinkMatch.All">Store</MudNavLink>
             <MudNavLink Match="NavLinkMatch.All">Library</MudNavLink>
             <MudNavLink Match="NavLinkMatch.All">Community</MudNavLink>

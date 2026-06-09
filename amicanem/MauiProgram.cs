@@ -1,4 +1,6 @@
-﻿using amicanem.Service.Platform;
+﻿using amicanem.Service.AppEvent;
+using amicanem.Service.Platform;
+using amicanem.Shared.Service.AppEvent;
 using amicanem.Shared.Service.Platform;
 using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
@@ -18,6 +20,7 @@ public static class MauiProgram
         builder.Services.AddMudServices();
 
         builder.Services.AddSingleton<IPlatformService, MauiPlatformService>();
+        builder.Services.AddSingleton<IAppEventService, MauiAppEventService>();
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();
