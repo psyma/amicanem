@@ -1,9 +1,12 @@
 using amicanem.Shared.Service.AppEvent;
 using amicanem.Shared.Service.Platform;
+using amicanem.Shared.Service.Sqlite;
 using amicanem.Web.Client.Service.AppEvent;
 using amicanem.Web.Client.Service.Platform;
+using amicanem.Web.Client.Service.Sqlite;
 using amicanem.Web.Components;
 using MudBlazor.Services;
+using SqliteWasmBlazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,11 +14,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
+builder.Services.AddDbContextFactory<WebSqliteDbContext>(options =>
+{
+    var connection = new SqliteWasmConnection("Data source=amicanem.db3");
+    options.UseSqliteWasm(connection);
+});
+
 builder.Services.AddMudServices();
+builder.Services.AddSqliteWasm();
 
 // Client
 builder.Services.AddSingleton<IPlatformService, WebPlatformService>();
 builder.Services.AddSingleton<IAppEventService, WebAppEventService>();
+builder.Services.AddSingleton<ISqliteService, WebSqliteService>(); 
 
 var app = builder.Build();
 

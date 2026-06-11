@@ -15,4 +15,10 @@
         <PackageReference Include="MudBlazor" Version="9.5.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="SQLite-net">
+        <HintPath>..\..\..\.nuget\packages\sqlite-net-pcl\1.9.172\lib\netstandard2.0\SQLite-net.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

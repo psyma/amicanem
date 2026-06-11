@@ -1,5 +1,7 @@
-﻿@using amicanem.Shared.Service.AppEvent
+﻿@using amicanem.Shared.Models.Sqlite
+@using amicanem.Shared.Service.AppEvent
 @using amicanem.Shared.Service.Platform
+@using amicanem.Shared.Service.Sqlite
 
 @inherits LayoutComponentBase
 @implements IBrowserViewportObserver
@@ -8,6 +10,7 @@
 @inject IPlatformService PlatformService
 @inject IBrowserViewportService BrowserViewportService 
 @inject IAppEventService AppEventService
+@inject ISqliteService SqliteService
 
 <MudThemeProvider IsDarkMode="IsDarkMode" />
 <MudPopoverProvider />
@@ -104,6 +107,20 @@
         { 
             IsDrawerOpen = PlatformService.IsWeb;
             await BrowserViewportService.SubscribeAsync(this, fireImmediately: true);
+
+            var theme = await SqliteService.Get<Theme>(1);
+            if (theme == null)
+            {
+                theme = new Theme
+                {
+                    Name = IsDarkMode ? "Dark" : "Light",
+                    IsDarkMode = IsDarkMode
+                };
+                await SqliteService.Insert(theme);
+            }
+            else IsDarkMode = theme.IsDarkMode;
+
+            await InvokeAsync(StateHasChanged);
         }
     }
 
@@ -112,9 +129,16 @@
         IsDrawerOpen = !IsDrawerOpen;
     }
 
-    private void ToggleDarkMode()
+    private async Task ToggleDarkMode()
     {
         IsDarkMode = !IsDarkMode;
+        await InvokeAsync(StateHasChanged);  
+        
+        var theme = await SqliteService.Get<Theme>(1);
+        if (theme == null) return;
+        
+        theme.IsDarkMode = IsDarkMode;
+        await SqliteService.Update(theme);
     }
     
     public async Task NotifyBrowserViewportChangeAsync(BrowserViewportEventArgs browserViewportEventArgs)
