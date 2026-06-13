@@ -2,22 +2,107 @@
 @using amicanem.Shared.Service.AppEvent
 @using amicanem.Shared.Service.Platform
 
+@implements IAsyncDisposable 
+@implements IBrowserViewportObserver
+
+@inject IBrowserViewportService BrowserViewportService
 @inject IPlatformService PlatformService
 @inject IAppEventService AppEventService
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Amicanem</PageTitle>
+ 
+<div class="h-full overflow-hidden flex flex-col">
+    <MudAppBar Elevation="5" Color="Color.Transparent" Gutters="true" Fixed="false" Class="shrink-0 z-20">
+        <div class="flex items-center w-full">
+            <div class="flex flex-row gap-3 items-center py-3 px-1 rounded-lg flex-1 min-w-0">
+                <MudBadge Color="Color.Success" Overlap="true" Bordered="true">
+                    <MudAvatar>A</MudAvatar>
+                </MudBadge>
 
-<h1>Hello, world!</h1>
+                <div class="flex flex-col flex-1 min-w-0">
+                    <MudText Typo="@(PlatformService.IsMobile ? Typo.body1 : Typo.body2)">
+                        <span class="block truncate">Rickben Anthony Gimeda</span>
+                    </MudText>
 
-<div>
-    <p class="text-red-500">tailwindcss 1234</p>
-    Welcome to your new app. @PlatformService.PlatformName
-    <p>Clicks: @count</p>
-    <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary">Hello World!</MudButton>
+                    <MudText Typo="@(PlatformService.IsMobile ? Typo.body2 : Typo.caption)">
+                        Lorem Ipsum
+                    </MudText>
+                </div>
+            </div>
+
+            <div class="flex gap-2 shrink-0">
+                <MudIconButton Color="@(IsDarkMode ? Color.Default : Color.Primary)" Size="Size.Small" Icon="@Icons.Material.Filled.Call" Variant="Variant.Filled" />
+                <MudIconButton Color="@(IsDarkMode ? Color.Default : Color.Primary)" Size="Size.Small" Icon="@Icons.Material.Filled.Videocam" Variant="Variant.Filled" />
+            </div>
+        </div>
+    </MudAppBar>
+
+    <div class="flex-1 min-h-0 overflow-y-auto px-5 py-5">
+        <div class="min-h-full flex flex-col justify-end gap-4">
+            @for (var i = 0; i < 20; i++)
+            {
+                <MudXChat Color="Color.Info"
+                          Elevation="0"
+                          Variant="Variant.Filled"
+                          Square="false"
+                          ArrowPosition="ChatArrowPosition.None"
+                          ChatPosition="ChatBubblePosition.Start">
+                    <MudXChatHeader Time="12:46"/>
+                    <MudAvatar>B</MudAvatar>
+                    <MudXChatBubble>What kind of nonsense is this</MudXChatBubble>
+                    <MudXChatBubble>Put me on the Council and not make me a Master!??</MudXChatBubble>
+                    <MudXChatBubble>That's never been done in the history of the Jedi. It's insulting!</MudXChatBubble>
+                    <MudXChatFooter Text="Seen at 12:46"/>
+                </MudXChat>
+                <MudXChat Color="Color.Default"
+                          Elevation="0"
+                          Variant="Variant.Filled"
+                          Square="true"
+                          ArrowPosition="ChatArrowPosition.None"
+                          ChatPosition="ChatBubblePosition.End">
+                    <MudXChatHeader Time="12:46"/>
+                    <MudXChatBubble>What kind of nonsense is this</MudXChatBubble>
+                    <MudXChatBubble>Put me on the Council and not make me a Master!??</MudXChatBubble>
+                    <MudXChatBubble>That's never been done in the history of the Jedi. It's insulting!</MudXChatBubble>
+                    <MudXChatFooter Text="Seen at 12:46"/>
+                </MudXChat>
+            }
+        </div>
+    </div>
+
+    <div class="shrink-0 z-20 px-4 py-3 shadow-lg border-t" style="background-color: var(--mud-palette-surface);">
+        <MudTextField @bind-Value="Message" Variant="Variant.Outlined" FullWidth="true" MaxLines="6"
+                      Immediate="true" Counter="MessageTextLimit" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Send"
+                      AdornmentColor="Color.Primary" OnAdornmentClick="@SendTextMessage"
+                      Lines="1" Label="Type a message" Sizing="InputSizing.Auto" Clearable="true"/>
+
+    </div>
+
 </div>
 
 @code {
-    private int count;
+    private const int MessageTextLimit = 1000;
+    
+    private bool IsDarkMode { get; set; }
+    private bool IsMobileView { get; set; }
+    private string Message { get; set; }
+    
+    Guid IBrowserViewportObserver.Id { get; } = Guid.NewGuid();
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        { 
+            await BrowserViewportService.SubscribeAsync(this, fireImmediately: true);
+
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task SendTextMessage()
+    {
+        
+    }
 
     protected override void OnInitialized()
     {
@@ -26,13 +111,26 @@
 
     private void OnMenuClicked()
     {
-        count++;
-        Console.WriteLine(count);
         InvokeAsync(StateHasChanged);
     }
+    
+    public async Task NotifyBrowserViewportChangeAsync(BrowserViewportEventArgs browserViewportEventArgs)
+    { 
+        if (browserViewportEventArgs.Breakpoint == Breakpoint.Xs)
+        {
+            IsMobileView = true;
+        }
+        else
+        {
+            IsMobileView = false;
+        }
 
-    public void Dispose()
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public async ValueTask DisposeAsync()
     {
+        await BrowserViewportService.UnsubscribeAsync(this);
         AppEventService.MenuClicked -= OnMenuClicked;
     }
 }

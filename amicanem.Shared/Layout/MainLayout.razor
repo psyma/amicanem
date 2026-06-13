@@ -7,8 +7,8 @@
 @implements IBrowserViewportObserver
 @implements IAsyncDisposable 
 
-@inject IPlatformService PlatformService
 @inject IBrowserViewportService BrowserViewportService 
+@inject IPlatformService PlatformService
 @inject IAppEventService AppEventService
 @inject ISqliteService SqliteService
 
@@ -17,7 +17,7 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudLayout>
+<MudLayout Class="h-screen overflow-hidden">
     <MudAppBar Elevation="1" Dense="true">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
         <MudSpacer />
@@ -25,16 +25,15 @@
             <div class="flex flex-row items-center gap-1">
                 <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Href="https://github.com/MudBlazor/MudBlazor" Target="_blank" />
                 <MudIconButton 
-                    Color="@(IsDarkMode ? Color.Default : Color.Primary)"
+                    Color="Color.Primary"
                     OnClick="@ToggleDarkMode" 
                     Icon="@(IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)" 
                     Variant="Variant.Filled" Size="Size.Small"/>
             </div>
         </div>
-    
     </MudAppBar>
     <MudDrawer @bind-Open="@IsDrawerOpen" ClipMode="DrawerClipMode.Always" Elevation="1" Variant="@DrawerVariant.Responsive" Width="@DrawerWidth">
-        <MudDrawerHeader>
+        <MudDrawerHeader Dense="true">
             <div class="flex w-full">
                 <div class="flex flex-col w-full">
                     <div class="flex items-center justify-between">
@@ -61,17 +60,18 @@
                             @* ReSharper restore Asp.Entity *@
                             <div class="flex flex-row gap-3 items-center py-3 px-1 rounded-lg">
                                 <div class="relative">
-                                    <MudAvatar Size="Size.Large"> A </MudAvatar>
+                                    <MudAvatar Size="Size.Large">A</MudAvatar>
                                     <MudIcon Class="absolute bottom-0 right-0" Icon="@Icons.Material.Filled.Circle" Color="Color.Success" Size="Size.Small" />
                                 </div>
+                                
                                 <div class="flex flex-col flex-1 min-w-0">
                                     <div class="flex items-center min-w-0">
-                                        <MudText Typo="@(PlatformService.IsMobile ? Typo.body1 : Typo.body2)" Class="flex-1 min-w-0">
+                                        <MudText Typo="@(IsMobileView? Typo.body1 : Typo.body2)" Class="flex-1 min-w-0">
                                             <span class="block truncate">Rickben Anthony Gimeda</span>
                                         </MudText>
                                         <MudChip T="string" Size="Size.Small" Class="flex-shrink-0">16d</MudChip>
                                     </div>
-                                    <MudText Typo="@(PlatformService.IsMobile ? Typo.body2 : Typo.caption)">You: Lorem Ipsum</MudText>
+                                    <MudText Typo="@(IsMobileView ? Typo.body2 : Typo.caption)">You: Lorem Ipsum</MudText>
                                 </div>
                             </div>
                         </MudNavLink>
@@ -80,10 +80,11 @@
             </div>
         </MudDrawerContainer>
     </MudDrawer>
-    <MudMainContent>
-        <MudContainer>
+  
+    <MudMainContent Class="h-full overflow-hidden">
+        <div class="h-full overflow-hidden">
             @Body
-        </MudContainer>
+        </div>
     </MudMainContent>
 </MudLayout>
 
