@@ -35,18 +35,20 @@
     </MudAppBar>
     <MudDrawer @bind-Open="@IsDrawerOpen" ClipMode="DrawerClipMode.Always" Elevation="1" Variant="@DrawerVariant.Responsive" Width="@DrawerWidth">
         <MudDrawerHeader>
-             <div class="flex justify-between w-full">
-                    <div>
+            <div class="flex w-full">
+                <div class="flex flex-col">
+                    <div class="flex items-center justify-between">
                         <MudText Typo="Typo.h6">Latest chats</MudText>
-                        <MudText Typo="Typo.caption">Stay connected with your conversations</MudText>
+                        @if (IsMobileView)
+                        {
+                            <div>
+                                <MudIconButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Small" Icon="@Icons.Material.Outlined.Close" OnClick="@ToggleDrawer"/>
+                            </div>
+                        }
                     </div>
-                    @if (IsMobileView)
-                    {
-                        <div>
-                            <MudIconButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Small" Icon="@Icons.Material.Outlined.Close" OnClick="@ToggleDrawer"/>
-                        </div>
-                    }
+                    <MudText Typo="Typo.caption">Stay connected with your conversations</MudText>
                 </div>
+            </div>
         </MudDrawerHeader>
         <MudDrawerContainer Class="overflow-hidden h-full">
             <MudDivider/>
@@ -66,10 +68,12 @@
                                 </div>
                                 <div class="flex flex-col justify-between w-full">
                                     <div class="flex flex-row items-center justify-between">
-                                        <MudText Typo=@(PlatformService.IsMobile ? Typo.body1 : Typo.body2)>Rickben Anthony Gimeda</MudText>
-                                        <MudBadge Content="@("16d")" Overlap="true" Class="mx-3"/>
+                                        <MudText Typo="Typo.body2">
+                                            <span class="block max-w-48 truncate">Rickben Anthony Gimeda</span>
+                                        </MudText>
+                                        <MudChip T="string" Size="Size.Small" Class="mx-1">16d</MudChip>
                                     </div>
-                                    <MudText Typo=@(PlatformService.IsMobile ? Typo.body2 : Typo.caption)>You: Lorem Ipsum</MudText>
+                                    <MudText Typo="Typo.caption">You: Lorem Ipsum</MudText>
                                 </div>
                                 <div>
                                 </div>
