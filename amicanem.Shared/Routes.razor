@@ -1,6 +1,35 @@
-﻿<Router AppAssembly="typeof(Layout.MainLayout).Assembly" NotFoundPage="typeof(Pages.NotFound)">
-    <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)"/>
-        <FocusOnNavigate RouteData="routeData" Selector="h1"/>
-    </Found>
-</Router>
+﻿@using amicanem.Shared.Pages
+@using amicanem.Shared.Service.Auth
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject IAuthService AuthService
+
+<CascadingAuthenticationState>
+    @if (!_isInitialized)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        <Router AppAssembly="typeof(Layout.MainLayout).Assembly" NotFoundPage="typeof(Pages.NotFound)">
+            <Found Context="routeData">
+                <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
+                    <NotAuthorized>
+                        <RedirectToLogin/>
+                    </NotAuthorized>
+                </AuthorizeRouteView>
+                <FocusOnNavigate RouteData="routeData" Selector="h1"/>
+            </Found>
+        </Router>
+    }
+</CascadingAuthenticationState>
+
+@code { 
+    private bool _isInitialized;
+    
+    protected override async Task OnInitializedAsync()
+    { 
+        await AuthService.InitializeAsync(); 
+        _isInitialized = true; 
+    }
+}

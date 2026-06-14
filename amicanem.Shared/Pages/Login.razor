@@ -1,35 +1,44 @@
 @page "/Login"
+@using amicanem.Shared.Service.Auth
+@using amicanem.Shared.Service.JwtAuthState
+@using amicanem.Shared.Service.Platform
+
+@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+@inject IPlatformService PlatformService
+@inject IJwtAuthStateProvider JwtAuthStateProvider
 
 <div class="relative flex h-[100dvh] items-center justify-center overflow-hidden">
     <div class="absolute inset-0 bg-[linear-gradient(rgba(9,9,11,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(9,9,11,0.05)_1px,transparent_1px)] bg-[size:56px_56px]"></div>
     <div class="absolute -right-[120px] -top-[120px] h-[420px] w-[420px] rounded-full bg-zinc-950/5 blur-3xl"></div>
     <div class="absolute -bottom-[120px] -left-[120px] h-[320px] w-[320px] rounded-full bg-zinc-950/5 blur-3xl"></div>
-    
+
     <MudContainer MaxWidth="MaxWidth.Small" Class="z-50">
-        <MudPaper Elevation="5" Outlined="true" Square="true" Class="p-8">
-            <div class="flex flex-col gap-5 text-center">
+        <MudPaper Elevation="5" Outlined="true" Square="true" Class="relative">
+            <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class=@(IsLoggingIn ? "absolute left-0 top-0" : "hidden")/>
+            <div class="flex flex-col gap-5 text-center p-8">
                 <div>
                     <MudText Typo="Typo.h6">Welcome back</MudText>
                     <MudText Typo="Typo.body2">Sign in to continue to your account</MudText>
                 </div>
-            
+
                 <div class="flex flex-col gap-3">
                     <MudTextField T="string" @bind-Value="Email" Label="Email" Variant="Variant.Outlined" InputType="InputType.Email"
-                                  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Email" Clearable="true" Margin="Margin.Dense" />
-                    <MudTextField T="string" @bind-Value="Email" Label="Password" Variant="Variant.Outlined" InputType="InputType.Password"
+                                  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Email" Clearable="true" Margin="Margin.Dense"/>
+                    <MudTextField T="string" @bind-Value="Password" Label="Password" Variant="Variant.Outlined" InputType="InputType.Password"
                                   Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.VisibilityOff" Clearable="true" Margin="Margin.Dense"/>
-                    <MudButton Color="Color.Primary" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Lock" FullWidth="true">Sign in with password</MudButton>
+                    <MudButton Disabled="IsLoggingIn" OnClick="@PasswordLogin" Color="Color.Primary" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Lock" FullWidth="true">Sign in with password</MudButton>
                 </div>
-            
+
                 <div class="d-flex flex-row align-center gap-2">
-                    <MudDivider Style="flex:1" />
+                    <MudDivider Style="flex:1"/>
                     <MudText Typo="Typo.body2">OR</MudText>
-                    <MudDivider Style="flex:1" />
+                    <MudDivider Style="flex:1"/>
                 </div>
-            
+
                 <div class="flex flex-col gap-3">
-                    <MudButton Color="Color.Info" Variant="Variant.Filled" EndIcon="@Icons.Custom.Brands.Google" FullWidth="true">Sign in with Google</MudButton>
-                    <MudButton Color="Color.Success" Variant="Variant.Filled" EndIcon="@Icons.Custom.Brands.Apple" FullWidth="true" Disabled="true">Sign in with Apple</MudButton>
+                    <MudButton Disabled="IsLoggingIn" OnClick="@GoogleLogin" Color="Color.Info" Variant="Variant.Filled" EndIcon="@Icons.Custom.Brands.Google" FullWidth="true">Sign in with Google</MudButton>
+                    <MudButton Disabled="true" Color="Color.Success" Variant="Variant.Filled" EndIcon="@Icons.Custom.Brands.Apple" FullWidth="true">Sign in with Apple</MudButton>
                     <MudText Typo="Typo.caption">
                         By continuing, you agree to our <MudLink Href="/Terms">Terms</MudLink> and <MudLink Href="/Privacy">Privacy Policy</MudLink>
                     </MudText>
@@ -40,6 +49,36 @@
 </div>
 
 @code {
-    public string Email { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
+    public bool IsLoggingIn { get; set; }
+    public string Email { get; set; } = "tatamacoy001@gmail.com";
+    public string Password { get; set; } = "Password!1234";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var auth = await JwtAuthStateProvider.GetAuthenticationStateAsync();
+        if (auth.User.Identity != null)
+        {
+            if (auth.User.Identity.IsAuthenticated)
+            {
+                NavigationManager.NavigateTo("/", forceLoad: true); 
+            }
+        }
+    }
+    
+    private async Task PasswordLogin()
+    {
+        IsLoggingIn = true;
+        
+        var result = await AuthService.Login(Email, Password, PlatformService.PlatformName);
+        if (result) NavigationManager.NavigateTo("/", forceLoad: true);
+        
+        IsLoggingIn = false;
+    }
+    
+    private void GoogleLogin()
+    {
+        const string baseUrl = "https://localhost:7113";
+        var returnUrl = Uri.EscapeDataString(NavigationManager.BaseUri.TrimEnd('/') + "/ExternalAuth");
+        AuthService.ExternalLogin(baseUrl, returnUrl, "Google");
+    }
 }

@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using amicanem.Shared.Service.AppEvent
 @using amicanem.Shared.Service.Platform
+@using Microsoft.AspNetCore.Components.Authorization
 
 @implements IAsyncDisposable 
 @implements IBrowserViewportObserver
@@ -8,84 +9,92 @@
 @inject IBrowserViewportService BrowserViewportService
 @inject IPlatformService PlatformService
 @inject IAppEventService AppEventService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Amicanem</PageTitle>
- 
-<div class="h-full overflow-hidden flex flex-col">
-    <MudAppBar Elevation="5" Color="Color.Transparent" Gutters="true" Fixed="false" Class="shrink-0 z-20">
-        <div class="flex items-center w-full">
-            <div class="flex flex-row gap-3 items-center py-3 px-1 rounded-lg flex-1 min-w-0">
-                <MudBadge Color="Color.Success" Overlap="true" Bordered="true">
-                    <MudAvatar>A</MudAvatar>
-                </MudBadge>
 
-                <div class="flex flex-col flex-1 min-w-0">
-                    <MudText Typo="@(PlatformService.IsMobile ? Typo.body1 : Typo.body2)">
-                        <span class="block truncate">Rickben Anthony Gimeda</span>
-                    </MudText>
+<AuthorizeView>
+    <Authorized> 
+        <div class="h-full overflow-hidden flex flex-col">
+            <MudAppBar Elevation="5" Color="Color.Transparent" Gutters="true" Fixed="false" Class="shrink-0 z-20">
+                <div class="flex items-center w-full">
+                    <div class="flex flex-row gap-3 items-center py-3 px-1 rounded-lg flex-1 min-w-0">
+                        <MudBadge Color="Color.Success" Overlap="true" Bordered="true">
+                            <MudAvatar>A</MudAvatar>
+                        </MudBadge>
 
-                    <MudText Typo="@(PlatformService.IsMobile ? Typo.body2 : Typo.caption)">
-                        Lorem Ipsum
-                    </MudText>
+                        <div class="flex flex-col flex-1 min-w-0">
+                            <MudText Typo="@(PlatformService.IsMobile ? Typo.body1 : Typo.body2)">
+                                <span class="block truncate">Rickben Anthony Gimeda</span>
+                            </MudText>
+
+                            <MudText Typo="@(PlatformService.IsMobile ? Typo.body2 : Typo.caption)">
+                                Lorem Ipsum
+                            </MudText>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 shrink-0">
+                        <MudIconButton OnClick="SendTextMessage" Color="@(IsDarkMode ? Color.Default : Color.Primary)" Size="Size.Small" Icon="@Icons.Material.Filled.Call" Variant="Variant.Filled" />
+                        <MudIconButton Color="@(IsDarkMode ? Color.Default : Color.Primary)" Size="Size.Small" Icon="@Icons.Material.Filled.Videocam" Variant="Variant.Filled" />
+                    </div>
+                </div>
+            </MudAppBar>
+
+            <div class="flex-1 min-h-0 overflow-y-auto px-5 py-5">
+                <div class="min-h-full flex flex-col justify-end gap-4">
+                    @for (var i = 0; i < 1; i++)
+                    {
+                        <MudXChat Color="Color.Info"
+                                  Elevation="0"
+                                  Variant="Variant.Filled"
+                                  Square="false"
+                                  ArrowPosition="ChatArrowPosition.None"
+                                  ChatPosition="ChatBubblePosition.Start">
+                            <MudXChatHeader Time="12:46"/>
+                            <MudAvatar>B</MudAvatar>
+                            <MudXChatBubble>What kind of nonsense is this</MudXChatBubble>
+                            <MudXChatBubble>Put me on the Council and not make me a Master!??</MudXChatBubble>
+                            <MudXChatBubble>That's never been done in the history of the Jedi. It's insulting!</MudXChatBubble>
+                            <MudXChatFooter Text="Seen at 12:46"/>
+                        </MudXChat>
+                        <MudXChat Color="Color.Default"
+                                  Elevation="0"
+                                  Variant="Variant.Filled"
+                                  Square="true"
+                                  ArrowPosition="ChatArrowPosition.None"
+                                  ChatPosition="ChatBubblePosition.End">
+                            <MudXChatHeader Time="12:46"/>
+                            <MudXChatBubble>What kind of nonsense is this</MudXChatBubble>
+                            <MudXChatBubble>Put me on the Council and not make me a Master!??</MudXChatBubble>
+                            <MudXChatBubble>That's never been done in the history of the Jedi. It's insulting!</MudXChatBubble>
+                            <MudXChatFooter Text="Seen at 12:46"/>
+                        </MudXChat>
+                    }
                 </div>
             </div>
 
-            <div class="flex gap-2 shrink-0">
-                <MudIconButton Color="@(IsDarkMode ? Color.Default : Color.Primary)" Size="Size.Small" Icon="@Icons.Material.Filled.Call" Variant="Variant.Filled" />
-                <MudIconButton Color="@(IsDarkMode ? Color.Default : Color.Primary)" Size="Size.Small" Icon="@Icons.Material.Filled.Videocam" Variant="Variant.Filled" />
+            <div class="shrink-0 z-20 px-4 py-3 shadow-lg border-t" style="background-color: var(--mud-palette-surface);">
+                <MudTextField @bind-Value="Message" Variant="Variant.Outlined" FullWidth="true" MaxLines="6"
+                              Immediate="true" Counter="MessageTextLimit" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Send"
+                              AdornmentColor="Color.Primary" OnAdornmentClick="@SendTextMessage"
+                              Lines="1" Label="Type a message" Sizing="InputSizing.Auto" Clearable="true"/>
+
             </div>
+
         </div>
-    </MudAppBar>
-
-    <div class="flex-1 min-h-0 overflow-y-auto px-5 py-5">
-        <div class="min-h-full flex flex-col justify-end gap-4">
-            @for (var i = 0; i < 1; i++)
-            {
-                <MudXChat Color="Color.Info"
-                          Elevation="0"
-                          Variant="Variant.Filled"
-                          Square="false"
-                          ArrowPosition="ChatArrowPosition.None"
-                          ChatPosition="ChatBubblePosition.Start">
-                    <MudXChatHeader Time="12:46"/>
-                    <MudAvatar>B</MudAvatar>
-                    <MudXChatBubble>What kind of nonsense is this</MudXChatBubble>
-                    <MudXChatBubble>Put me on the Council and not make me a Master!??</MudXChatBubble>
-                    <MudXChatBubble>That's never been done in the history of the Jedi. It's insulting!</MudXChatBubble>
-                    <MudXChatFooter Text="Seen at 12:46"/>
-                </MudXChat>
-                <MudXChat Color="Color.Default"
-                          Elevation="0"
-                          Variant="Variant.Filled"
-                          Square="true"
-                          ArrowPosition="ChatArrowPosition.None"
-                          ChatPosition="ChatBubblePosition.End">
-                    <MudXChatHeader Time="12:46"/>
-                    <MudXChatBubble>What kind of nonsense is this</MudXChatBubble>
-                    <MudXChatBubble>Put me on the Council and not make me a Master!??</MudXChatBubble>
-                    <MudXChatBubble>That's never been done in the history of the Jedi. It's insulting!</MudXChatBubble>
-                    <MudXChatFooter Text="Seen at 12:46"/>
-                </MudXChat>
-            }
-        </div>
-    </div>
-
-    <div class="shrink-0 z-20 px-4 py-3 shadow-lg border-t" style="background-color: var(--mud-palette-surface);">
-        <MudTextField @bind-Value="Message" Variant="Variant.Outlined" FullWidth="true" MaxLines="6"
-                      Immediate="true" Counter="MessageTextLimit" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Send"
-                      AdornmentColor="Color.Primary" OnAdornmentClick="@SendTextMessage"
-                      Lines="1" Label="Type a message" Sizing="InputSizing.Auto" Clearable="true"/>
-
-    </div>
-
-</div>
+    </Authorized>
+    <NotAuthorized>
+        <RedirectToLogin />
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
     private const int MessageTextLimit = 1000;
     
     private bool IsDarkMode { get; set; }
     private bool IsMobileView { get; set; }
-    private string Message { get; set; }
+    private string Message { get; set; } = string.Empty;
     
     Guid IBrowserViewportObserver.Id { get; } = Guid.NewGuid();
     
@@ -101,7 +110,7 @@
 
     private async Task SendTextMessage()
     {
-        
+        NavigationManager.NavigateTo("/Login", forceLoad: true);
     }
 
     protected override void OnInitialized()

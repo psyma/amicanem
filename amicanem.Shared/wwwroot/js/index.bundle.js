@@ -26,7 +26,7 @@ eval("{__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _ww
   \****************************/
 () {
 
-eval("{console.log(\"Hello World!\")\n\n//# sourceURL=webpack://amicanem/./wwwroot/js/site.js?\n}");
+eval("{\n\n//# sourceURL=webpack://amicanem/./wwwroot/js/site.js?\n}");
 
 /***/ }
 

@@ -7,5 +7,5 @@ public class WebPlatformService : IPlatformService
     public bool IsMobile => false;
     public bool IsWeb => true;
 
-    public string PlatformName => "Web";
+    public string PlatformName => "web";
 }

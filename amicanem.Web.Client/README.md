@@ -1,1 +1,1 @@
-dotnet ef migrations add Initial --project . --startup-project ../amicanem.Web
+dotnet ef migrations add Initial --project . --startup-project ../amicanem.Web  --context WebSqliteDbContext

@@ -16,6 +16,7 @@ public class MauiSqliteService : ISqliteService
 
         _database = new SQLiteAsyncConnection(DatabasePath);
         await _database.CreateTableAsync<Theme>();
+        await _database.CreateTableAsync<AuthUser>();
         
         return _database;
     }

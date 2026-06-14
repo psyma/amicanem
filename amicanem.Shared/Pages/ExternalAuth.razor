@@ -1,0 +1,54 @@
+@page "/ExternalAuth"
+@using amicanem.Shared.Models.Sqlite
+@using amicanem.Shared.Service.JwtAuthState
+@using amicanem.Shared.Service.Sqlite
+
+@inject IJwtAuthStateProvider JwtAuthStateProvider
+@inject ISqliteService SqliteService
+@inject NavigationManager NavigationManager
+
+@code {
+    [SupplyParameterFromQuery] public required int Id { get; set; }
+    [SupplyParameterFromQuery] public required string Email { get; set; }
+    [SupplyParameterFromQuery] public required string DisplayName { get; set; }
+    [SupplyParameterFromQuery] public required string Nickname { get; set; }
+    [SupplyParameterFromQuery] public required string PictureUrl { get; set; }
+    [SupplyParameterFromQuery] public required string AccessToken { get; set; }
+    [SupplyParameterFromQuery] public string? RefreshToken { get; set; }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !string.IsNullOrEmpty(AccessToken))
+        {
+            var authUser = await SqliteService.Get<AuthUser>(1);
+            if (authUser == null)
+            {
+                authUser = new AuthUser
+                {
+                    Email = Email,
+                    DisplayName = DisplayName,
+                    Nickname = Nickname,
+                    PictureUrl = PictureUrl,
+                    AccessToken = AccessToken,
+                    RefreshToken = RefreshToken
+                };
+            
+                await SqliteService.Insert(authUser);
+            }
+            else
+            {
+                authUser.Email = Email;
+                authUser.DisplayName = DisplayName;
+                authUser.Nickname = Nickname;
+                authUser.PictureUrl = PictureUrl;
+                authUser.AccessToken = AccessToken;
+                authUser.RefreshToken = RefreshToken;
+            
+                await SqliteService.Update(authUser);
+            }
+         
+            JwtAuthStateProvider.NotifyUserAuthentication(AccessToken);
+            NavigationManager.NavigateTo("/", forceLoad: false);
+        }
+    }
+}
