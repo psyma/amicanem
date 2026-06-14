@@ -11,82 +11,89 @@
 @inject IPlatformService PlatformService
 @inject IAppEventService AppEventService
 @inject ISqliteService SqliteService
+@inject NavigationManager NavigationManager
 
 <MudThemeProvider IsDarkMode="IsDarkMode" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudLayout Class="h-screen overflow-hidden">
-    <MudAppBar Elevation="1" Dense="true">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
-        <MudSpacer />
-        <div class="flex flex-row gap-2"> 
-            <div class="flex flex-row items-center gap-1">
-                <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Href="https://github.com/MudBlazor/MudBlazor" Target="_blank" />
-                <MudIconButton 
-                    Color="Color.Primary"
-                    OnClick="@ToggleDarkMode" 
-                    Icon="@(IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)" 
-                    Variant="Variant.Filled" Size="Size.Small"/>
-            </div>
-        </div>
-    </MudAppBar>
-    <MudDrawer @bind-Open="@IsDrawerOpen" ClipMode="DrawerClipMode.Always" Elevation="1" Variant="@DrawerVariant.Responsive" Width="@DrawerWidth">
-        <MudDrawerHeader Dense="true">
-            <div class="flex w-full">
-                <div class="flex flex-col w-full">
-                    <div class="flex items-center justify-between">
-                        <MudText Typo="Typo.h6">Latest chats</MudText>
-                        @if (IsMobileView)
-                        {
-                            <div>
-                                <MudIconButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Small" Icon="@Icons.Material.Outlined.Close" OnClick="@ToggleDrawer"/>
-                            </div>
-                        }
-                    </div>
-                    <MudText Typo="Typo.caption">Stay connected with your conversations</MudText>
+@if (IsPublicRoute)
+{
+    @Body
+}
+else
+{
+    <MudLayout Class="h-screen overflow-hidden">
+        <MudAppBar Elevation="1" Dense="true">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+            <MudSpacer />
+            <div class="flex flex-row gap-2"> 
+                <div class="flex flex-row items-center gap-1">
+                    <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Href="https://github.com/MudBlazor/MudBlazor" Target="_blank" />
+                    <MudIconButton 
+                        Color="Color.Primary"
+                        OnClick="@ToggleDarkMode" 
+                        Icon="@(IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)" 
+                        Variant="Variant.Filled" Size="Size.Small"/>
                 </div>
             </div>
-        </MudDrawerHeader>
-        <MudDrawerContainer Class="overflow-hidden h-full">
-            <MudDivider/>
-            <div class="flex flex-col gap-3 px-4 py-5 overflow-auto h-full">
-                @for (var i = 0; i < 20; i++)
-                {
-                    <MudPaper Elevation="5" Class="rounded-lg" Outlined="true">
-                        @* ReSharper disable Asp.Entity *@
-                        <MudNavLink Class="[&>a]:p-0 [&>a]:rounded-lg [&_a>div:first-child]:ml-0 [&_a>div:first-child]:me-0 px-3 py-2">
-                            @* ReSharper restore Asp.Entity *@
-                            <div class="flex flex-row gap-3 items-center py-3 px-1 rounded-lg">
-                                <div class="relative">
-                                    <MudAvatar Size="Size.Large">A</MudAvatar>
-                                    <MudIcon Class="absolute bottom-0 right-0" Icon="@Icons.Material.Filled.Circle" Color="Color.Success" Size="Size.Small" />
+        </MudAppBar>
+        <MudDrawer @bind-Open="@IsDrawerOpen" ClipMode="DrawerClipMode.Always" Elevation="1" Variant="@DrawerVariant.Responsive" Width="@DrawerWidth">
+            <MudDrawerHeader Dense="true">
+                <div class="flex w-full">
+                    <div class="flex flex-col w-full">
+                        <div class="flex items-center justify-between">
+                            <MudText Typo="Typo.h6">Latest chats</MudText>
+                            @if (IsMobileView)
+                            {
+                                <div>
+                                    <MudIconButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Small" Icon="@Icons.Material.Outlined.Close" OnClick="@ToggleDrawer"/>
                                 </div>
-                                
-                                <div class="flex flex-col flex-1 min-w-0">
-                                    <div class="flex items-center min-w-0">
-                                        <MudText Typo="@(IsMobileView? Typo.body1 : Typo.body2)" Class="flex-1 min-w-0">
-                                            <span class="block truncate">Rickben Anthony Gimeda</span>
-                                        </MudText>
-                                        <MudChip T="string" Size="Size.Small" Class="flex-shrink-0">16d</MudChip>
+                            }
+                        </div>
+                        <MudText Typo="Typo.caption">Stay connected with your conversations</MudText>
+                    </div>
+                </div>
+            </MudDrawerHeader>
+            <MudDrawerContainer Class="overflow-hidden h-full">
+                <MudDivider/>
+                <div class="flex flex-col gap-3 px-4 py-5 overflow-auto h-full">
+                    <MudVirtualize Items="Conversations" Enabled="true">
+                        <MudPaper Elevation="5" Class="rounded-lg" Outlined="true">
+                            @* ReSharper disable Asp.Entity *@
+                            <MudNavLink Class="[&>a]:p-0 [&>a]:rounded-lg [&_a>div:first-child]:ml-0 [&_a>div:first-child]:me-0 px-3 py-2">
+                                @* ReSharper restore Asp.Entity *@
+                                <div class="flex flex-row gap-3 items-center p-1 rounded-lg">
+                                    <div class="relative">
+                                        <MudAvatar Size="Size.Large">A</MudAvatar>
+                                        <MudIcon Class="absolute bottom-0 right-0" Icon="@Icons.Material.Filled.Circle" Color="Color.Success" Size="Size.Small"/>
                                     </div>
-                                    <MudText Typo="@(IsMobileView ? Typo.body2 : Typo.caption)">You: Lorem Ipsum</MudText>
+
+                                    <div class="flex flex-col flex-1 min-w-0">
+                                        <div class="flex items-center min-w-0">
+                                            <MudText Typo="@(IsMobileView ? Typo.body1 : Typo.body2)" Class="flex-1 min-w-0">
+                                                <span class="block truncate">@context.Name</span>
+                                            </MudText>
+                                            <MudChip T="string" Size="Size.Small" Class="flex-shrink-0">16d</MudChip>
+                                        </div>
+                                        <MudText Typo="@(IsMobileView ? Typo.body2 : Typo.caption)">You: @context.LastMessage</MudText>
+                                    </div>
                                 </div>
-                            </div>
-                        </MudNavLink>
-                    </MudPaper>
-                }
-            </div>
-        </MudDrawerContainer>
-    </MudDrawer>
+                            </MudNavLink>
+                        </MudPaper>
+                    </MudVirtualize>
+                </div>
+            </MudDrawerContainer>
+        </MudDrawer>
   
-    <MudMainContent Class="h-full overflow-hidden">
-        <div class="h-full overflow-hidden">
-            @Body
-        </div>
-    </MudMainContent>
-</MudLayout>
+        <MudMainContent Class="h-full overflow-hidden">
+            <div class="h-full overflow-hidden">
+                @Body
+            </div>
+        </MudMainContent>
+    </MudLayout>
+}
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
@@ -98,8 +105,10 @@
     private bool IsMobileView { get; set; }
     private bool IsDrawerOpen { get; set; }
     private bool IsDarkMode { get; set; }
+    private bool IsPublicRoute { get; set; }
     private string? DrawerWidth { get; set; }
-    
+    private List<Conversation> Conversations { get; set; } = new();
+
     Guid IBrowserViewportObserver.Id { get; } = Guid.NewGuid();
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -120,6 +129,20 @@
                 await SqliteService.Insert(theme);
             }
             else IsDarkMode = theme.IsDarkMode;
+            
+            var publicRoutes = new[] { "/login", "/register" };
+            var uri = new Uri(NavigationManager.Uri);  
+            
+            IsPublicRoute = publicRoutes.Contains(uri.AbsolutePath.ToLower());
+
+            for (var i = 0; i < 1000; i++)
+            {
+                Conversations.Add(new Conversation
+                {
+                    Name = "Rickben Anthony Gimeda",
+                    LastMessage = "Lorem Ipsum"
+                });
+            }
 
             await InvokeAsync(StateHasChanged);
         }
@@ -161,5 +184,11 @@
     public async ValueTask DisposeAsync()
     {
         await BrowserViewportService.UnsubscribeAsync(this);
+    }
+
+    private sealed class Conversation
+    {
+        public string Name { get; set; }
+        public string LastMessage { get; set; }
     }
 }
